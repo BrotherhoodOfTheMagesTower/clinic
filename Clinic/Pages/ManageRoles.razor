@@ -1,0 +1,70 @@
+﻿@page "/ManageRoles"
+@using Clinic.Services
+@inject UserService userService;
+@inject NavigationManager NavigationManager
+
+<PageTitle>Manage Roles</PageTitle>
+
+<AuthorizeView Roles = "Administrator">
+    <Authorized>
+        <div class="col-12">
+            <h2>Add or remove roles for users</h2>  
+            <h3><b>User - Role</b></h3>    
+            @if (usersWithRoles != null)
+            {
+                <div class="card-body">
+                    @if(usersWithRoles.Any())
+                    {
+                        foreach(var user in usersWithRoles)
+                        {
+                            <h5 class="card-title" @onclick="() => NavigateToEditUserRoles(user.Item1.Id)">@user.Item1.UserName - @user.Item2</h5>
+                        }
+                    }
+                    else
+                    {
+                        <h5 class="card-title">No users in database</h5>
+                    }
+                </div>
+            }
+            else
+            {
+                <h5 class="card-title">No users in database</h5>
+            }
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <h1>Access denied!</h1>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code{
+    private List<Tuple<ApplicationUser, string>>? usersWithRoles;
+    protected override async Task OnInitializedAsync()
+    {
+        var users = await userService.GetAllUsersAsync();
+        usersWithRoles = new List<Tuple<ApplicationUser, string>>();
+
+        foreach (var user in users)
+            usersWithRoles.Add(Tuple.Create(user, GetRolesForUser(user.Id)));
+    }
+
+    private string GetRolesForUser(string userId)
+    {
+        var roles = userService.GetRolesForUser(userId);
+
+        if (roles != null)
+        {
+            if (roles.Count == 1)
+                return roles.First();
+            else if(roles.Count != 0)
+                return string.Join(", ", roles);
+        }
+
+        return "";
+    }
+
+    private void NavigateToEditUserRoles(string userId)
+    {
+        NavigationManager.NavigateTo($"EditUserRoles/{userId}");
+    }
+}
