@@ -56,6 +56,16 @@ namespace Clinic.Migrations
                     b.ToTable("Addresses");
                 });
 
+            modelBuilder.Entity("Clinic.Areas.Identity.Data.Administrator", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Administrators", (string)null);
+                });
+
             modelBuilder.Entity("Clinic.Areas.Identity.Data.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -66,10 +76,6 @@ namespace Clinic.Migrations
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
@@ -131,8 +137,49 @@ namespace Clinic.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
 
-                    b.HasDiscriminator<string>("Discriminator").HasValue("ApplicationUser");
+            modelBuilder.Entity("Clinic.Areas.Identity.Data.Doctor", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<long?>("PermissionNumber")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Doctors", (string)null);
+                });
+
+            modelBuilder.Entity("Clinic.Areas.Identity.Data.LabManager", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("LabManagers", (string)null);
+                });
+
+            modelBuilder.Entity("Clinic.Areas.Identity.Data.LabTechnician", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("LabTechnicians", (string)null);
+                });
+
+            modelBuilder.Entity("Clinic.Areas.Identity.Data.Registrar", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Registrars", (string)null);
                 });
 
             modelBuilder.Entity("Clinic.Data.Models.Appointment", b =>
@@ -251,7 +298,7 @@ namespace Clinic.Migrations
 
             modelBuilder.Entity("Clinic.Data.Models.Patient", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("PatientId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -275,7 +322,7 @@ namespace Clinic.Migrations
                     b.Property<long?>("PhoneNumber")
                         .HasColumnType("bigint");
 
-                    b.HasKey("Id");
+                    b.HasKey("PatientId");
 
                     b.ToTable("Patients");
                 });
@@ -442,44 +489,6 @@ namespace Clinic.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Clinic.Areas.Identity.Data.Administrator", b =>
-                {
-                    b.HasBaseType("Clinic.Areas.Identity.Data.ApplicationUser");
-
-                    b.HasDiscriminator().HasValue("Administrator");
-                });
-
-            modelBuilder.Entity("Clinic.Areas.Identity.Data.Doctor", b =>
-                {
-                    b.HasBaseType("Clinic.Areas.Identity.Data.ApplicationUser");
-
-                    b.Property<long>("PermissionNumber")
-                        .HasColumnType("bigint");
-
-                    b.HasDiscriminator().HasValue("Doctor");
-                });
-
-            modelBuilder.Entity("Clinic.Areas.Identity.Data.LabManager", b =>
-                {
-                    b.HasBaseType("Clinic.Areas.Identity.Data.ApplicationUser");
-
-                    b.HasDiscriminator().HasValue("LabManager");
-                });
-
-            modelBuilder.Entity("Clinic.Areas.Identity.Data.LabTechnician", b =>
-                {
-                    b.HasBaseType("Clinic.Areas.Identity.Data.ApplicationUser");
-
-                    b.HasDiscriminator().HasValue("LabTechnician");
-                });
-
-            modelBuilder.Entity("Clinic.Areas.Identity.Data.Registrar", b =>
-                {
-                    b.HasBaseType("Clinic.Areas.Identity.Data.ApplicationUser");
-
-                    b.HasDiscriminator().HasValue("Registrar");
-                });
-
             modelBuilder.Entity("Clinic.Areas.Identity.Data.Address", b =>
                 {
                     b.HasOne("Clinic.Data.Models.Patient", "Patient")
@@ -489,6 +498,61 @@ namespace Clinic.Migrations
                         .IsRequired();
 
                     b.Navigation("Patient");
+                });
+
+            modelBuilder.Entity("Clinic.Areas.Identity.Data.Administrator", b =>
+                {
+                    b.HasOne("Clinic.Areas.Identity.Data.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Clinic.Areas.Identity.Data.Doctor", b =>
+                {
+                    b.HasOne("Clinic.Areas.Identity.Data.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Clinic.Areas.Identity.Data.LabManager", b =>
+                {
+                    b.HasOne("Clinic.Areas.Identity.Data.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Clinic.Areas.Identity.Data.LabTechnician", b =>
+                {
+                    b.HasOne("Clinic.Areas.Identity.Data.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Clinic.Areas.Identity.Data.Registrar", b =>
+                {
+                    b.HasOne("Clinic.Areas.Identity.Data.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Clinic.Data.Models.Appointment", b =>
@@ -621,6 +685,26 @@ namespace Clinic.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Clinic.Areas.Identity.Data.Doctor", b =>
+                {
+                    b.Navigation("Appointments");
+                });
+
+            modelBuilder.Entity("Clinic.Areas.Identity.Data.LabManager", b =>
+                {
+                    b.Navigation("LaboratoryExaminations");
+                });
+
+            modelBuilder.Entity("Clinic.Areas.Identity.Data.LabTechnician", b =>
+                {
+                    b.Navigation("LaboratoryExaminations");
+                });
+
+            modelBuilder.Entity("Clinic.Areas.Identity.Data.Registrar", b =>
+                {
+                    b.Navigation("Appointments");
+                });
+
             modelBuilder.Entity("Clinic.Data.Models.Appointment", b =>
                 {
                     b.Navigation("LaboratoryExaminations");
@@ -639,26 +723,6 @@ namespace Clinic.Migrations
                 {
                     b.Navigation("Address");
 
-                    b.Navigation("Appointments");
-                });
-
-            modelBuilder.Entity("Clinic.Areas.Identity.Data.Doctor", b =>
-                {
-                    b.Navigation("Appointments");
-                });
-
-            modelBuilder.Entity("Clinic.Areas.Identity.Data.LabManager", b =>
-                {
-                    b.Navigation("LaboratoryExaminations");
-                });
-
-            modelBuilder.Entity("Clinic.Areas.Identity.Data.LabTechnician", b =>
-                {
-                    b.Navigation("LaboratoryExaminations");
-                });
-
-            modelBuilder.Entity("Clinic.Areas.Identity.Data.Registrar", b =>
-                {
                     b.Navigation("Appointments");
                 });
 #pragma warning restore 612, 618

@@ -9,18 +9,40 @@ namespace Clinic.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "Discriminator",
-                table: "AspNetUsers",
-                type: "nvarchar(max)",
-                nullable: false,
-                defaultValue: "");
+            migrationBuilder.CreateTable(
+                name: "Administrators",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Administrators", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Administrators_AspNetUsers_Id",
+                        column: x => x.Id,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
 
-            migrationBuilder.AddColumn<long>(
-                name: "PermissionNumber",
-                table: "AspNetUsers",
-                type: "bigint",
-                nullable: true);
+            migrationBuilder.CreateTable(
+                name: "Doctors",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    PermissionNumber = table.Column<long>(type: "bigint", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Doctors", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Doctors_AspNetUsers_Id",
+                        column: x => x.Id,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
 
             migrationBuilder.CreateTable(
                 name: "GlossaryDictionaries",
@@ -36,10 +58,44 @@ namespace Clinic.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "LabManagers",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LabManagers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LabManagers_AspNetUsers_Id",
+                        column: x => x.Id,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "LabTechnicians",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LabTechnicians", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LabTechnicians_AspNetUsers_Id",
+                        column: x => x.Id,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Patients",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PatientId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Pesel = table.Column<long>(type: "bigint", nullable: true),
@@ -49,7 +105,24 @@ namespace Clinic.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Patients", x => x.Id);
+                    table.PrimaryKey("PK_Patients", x => x.PatientId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Registrars",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Registrars", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Registrars_AspNetUsers_Id",
+                        column: x => x.Id,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -71,7 +144,7 @@ namespace Clinic.Migrations
                         name: "FK_Addresses_Patients_PatientId",
                         column: x => x.PatientId,
                         principalTable: "Patients",
-                        principalColumn: "Id",
+                        principalColumn: "PatientId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -93,21 +166,21 @@ namespace Clinic.Migrations
                 {
                     table.PrimaryKey("PK_Appointments", x => x.AppointmentId);
                     table.ForeignKey(
-                        name: "FK_Appointments_AspNetUsers_DoctorId",
+                        name: "FK_Appointments_Doctors_DoctorId",
                         column: x => x.DoctorId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Appointments_AspNetUsers_RegistrarId",
-                        column: x => x.RegistrarId,
-                        principalTable: "AspNetUsers",
+                        principalTable: "Doctors",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Appointments_Patients_PatientId",
                         column: x => x.PatientId,
                         principalTable: "Patients",
+                        principalColumn: "PatientId",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Appointments_Registrars_RegistrarId",
+                        column: x => x.RegistrarId,
+                        principalTable: "Registrars",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -139,22 +212,22 @@ namespace Clinic.Migrations
                         principalColumn: "AppointmentId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_LaboratoryExaminations_AspNetUsers_LabManagerId",
-                        column: x => x.LabManagerId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_LaboratoryExaminations_AspNetUsers_LabTechnicianId",
-                        column: x => x.LabTechnicianId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
                         name: "FK_LaboratoryExaminations_GlossaryDictionaries_GlossaryDictionaryId",
                         column: x => x.GlossaryDictionaryId,
                         principalTable: "GlossaryDictionaries",
                         principalColumn: "Code",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_LaboratoryExaminations_LabManagers_LabManagerId",
+                        column: x => x.LabManagerId,
+                        principalTable: "LabManagers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_LaboratoryExaminations_LabTechnicians_LabTechnicianId",
+                        column: x => x.LabTechnicianId,
+                        principalTable: "LabTechnicians",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -242,10 +315,19 @@ namespace Clinic.Migrations
                 name: "Addresses");
 
             migrationBuilder.DropTable(
+                name: "Administrators");
+
+            migrationBuilder.DropTable(
                 name: "LaboratoryExaminations");
 
             migrationBuilder.DropTable(
                 name: "PhysicalExaminations");
+
+            migrationBuilder.DropTable(
+                name: "LabManagers");
+
+            migrationBuilder.DropTable(
+                name: "LabTechnicians");
 
             migrationBuilder.DropTable(
                 name: "Appointments");
@@ -254,15 +336,13 @@ namespace Clinic.Migrations
                 name: "GlossaryDictionaries");
 
             migrationBuilder.DropTable(
+                name: "Doctors");
+
+            migrationBuilder.DropTable(
                 name: "Patients");
 
-            migrationBuilder.DropColumn(
-                name: "Discriminator",
-                table: "AspNetUsers");
-
-            migrationBuilder.DropColumn(
-                name: "PermissionNumber",
-                table: "AspNetUsers");
+            migrationBuilder.DropTable(
+                name: "Registrars");
         }
     }
 }

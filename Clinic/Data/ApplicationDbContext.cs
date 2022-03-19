@@ -14,6 +14,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
     }
 
+    public DbSet<ApplicationUser> Users { get; set; }
     public DbSet<Administrator> Administrators { get; set; }
     public DbSet<Doctor> Doctors { get; set; }
     public DbSet<LabManager> LabManagers { get; set; }
@@ -32,7 +33,15 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         // Customize the ASP.NET Identity model and override the defaults if needed.
         // For example, you can rename the ASP.NET Identity table names and more.
         // Add your customizations after calling base.OnModelCreating(builder);
+
+        builder.Entity<Administrator>().ToTable("Administrators");
+        builder.Entity<Doctor>().ToTable("Doctors");
+        builder.Entity<LabManager>().ToTable("LabManagers");
+        builder.Entity<LabTechnician>().ToTable("LabTechnicians");
+        builder.Entity<Registrar>().ToTable("Registrars");
+
         builder.ApplyConfiguration(new ApplicationUserEntityConfiguration());
+
         builder.Entity<Appointment>().HasOne(p => p.Patient).WithMany(p => p.Appointments).HasForeignKey(f => f.PatientId).OnDelete(DeleteBehavior.Restrict);
         builder.Entity<Appointment>().HasOne(p => p.Registrar).WithMany(p => p.Appointments).HasForeignKey(f => f.RegistrarId).OnDelete(DeleteBehavior.Restrict);
         builder.Entity<Appointment>().HasOne(p => p.Doctor).WithMany(p => p.Appointments).HasForeignKey(f => f.DoctorId).OnDelete(DeleteBehavior.Restrict);

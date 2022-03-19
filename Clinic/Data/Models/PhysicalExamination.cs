@@ -5,8 +5,8 @@
         public Guid PhysicalExaminationId { get; set; }
         public string Result { get; set; }
         public Guid AppointmentId { get; set; }
-        public virtual Appointment Appointment { get; set; }
+        public Appointment Appointment { get; set; }
         public GlossaryCode GlossaryDictionaryId { get; set; }
-        public virtual GlossaryDictionary GlossaryDictionary { get; set; }
+        public GlossaryDictionary GlossaryDictionary { get; set; }
     }
 }

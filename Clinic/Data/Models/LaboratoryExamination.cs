@@ -13,12 +13,12 @@ namespace Clinic.Data.Models
         public DateTime ApprovalDate { get; set; }
         public Status Status { get; set; }
         public Guid AppointmentId { get; set; }
-        public virtual Appointment Appointment { get; set; }
+        public Appointment Appointment { get; set; }
         public GlossaryCode GlossaryDictionaryId { get; set; }
-        public virtual GlossaryDictionary GlossaryDictionary { get; set; }
+        public GlossaryDictionary GlossaryDictionary { get; set; }
         public string? LabTechnicianId { get; set; }
-        public virtual LabTechnician? LabTechnician { get; set; }
+        public LabTechnician? LabTechnician { get; set; }
         public string? LabManagerId { get; set; }
-        public virtual LabManager? LabManager { get; set; }
+        public LabManager? LabManager { get; set; }
     }
 }

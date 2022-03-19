@@ -11,11 +11,11 @@ namespace Clinic.Data.Models
         public DateTime RegistrationDate { get; set; }
         public DateTime AppointmentDate { get; set; }
         public string DoctorId { get; set; }
-        public virtual Doctor Doctor { get; set; }
+        public Doctor Doctor { get; set; }
         public string RegistrarId { get; set; }
-        public virtual Registrar Registrar { get; set; }
+        public Registrar Registrar { get; set; }
         public Guid PatientId { get; set; }
-        public virtual Patient Patient { get; set; }
+        public Patient Patient { get; set; }
         public List<LaboratoryExamination>? LaboratoryExaminations { get; set; }
         public List<PhysicalExamination>? PhysicalExaminations { get; set; }
 

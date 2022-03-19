@@ -1,7 +1,12 @@
 ﻿
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace Clinic.Areas.Identity.Data
 {
-    public class Administrator : ApplicationUser
+    public class Administrator
     {
+        [ForeignKey(nameof(User))]
+        public string Id { get; set; }
+        public ApplicationUser User { get; set; }
     }
 }

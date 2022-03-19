@@ -4,7 +4,7 @@ namespace Clinic.Data.Models
 {
     public class Patient
     {
-        public Guid Id { get; set; }
+        public Guid PatientId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public long? Pesel { get; set; }
@@ -12,6 +12,6 @@ namespace Clinic.Data.Models
         public long? PhoneNumber { get; set; }
         public Gender Gender { get; set; }
         public List<Appointment>? Appointments { get; set; }
-        public virtual Address? Address { get; set; }
+        public Address? Address { get; set; }
     }
 }

@@ -50,9 +50,9 @@ var serviceProvider = app.Services?.GetService<IServiceScopeFactory>()?.CreateSc
 serviceProvider!.GetService<ApplicationDbContext>()!.Database.Migrate();
 
 // Seed default data
-//await serviceProvider!.SeedRolesAsync();
-//var users = await serviceProvider!.SeedUsersAsync();
-//await serviceProvider!.AssignRoles(users);
+await serviceProvider!.SeedRolesAsync();
+var users = await serviceProvider!.SeedUsersAsync();
+await serviceProvider!.AssignRoles(users);
 
 app.Run();
 
