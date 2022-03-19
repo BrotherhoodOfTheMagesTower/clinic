@@ -13,7 +13,7 @@ namespace Clinic.Data
             var context = serviceProvider.GetService<ApplicationDbContext>();
             var users = new List<ApplicationUser> { };
 
-            if (!context!.Administrators.Any())
+            if (!context!.Administrators.Any() && context.Users.Where(x => x.FirstName == "Administrator").ToList().Count == 0)
             {
                 var administrator = new Administrator
                 {
@@ -34,8 +34,8 @@ namespace Clinic.Data
                 users.Add(administrator.User);
                 context!.Administrators.Add(administrator);
             }
-            
-            if(!context.Doctors.Any())
+
+            if (!context.Doctors.Any() && context.Users.Where(x => x.FirstName == "Doctor").ToList().Count == 0)
             {
                 var doctor = new Doctor
                 {
@@ -57,7 +57,7 @@ namespace Clinic.Data
                 context!.Doctors.Add(doctor);
             }
 
-            if (!context.Registrars.Any())
+            if (!context.Registrars.Any() && context.Users.Where(x => x.FirstName == "Registrar").ToList().Count == 0)
             {
                 var registrar = new Registrar
                 {
@@ -79,7 +79,7 @@ namespace Clinic.Data
                 context!.Registrars.Add(registrar);
             }
 
-            if (!context.LabTechnicians.Any())
+            if (!context.LabTechnicians.Any() && context.Users.Where(x => x.FirstName == "Lab Technician").ToList().Count == 0)
             {
                 var labTechnician = new LabTechnician
                 {
@@ -101,7 +101,7 @@ namespace Clinic.Data
                 context!.LabTechnicians.Add(labTechnician);
             }
 
-            if (!context.LabTechnicians.Any())
+            if (!context.LabManagers.Any() && context.Users.Where(x => x.FirstName == "Lab Manager").ToList().Count == 0)
             {
                 var labManager = new LabManager
                 {
@@ -122,7 +122,7 @@ namespace Clinic.Data
                 labManager.User.HashPassword();
                 context!.LabManagers.Add(labManager);
             }
-                
+
             context!.SaveChanges();
 
             return users.ToArray();
@@ -133,7 +133,7 @@ namespace Clinic.Data
             var context = serviceProvider.GetService<ApplicationDbContext>();
             string[] roles = new string[] { Roles.Administrator, Roles.Doctor, Roles.Registrar, Roles.LabTechnician, Roles.LabManager };
 
-            foreach(var role in roles)
+            foreach (var role in roles)
             {
                 var roleStore = new RoleStore<IdentityRole>(context);
 
@@ -152,7 +152,7 @@ namespace Clinic.Data
             var context = serviceProvider.GetService<ApplicationDbContext>();
             UserManager<ApplicationUser>? _userManager = serviceProvider.GetService<UserManager<ApplicationUser>>();
 
-            foreach(var user in users)
+            foreach (var user in users)
             {
                 var usr = await _userManager!.FindByEmailAsync(user.Email);
                 await _userManager.AddToRoleAsync(usr, usr.FirstName);
