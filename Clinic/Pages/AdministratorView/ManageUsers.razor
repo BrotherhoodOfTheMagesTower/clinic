@@ -1,0 +1,52 @@
+﻿@page "/ManageUsers"
+@using Clinic.Services
+@inject UserService userService;
+@inject NavigationManager NavigationManager
+
+<PageTitle>Manage Users</PageTitle>
+
+<AuthorizeView Roles = "Administrator">
+    <Authorized>
+        <div class="col-12">
+            <h2>Add, edit or disable user accounts</h2>  
+            <h3><b>Users:</b></h3>    
+            @if (users != null)
+            {
+                <div class="card-body">
+                    <h5 class="card-title"><b>FirstName LastName - UserName</b></h5>
+                    @if(users.Any())
+                    {
+                        foreach(var user in users)
+                        {
+                            <h5 class="card-title" @onclick="() => NavigateToEditUser(user.Id)">@user.FirstName @user.LastName - @user.UserName</h5>
+                        }
+                    }
+                    else
+                    {
+                        <h5 class="card-title">No users in database</h5>
+                    }
+                </div>
+            }
+            else
+            {
+                <h5 class="card-title">No users in database</h5>
+            }
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <h1>Access denied!</h1>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code{
+    private List<ApplicationUser>? users;
+    protected override async Task OnInitializedAsync()
+    {
+        users = await userService.GetAllUsersAsync();
+    }
+
+    private void NavigateToEditUser(string userId)
+    {
+        NavigationManager.NavigateTo($"EditUser/{userId}");
+    }
+}

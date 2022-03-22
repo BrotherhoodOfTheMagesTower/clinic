@@ -1,0 +1,139 @@
+﻿@page "/EditUser/{Id}"
+@using Microsoft.AspNetCore.Identity
+@using Clinic.Services
+@using Microsoft.AspNetCore.WebUtilities
+@using System.Text
+@inject UserService userService;
+@inject NavigationManager NavigationManager
+@inject RoleManager<IdentityRole> roleManager
+@inject UserManager<ApplicationUser> userManager
+
+
+<PageTitle>Edit user</PageTitle>
+
+<AuthorizeView Roles="Administrator">
+    <Authorized>
+        <form method="post">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Edit user <b>@User.UserName</b></h2>
+                </div>
+            </div>
+            <div class="card-body">
+                @if (User != null)
+                {
+                    // E-Mail & UserName change
+                    <EditForm Model="User" Context="Email">
+                        <div class="form-group">
+                            <label for="email">Email and user name</label>
+                            <InputText class="form-control" id="email" disabled @bind-Value="User.Email" />
+                        </div>
+                        <div class="form-group">
+                            <label for="new-email">New Email and user name</label>
+                            <input type="text" value="@email" @oninput="@OnEmailInput" class="form-control" id="new-email" />
+                        </div>
+                        <button id="change-email-button" type="submit" @onclick="async () => await ChangeEmailAndUserName(email)" class="w-100 btn btn-lg btn-primary">Change email and user name</button>
+                    </EditForm>
+
+                    // First & Last Name
+                    <EditForm Model="User" Context="FirstNameLastName">
+                        <div class="form-group">
+                            <label for="first-name">First name</label>
+                            <InputText class="form-control" id="first-name" @bind-Value="User.FirstName" />
+                        </div>
+                        <div class="form-group">
+                            <label for="second-name">Last name</label>
+                            <InputText class="form-control" id="last-name" @bind-Value="User.LastName" />
+                        </div>
+                        <button id="change-names-button" type="submit" @onclick="async () => ChangeFirstAndLastName()" class="w-100 btn btn-lg btn-primary">Change first and last name</button>
+                    </EditForm>
+
+                    // Password
+                    <EditForm Model="User" Context="Password">
+                        <div class="form-group">
+                            <label for="psswd">Password</label>
+                            <input type="text" value="@password" @oninput="@OnPasswordInput" class="form-control" id="psswd" />
+                        </div>
+                        <button id="change-psswd" type="submit" @onclick="async () => ChangePassword(password)" class="w-100 btn btn-lg btn-danger">Change password</button>
+                    </EditForm>
+                }
+                else
+                {
+                    <h5 class="card-title">No users in database</h5>
+                }
+            </div>
+
+        </form>
+    </Authorized>
+    <NotAuthorized>
+        <h1>Access denied!</h1>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+    private ApplicationUser User { get; set; }
+    private string email { get; set; }
+    private string password { get; set; } = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        User = userService.GetUserByIdAsync(Id);
+    }
+
+    private async Task<bool> IsUserInRole(string role)
+    {
+        return await userManager.IsInRoleAsync(User, role);
+    }
+
+    private List<string> GetRolesForUser(string userId)
+        => userService.GetRolesForUser(userId);
+
+    private void NavigateToEditUser(string userId)
+    {
+        NavigationManager.NavigateTo($"EditUser/{userId}");
+    }
+
+    private void NavigateToManageUsers()
+    {
+        NavigationManager.NavigateTo("ManageUsers");
+    }
+
+    private async Task ChangeFirstAndLastName()
+    {
+        if (User.FirstName != "" && User.LastName != "") // please provide a validation for empty strings -> if string is empty pass a "Unknown" value
+        {
+            await userService.SetFirstAndLastNameForSpecificUser(User.Id, User.FirstName, User.LastName);
+        }
+    }
+
+    private async Task ChangeEmailAndUserName(string newEmail)
+    {
+        if (newEmail != "" && newEmail != null)
+        {
+            await userManager.SetEmailAsync(User, newEmail);
+
+            var newUser = userService.GetUserByIdAsync(User.Id);
+            var emailConfirmationToken = await userManager.GenerateEmailConfirmationTokenAsync(newUser);
+            await userManager.ConfirmEmailAsync(User, emailConfirmationToken);
+            await userManager.SetUserNameAsync(newUser, newEmail);
+        }
+    }
+
+    private async Task ChangePassword(string newPassword)
+    {
+        var token = await userManager.GeneratePasswordResetTokenAsync(User);
+        await userManager.ResetPasswordAsync(User, token, newPassword);
+    }
+
+    public void OnEmailInput(ChangeEventArgs args)
+    {
+        email = args.Value.ToString();
+    }
+
+    public void OnPasswordInput(ChangeEventArgs args)
+    {
+        password = args.Value.ToString();
+    }
+}

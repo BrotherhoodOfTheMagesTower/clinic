@@ -35,5 +35,13 @@ namespace Clinic.Services
         
         public ApplicationUser GetUserByIdAsync(string userId)
             => _context.Users.Where(x => x.Id == userId).FirstOrDefault();
+
+        public async Task SetFirstAndLastNameForSpecificUser(string userId, string firstName, string lastName)
+        {
+            _context.Users.Where(x => x.Id == userId).First().FirstName = firstName;
+            _context.Users.Where(x => x.Id == userId).First().LastName = lastName;
+
+            await _context.SaveChangesAsync();
+        }
     }
 }
