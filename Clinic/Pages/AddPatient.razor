@@ -1,0 +1,86 @@
+﻿@page "/AddPatient"
+
+<PageTitle>Add Patient</PageTitle>
+
+<AuthorizeView Roles = "Registrar">
+    <Authorized>
+        <div class="col-12">
+            <h2>Add new patient</h2>  
+
+            <form method="post">
+
+            <h3>Enter the patient's name</h3>
+            <input type="text" name=@firstName size=15/>
+
+            <h3>Enter the patient's last name</h3>
+            <input type="text" name=@secondName size=15/>
+
+            <h3>Enter the patient's pesel</h3>
+            <input type="text" name=@pesel size=11/>
+
+            <h3>Enter the patient's birthday</h3>
+            <input type="date" name=@birthDate/>
+
+            <h3>Enter the patient's phone number</h3>
+            <input type="number" name=@phoneNumber size=15/>
+
+            <h3>Enter the patient's gender</h3>
+            <div><input type="radio" name="gender" value="male"/> Male</div>
+            <div><input type="radio" name="gender"value="female"/> Female</div>
+            <div><input type="radio" name="gender"value="other"/> Other</div>
+            <br/><br />
+
+            <h3>Do you want to add an address?</h3>
+            <input type="checkbox" @onchange="addAdress"/> Add adress
+
+            @if (isAdressChecked)
+            {
+                <h3>Enter the patient's city name</h3>
+                <input type="text" name=@city size=15/>
+
+                <h3>Enter the patient's street name</h3>
+                <input type="text" name=@street size=15/>
+
+                <h3>Enter the patient's postal code</h3>
+                <input type="text" name=@postalCode size=15/>
+
+                <h3>Enter the patient's number of house</h3>
+                <input type="number" name=@houseNumber size=15/>
+
+                <h3>Enter the patient's number of local</h3>
+                <input type="number" name=@localNumber size=15/>
+            }
+
+            <div><input type="button" class="btn btn-primary" @onclick="addPatient" value="Add patient"/></div>
+            </form>
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <h1>Access denied!</h1>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code{
+    String firstName;
+    String secondName;
+    long pesel;
+    DateTime? birthDate;
+    long phoneNumber;
+
+    bool isAdressChecked = false;
+
+    String street;
+    String city;
+    int postalCode;
+    int houseNumber;
+    int localNumber;
+
+    private void addPatient()
+    {
+
+    }
+    private void addAdress()
+    {
+        isAdressChecked = !isAdressChecked;
+    }
+}
