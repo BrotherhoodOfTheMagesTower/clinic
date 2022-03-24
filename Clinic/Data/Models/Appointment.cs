@@ -6,7 +6,7 @@ namespace Clinic.Data.Models
     {
         public Guid AppointmentId { get; set; }
         public string Description { get; set; } //Not null?
-        public string Diagnosis { get; set; } //Not null?
+        public string? Diagnosis { get; set; } 
         public Status Status { get; set; }
         public DateTime RegistrationDate { get; set; }
         public DateTime AppointmentDate { get; set; }
