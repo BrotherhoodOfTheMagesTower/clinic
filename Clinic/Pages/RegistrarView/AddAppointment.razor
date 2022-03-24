@@ -1,0 +1,84 @@
+﻿@page "/AddNewAppointment"
+@using Clinic.Data
+@using Clinic.Data.Models
+
+<PageTitle>Add Appointment</PageTitle>
+
+<AuthorizeView Roles="Registrar">
+    <Authorized>
+        <h2>Add a new appointment </h2><br/>
+
+        <h3>Select a doctor</h3>
+        <select @onchange="SelectDoctor" name=@doctor>
+            <option value="doctor1">doctorName1 doctorSurname1</option>
+            <option value="doctor2">doctorName2 doctorSurname2</option>
+            <option value="doctor3">doctorName3 doctorSurname3</option>
+        </select><br/>
+
+        @if (isDoctorSelected)
+        {
+            <h3>Select a patient</h3>
+            <select @onchange="SelectPatient" name=@patient>
+            <option value="doctor1">patientName1 patientSurname1</option>
+            <option value="doctor2">patientName2 patientSurname2</option>
+            <option value="doctor3">patientName3 patientSurname3</option>
+            </select><br/><br/>
+
+            @if(isPatientSelected)
+            {
+            <h3>Enter the appointment's date</h3>
+            <input type="date" name=@appointmentDate/><br/><br/>
+            <h3>Enter the appointment's description</h3>
+            <input type="text" name=@appointmentDescription size=30/> <br/><br/>
+             <div><input type="button" class="btn btn-primary" @onclick="addAppointment" value="Add appointment"/></div>
+            }
+        }
+
+    </Authorized>
+    <NotAuthorized>
+        <h1>Access denied!</h1>
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@code {
+    private bool isDoctorSelected = false;
+    private bool isPatientSelected = false;
+
+    private DateTime appointmentDate;
+    private DateTime registrationDate = DateTime.Today;
+    private string appointmentDescription;
+    private Doctor doctor;
+    private Patient patient;
+    private Status status = Status.Booked;
+    private string diagnosis = null;
+
+
+    private List<Doctor> AllDoctors { get; set; }
+    private List<Patient> AllPatients { get; set; }
+
+
+    private void SelectDoctor()
+    {
+        isDoctorSelected = true;
+    }
+
+    private void SelectPatient()
+    {
+        isPatientSelected = true;
+    }
+
+    private void addAppointment(){ //to do
+
+    }
+
+    private void getAllDoctors(){ //to do
+
+    }
+
+    private void getAllPatients(){ //to do
+
+    }
+
+   
+}
