@@ -4,35 +4,39 @@
 
 <PageTitle>Add Appointment</PageTitle>
 
-<AuthorizeView Roles="Registrar">
+<AuthorizeView Roles="Registrar" Context="appointmentAdding">
     <Authorized>
-        <h2>Add a new appointment </h2><br/>
+        <h2>Add a new appointment </h2><br />
 
-        <h3>Select a doctor</h3>
-        <select @onchange="SelectDoctor" name=@doctor>
-            <option value="doctor1">doctorName1 doctorSurname1</option>
-            <option value="doctor2">doctorName2 doctorSurname2</option>
-            <option value="doctor3">doctorName3 doctorSurname3</option>
-        </select><br/>
+        <EditForm EditContext="newAppointment" OnValidSubmit="addAppointment" class="w-50 bg-gray px-4 py-3 rounded">
+            
 
-        @if (isDoctorSelected)
-        {
-            <h3>Select a patient</h3>
-            <select @onchange="SelectPatient" name=@patient>
-            <option value="doctor1">patientName1 patientSurname1</option>
-            <option value="doctor2">patientName2 patientSurname2</option>
-            <option value="doctor3">patientName3 patientSurname3</option>
-            </select><br/><br/>
+                <h3>Select a doctor</h3>
 
-            @if(isPatientSelected)
-            {
-            <h3>Enter the appointment's date</h3>
-            <input type="date" name=@appointmentDate/><br/><br/>
-            <h3>Enter the appointment's description</h3>
-            <input type="text" name=@appointmentDescription size=30/> <br/><br/>
-             <div><input type="button" class="btn btn-primary" @onclick="addAppointment" value="Add appointment"/></div>
-            }
-        }
+                <InputSelect @bind-Value="appointment.DoctorId" class="form-control w-75">
+                    @foreach (var Doctor in AllDoctors)
+                    {
+                        <option value=@Doctor.Id>@Doctor.User.FirstName @Doctor.User.LastName</option>
+                    }
+                </InputSelect><br />
+
+                <h3>Select a patient</h3>
+
+                <InputSelect @bind-Value="appointment.PatientId" class="form-control w-75">
+                    @foreach (var Patient in AllPatients)
+                    {
+                        <option value=@Patient.PatientId>@Patient.FirstName @Patient.LastName</option>
+                    }
+                </InputSelect><br />
+
+                <h3>Enter the appointment's date</h3>
+
+                <InputDate @bind-Value="appointmentDate"> </InputDate><br />
+                <InputText type="time" @bind-Value="appointmentTime"> </InputText><br />
+
+                <div><button type="submit" class="btn btn-primary">Add appointment</button></div>
+
+        </EditForm>
 
     </Authorized>
     <NotAuthorized>
@@ -42,43 +46,66 @@
 
 
 @code {
-    private bool isDoctorSelected = false;
-    private bool isPatientSelected = false;
+    protected override void OnInitialized()
+    {
+        newAppointment = new EditContext(appointment);
 
+        base.OnInitialized();
+    }
+    readonly Appointment appointment = new();
+    EditContext newAppointment;
+
+    private string appointmentTime;
     private DateTime appointmentDate;
-    private DateTime registrationDate = DateTime.Today;
-    private string appointmentDescription;
-    private Doctor doctor;
-    private Patient patient;
-    private Status status = Status.Booked;
-    private string diagnosis = null;
 
+    //testowo utworzone obiekty klas, docelowo do lisy wczytane będzie to co zwróci funkcja getAllDoctors i getAllPatients
+    static ApplicationUser user1 = new ApplicationUser() { FirstName = "Zbigniew", LastName = "Konieczny" };
+    static ApplicationUser user2 = new ApplicationUser() { FirstName = "Andrzej", LastName = "Maćkowski" };
 
-    private List<Doctor> AllDoctors { get; set; }
-    private List<Patient> AllPatients { get; set; }
-
-
-    private void SelectDoctor()
+    private List<Doctor> AllDoctors = new List<Doctor>()
     {
-        isDoctorSelected = true;
-    }
+        new Doctor() {Id="id", PermissionNumber=123, User=user1},
+        new Doctor() {Id="id2", PermissionNumber=345, User=user2}
+    };
 
-    private void SelectPatient()
+    private List<Patient> AllPatients = new List<Patient>()
     {
-        isPatientSelected = true;
+        new Patient() {PatientId=Guid.NewGuid(), FirstName="Adam", LastName="Nowak", Gender=Gender.Male},
+        new Patient() {PatientId=Guid.NewGuid(), FirstName="Marcin", LastName="Kowalski", Gender=Gender.Male}
+    };
+
+    private void addAppointment() //to do
+    {
+        //testowe zapisywanie obiektu klasy Doctor i Patient do appointment po id
+        foreach (var Patient in AllPatients)
+        {
+            if (Patient.PatientId.Equals(appointment.PatientId))
+                appointment.Patient = Patient;
+        }
+
+        foreach (var Doctor in AllDoctors)
+        {
+            if (Doctor.Id.Equals(appointment.DoctorId))
+                appointment.Doctor = Doctor;
+        }
+
+        System.DateTime validatedDateTime = appointmentDate.Add(TimeSpan.Parse(appointmentTime));
+        appointment.AppointmentDate = validatedDateTime;
+
+        //wypisywanie danych w konsoli
+        Console.WriteLine($"Data - doctor last name: {appointment.Doctor.User.LastName}, patient last name: {appointment.Patient.LastName}, date: {appointment.AppointmentDate}.");
+
     }
 
-    private void addAppointment(){ //to do
+    private void getAllDoctors()
+    { //to do
 
     }
 
-    private void getAllDoctors(){ //to do
+    private void getAllPatients()
+    { //to do
 
     }
 
-    private void getAllPatients(){ //to do
 
-    }
-
-   
 }
