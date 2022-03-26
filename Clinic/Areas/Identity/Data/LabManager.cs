@@ -3,11 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Clinic.Areas.Identity.Data
 {
-    public class LabManager
+    public class LabManager : ApplicationUser
     {
-        [ForeignKey(nameof(User))]
-        public string Id { get; set; }
-        public List<LaboratoryExamination>? LaboratoryExaminations { get; set; }
-        public ApplicationUser User { get; set; }
+        public ICollection<LaboratoryExamination>? LaboratoryExaminations { get; set; }
     }
 }

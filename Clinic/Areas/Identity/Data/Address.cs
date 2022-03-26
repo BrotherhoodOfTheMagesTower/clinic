@@ -4,13 +4,12 @@ namespace Clinic.Areas.Identity.Data
 {
     public class Address
     {
-        public Guid AddressId { get; set; }
+        public Guid Id { get; set; }
         public string Street { get; set; }
         public string City { get; set; }
-        public int PostalCode { get; set; }
-        public int HouseNumber { get; set; }
-        public int? LocalNumber { get; set; }
-        public Guid PatientId { get; set; }
-        public Patient Patient { get; set; }
+        public string PostalCode { get; set; }
+        public string HouseNumber { get; set; }
+        public string? LocalNumber { get; set; }
+        public ICollection<Patient> Patients { get; set; }
     }
 }
