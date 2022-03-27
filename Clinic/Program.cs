@@ -4,7 +4,6 @@ using Clinic.Areas.Identity.Data;
 using Microsoft.AspNetCore.Components.Authorization;
 using Clinic.Areas.Identity;
 using Microsoft.AspNetCore.Identity;
-using Clinic.Constants;
 using Clinic.Services;
 
 var builder = WebApplication.CreateBuilder(args);

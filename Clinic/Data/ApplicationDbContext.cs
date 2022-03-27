@@ -40,27 +40,19 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         builder.Entity<LabTechnician>().ToTable("LabTechnicians");
         builder.Entity<Registrar>().ToTable("Registrars");
 
-        builder.ApplyConfiguration(new ApplicationUserEntityConfiguration());
-
-        builder.Entity<Appointment>().HasOne(p => p.Patient).WithMany(p => p.Appointments).HasForeignKey(f => f.PatientId).OnDelete(DeleteBehavior.Restrict);
-        builder.Entity<Appointment>().HasOne(p => p.Registrar).WithMany(p => p.Appointments).HasForeignKey(f => f.RegistrarId).OnDelete(DeleteBehavior.Restrict);
-        builder.Entity<Appointment>().HasOne(p => p.Doctor).WithMany(p => p.Appointments).HasForeignKey(f => f.DoctorId).OnDelete(DeleteBehavior.Restrict);
-        builder.Entity<LaboratoryExamination>().HasOne(p => p.Appointment).WithMany(p => p.LaboratoryExaminations).HasForeignKey(f => f.AppointmentId).OnDelete(DeleteBehavior.Restrict);
-        builder.Entity<LaboratoryExamination>().HasOne(p => p.GlossaryDictionary).WithMany(p => p.LaboratoryExaminations).HasForeignKey(f => f.GlossaryDictionaryId).OnDelete(DeleteBehavior.Restrict);
-        builder.Entity<LaboratoryExamination>().HasOne(p => p.LabTechnician).WithMany(p => p.LaboratoryExaminations).HasForeignKey(f => f.LabTechnicianId).OnDelete(DeleteBehavior.Restrict);
-        builder.Entity<LaboratoryExamination>().HasOne(p => p.LabManager).WithMany(p => p.LaboratoryExaminations).HasForeignKey(f => f.LabManagerId).OnDelete(DeleteBehavior.Restrict);
-        builder.Entity<PhysicalExamination>().HasOne(p => p.Appointment).WithMany(p => p.PhysicalExaminations).HasForeignKey(f => f.AppointmentId).OnDelete(DeleteBehavior.Restrict);
-        builder.Entity<PhysicalExamination>().HasOne(p => p.GlossaryDictionary).WithMany(p => p.PhysicalExaminations).HasForeignKey(f => f.GlossaryDictionaryId).OnDelete(DeleteBehavior.Restrict);
-        builder.Entity<Patient>().HasOne(p => p.Address).WithOne(p => p.Patient).HasForeignKey<Address>(a => a.PatientId);
         builder.Entity<GlossaryDictionary>().HasKey(k => k.Code);
-    }
-}
 
-public class ApplicationUserEntityConfiguration : IEntityTypeConfiguration<ApplicationUser>
-{
-    public void Configure(EntityTypeBuilder<ApplicationUser> builder)
-    {
-        builder.Property(u => u.FirstName).HasMaxLength(255);
-        builder.Property(u => u.LastName).HasMaxLength(255);
+        builder.Entity<Appointment>().HasOne(p => p.Patient).WithMany(p => p.Appointments);
+        builder.Entity<Appointment>().HasOne(p => p.Registrar).WithMany(p => p.Appointments).OnDelete(DeleteBehavior.NoAction);
+        builder.Entity<Appointment>().HasOne(p => p.Doctor).WithMany(p => p.Appointments).OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<LaboratoryExamination>().HasOne(p => p.Appointment).WithMany(p => p.LaboratoryExaminations);
+        builder.Entity<LaboratoryExamination>().HasOne(p => p.GlossaryDictionary).WithMany(p => p.LaboratoryExaminations);
+        builder.Entity<LaboratoryExamination>().HasOne(p => p.LabTechnician).WithMany(p => p.LaboratoryExaminations);
+        builder.Entity<LaboratoryExamination>().HasOne(p => p.LabManager).WithMany(p => p.LaboratoryExaminations);
+
+        builder.Entity<PhysicalExamination>().HasOne(p => p.Appointment).WithMany(p => p.PhysicalExaminations);
+        builder.Entity<PhysicalExamination>().HasOne(p => p.GlossaryDictionary).WithMany(p => p.PhysicalExaminations);
+        builder.Entity<Patient>().HasOne(p => p.Address).WithMany(p => p.Patients);
     }
 }

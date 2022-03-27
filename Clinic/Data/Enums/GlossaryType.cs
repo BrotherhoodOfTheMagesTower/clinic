@@ -2,7 +2,7 @@
 {
     public enum GlossaryType
     {
-        Physical,
-        Laboratory
+        PHYSICAL,
+        LABORATORY
     }
 }

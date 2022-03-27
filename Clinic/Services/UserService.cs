@@ -26,22 +26,22 @@ namespace Clinic.Services
 
             return roleNames;
         }
-        
+
         public async Task<string> GetUserName(string userId)
             => (await _context.Users.FirstOrDefaultAsync(x => x.Id == userId))!.UserName;
-        
+
         public List<IdentityRole> GetAllRoles()
             => _context.Roles.ToList();
-        
+
         public ApplicationUser GetUserByIdAsync(string userId)
             => _context.Users.Where(x => x.Id == userId).FirstOrDefault();
 
-        public async Task SetFirstAndLastNameForSpecificUser(string userId, string firstName, string lastName)
-        {
-            _context.Users.Where(x => x.Id == userId).First().FirstName = firstName;
-            _context.Users.Where(x => x.Id == userId).First().LastName = lastName;
+        //public async Task SetFirstAndLastNameForSpecificUser(string userId, string firstName, string lastName)
+        //{
+        //    _context.Users.Where(x => x.Id == userId).First().FirstName = firstName;
+        //    _context.Users.Where(x => x.Id == userId).First().LastName = lastName;
 
-            await _context.SaveChangesAsync();
-        }
+        //    await _context.SaveChangesAsync();
+        //}
     }
 }
