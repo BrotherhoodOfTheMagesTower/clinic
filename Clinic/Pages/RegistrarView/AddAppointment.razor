@@ -6,35 +6,37 @@
 
 <AuthorizeView Roles="Registrar" Context="appointmentAdding">
     <Authorized>
-        <h2>Add a new appointment </h2><br />
+        
 
         <EditForm EditContext="newAppointment" OnValidSubmit="addAppointment" class="w-50 bg-gray px-4 py-3 rounded">
-            
+            <h2 class="mb-3 fw-bold">Add a new appointment </h2><br />
+            <label class="d-block mb-1 ml-1">Doctor:</label>
+            <InputSelect @bind-Value="doctorId" class="form-control w-75">
+                <option value="" selected disabled hidden>Choose here...</option>
+                @foreach (var Doctor in AllDoctors)
+                {
+                    <option value=@Doctor.Id>@Doctor.User.LastName @Doctor.User.FirstName</option>
+                }
+            </InputSelect><br />
 
-                <h3>Select a doctor</h3>
+            <label class="d-block mb-1 ml-1">Patient:</label>
+            <InputSelect @bind-Value="patientId" class="form-control w-75">
+                <option value="Guid.Empty" selected disabled hidden>Choose here...</option>
+                @foreach (var Patient in AllPatients)
+                {
+                    <option value=@Patient.PatientId.ToString()>@Patient.LastName @Patient.FirstName </option>
 
-                <InputSelect @bind-Value="appointment.DoctorId" class="form-control w-75">
-                    @foreach (var Doctor in AllDoctors)
-                    {
-                        <option value=@Doctor.Id>@Doctor.User.FirstName @Doctor.User.LastName</option>
-                    }
-                </InputSelect><br />
+                }
+            </InputSelect><br />
 
-                <h3>Select a patient</h3>
 
-                <InputSelect @bind-Value="appointment.PatientId" class="form-control w-75">
-                    @foreach (var Patient in AllPatients)
-                    {
-                        <option value=@Patient.PatientId>@Patient.FirstName @Patient.LastName</option>
-                    }
-                </InputSelect><br />
+            <label class="d-block mb-1 ml-1">Date:</label>
 
-                <h3>Enter the appointment's date</h3>
+            <InputDate @bind-Value="appointmentDate" class="form-control w-75"> </InputDate><br />
 
-                <InputDate @bind-Value="appointmentDate"> </InputDate><br />
-                <InputText type="time" @bind-Value="appointmentTime"> </InputText><br />
-
-                <div><button type="submit" class="btn btn-primary">Add appointment</button></div>
+            <label class="d-block mb-1 ml-1">Time:</label>
+            <InputText type="time" @bind-Value="appointmentTime" step=30 class="form-control w-75"></InputText><br />
+            <div><button type="submit" class="btn btn-primary">Add appointment</button></div>
 
         </EditForm>
 
@@ -49,7 +51,9 @@
     protected override void OnInitialized()
     {
         newAppointment = new EditContext(appointment);
-
+        //default data and time
+        appointmentDate=DateTime.Today;
+        appointmentTime = "15:00:00";
         base.OnInitialized();
     }
     readonly Appointment appointment = new();
@@ -57,9 +61,11 @@
 
     private string appointmentTime;
     private DateTime appointmentDate;
+    private string doctorId;
+    private string patientId;
 
     //testowo utworzone obiekty klas, docelowo do lisy wczytane będzie to co zwróci funkcja getAllDoctors i getAllPatients
-    static ApplicationUser user1 = new ApplicationUser() { FirstName = "Zbigniew", LastName = "Konieczny" };
+    static ApplicationUser user1 = new ApplicationUser() { FirstName = "Zbigniew", LastName = "Nowak" };
     static ApplicationUser user2 = new ApplicationUser() { FirstName = "Andrzej", LastName = "Maćkowski" };
 
     private List<Doctor> AllDoctors = new List<Doctor>()
@@ -71,23 +77,15 @@
     private List<Patient> AllPatients = new List<Patient>()
     {
         new Patient() {PatientId=Guid.NewGuid(), FirstName="Adam", LastName="Nowak", Gender=Gender.Male},
-        new Patient() {PatientId=Guid.NewGuid(), FirstName="Marcin", LastName="Kowalski", Gender=Gender.Male}
+        new Patient() {PatientId=Guid.NewGuid(), FirstName="Marcin", LastName="Kowalski", Gender=Gender.Male},
+        new Patient() {PatientId=Guid.NewGuid(), FirstName="Daniel", LastName="Anczyk", Gender=Gender.Male},
+        new Patient() {PatientId=Guid.NewGuid(), FirstName="Dawid", LastName="Nowakowski", Gender=Gender.Male}
     };
 
     private void addAppointment() //to do
     {
         //testowe zapisywanie obiektu klasy Doctor i Patient do appointment po id
-        foreach (var Patient in AllPatients)
-        {
-            if (Patient.PatientId.Equals(appointment.PatientId))
-                appointment.Patient = Patient;
-        }
-
-        foreach (var Doctor in AllDoctors)
-        {
-            if (Doctor.Id.Equals(appointment.DoctorId))
-                appointment.Doctor = Doctor;
-        }
+        assignPatientsAndDoctorsToAppointmentById();
 
         System.DateTime validatedDateTime = appointmentDate.Add(TimeSpan.Parse(appointmentTime));
         appointment.AppointmentDate = validatedDateTime;
@@ -107,5 +105,18 @@
 
     }
 
+    private void assignPatientsAndDoctorsToAppointmentById()
+    {
+        foreach (var Patient in AllPatients) 
+        {
+            if (Patient.PatientId.Equals(Guid.Parse(patientId)))
+                appointment.Patient = Patient;
+        }
 
+        foreach (var Doctor in AllDoctors)
+        {
+            if (Doctor.Id.Equals(doctorId))
+                appointment.Doctor = Doctor;
+        }
+    }
 }
