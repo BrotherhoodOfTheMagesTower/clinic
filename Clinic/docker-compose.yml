@@ -7,10 +7,4 @@ services:
             ACCEPT_EULA: "Y"
         ports:
           - "1433:1433"
-    web:
-        build: .
-        ports:
-          - "8000:80"
-        depends_on:
-          - clinicdb
     

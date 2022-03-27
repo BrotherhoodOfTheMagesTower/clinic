@@ -35,7 +35,7 @@
                         <button id="change-email-button" type="submit" @onclick="async () => await ChangeEmailAndUserName(email)" class="w-100 btn btn-lg btn-primary">Change email and user name</button>
                     </EditForm>
 
-                    // First & Last Name
+                    @*// First & Last Name
                     <EditForm Model="User" Context="FirstNameLastName">
                         <div class="form-group">
                             <label for="first-name">First name</label>
@@ -46,7 +46,7 @@
                             <InputText class="form-control" id="last-name" @bind-Value="User.LastName" />
                         </div>
                         <button id="change-names-button" type="submit" @onclick="async () => ChangeFirstAndLastName()" class="w-100 btn btn-lg btn-primary">Change first and last name</button>
-                    </EditForm>
+                    </EditForm>*@
 
                     // Password
                     <EditForm Model="User" Context="Password">
@@ -100,13 +100,13 @@
         NavigationManager.NavigateTo("ManageUsers");
     }
 
-    private async Task ChangeFirstAndLastName()
-    {
-        if (User.FirstName != "" && User.LastName != "") // please provide a validation for empty strings -> if string is empty pass a "Unknown" value
-        {
-            await userService.SetFirstAndLastNameForSpecificUser(User.Id, User.FirstName, User.LastName);
-        }
-    }
+    //private async Task ChangeFirstAndLastName()
+    //{
+    //    if (User.FirstName != "" && User.LastName != "") // please provide a validation for empty strings -> if string is empty pass a "Unknown" value
+    //    {
+    //        await userService.SetFirstAndLastNameForSpecificUser(User.Id, User.FirstName, User.LastName);
+    //    }
+    //}
 
     private async Task ChangeEmailAndUserName(string newEmail)
     {
