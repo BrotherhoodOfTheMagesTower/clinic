@@ -13,12 +13,12 @@
             @if (users != null)
             {
                 <div class="card-body">
-                    <h5 class="card-title"><b>FirstName LastName - UserName</b></h5>
+                    <h5 class="card-title"><b>E-mail</b></h5>
                     @if(users.Any())
                     {
                         foreach(var user in users)
                         {
-                            <h5 class="card-title" @onclick="() => NavigateToEditUser(user.Id)">@user.FirstName @user.LastName - @user.UserName</h5>
+                            <h5 class="card-title" @onclick="() => NavigateToEditUser(user.Id)">@user.Email</h5>
                         }
                     }
                     else

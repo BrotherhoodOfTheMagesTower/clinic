@@ -49,60 +49,13 @@ namespace Clinic.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Address");
+                    b.ToTable("Addresses");
                 });
 
-            modelBuilder.Entity("Clinic.Areas.Identity.Data.ApplicationRole", b =>
+            modelBuilder.Entity("Clinic.Areas.Identity.Data.Administrator", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("NormalizedName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedName")
-                        .IsUnique()
-                        .HasDatabaseName("RoleNameIndex")
-                        .HasFilter("[NormalizedName] IS NOT NULL");
-
-                    b.ToTable("AspNetRoles", (string)null);
-                });
-
-            modelBuilder.Entity("Clinic.Areas.Identity.Data.ApplicationUser", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("bit");
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("FirstName")
                         .HasMaxLength(255)
@@ -114,6 +67,30 @@ namespace Clinic.Migrations
                     b.Property<string>("LastName")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Administrators", (string)null);
+                });
+
+            modelBuilder.Entity("Clinic.Areas.Identity.Data.ApplicationUser", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -159,8 +136,93 @@ namespace Clinic.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
 
-                    b.HasDiscriminator<string>("Discriminator").HasValue("ApplicationUser");
+            modelBuilder.Entity("Clinic.Areas.Identity.Data.Doctor", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("FirstName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<long?>("PermissionNumber")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Doctors", (string)null);
+                });
+
+            modelBuilder.Entity("Clinic.Areas.Identity.Data.LabManager", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("FirstName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("LabManagers", (string)null);
+                });
+
+            modelBuilder.Entity("Clinic.Areas.Identity.Data.LabTechnician", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("FirstName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("LabTechnicians", (string)null);
+                });
+
+            modelBuilder.Entity("Clinic.Areas.Identity.Data.Registrar", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("FirstName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Registrars", (string)null);
                 });
 
             modelBuilder.Entity("Clinic.Data.Models.Appointment", b =>
@@ -175,8 +237,9 @@ namespace Clinic.Migrations
                     b.Property<string>("Diagnosis")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("DoctorId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("DoctorId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<Guid>("PatientId")
                         .HasColumnType("uniqueidentifier");
@@ -187,8 +250,9 @@ namespace Clinic.Migrations
                     b.Property<DateTime>("RegisteredTo")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("RegistrarId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("RegistrarId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -201,7 +265,7 @@ namespace Clinic.Migrations
 
                     b.HasIndex("RegistrarId");
 
-                    b.ToTable("Appointment");
+                    b.ToTable("Appointments");
                 });
 
             modelBuilder.Entity("Clinic.Data.Models.GlossaryDictionary", b =>
@@ -218,7 +282,7 @@ namespace Clinic.Migrations
 
                     b.HasKey("Code");
 
-                    b.ToTable("GlossaryDictionary");
+                    b.ToTable("GlossaryDictionaries");
                 });
 
             modelBuilder.Entity("Clinic.Data.Models.LaboratoryExamination", b =>
@@ -242,11 +306,11 @@ namespace Clinic.Migrations
                     b.Property<int>("GlossaryDictionaryCode")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("LabManagerId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("LabManagerId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<Guid?>("LabTechnicianId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("LabTechnicianId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ManagerNotes")
                         .HasColumnType("nvarchar(max)");
@@ -270,7 +334,7 @@ namespace Clinic.Migrations
 
                     b.HasIndex("LabTechnicianId");
 
-                    b.ToTable("LaboratoryExamination");
+                    b.ToTable("LaboratoryExaminations");
                 });
 
             modelBuilder.Entity("Clinic.Data.Models.Patient", b =>
@@ -306,7 +370,7 @@ namespace Clinic.Migrations
 
                     b.HasIndex("AddressId");
 
-                    b.ToTable("Patient");
+                    b.ToTable("Patients");
                 });
 
             modelBuilder.Entity("Clinic.Data.Models.PhysicalExamination", b =>
@@ -331,10 +395,37 @@ namespace Clinic.Migrations
 
                     b.HasIndex("GlossaryDictionaryCode");
 
-                    b.ToTable("PhysicalExamination");
+                    b.ToTable("PhysicalExaminations");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex")
+                        .HasFilter("[NormalizedName] IS NOT NULL");
+
+                    b.ToTable("AspNetRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -348,8 +439,9 @@ namespace Clinic.Migrations
                     b.Property<string>("ClaimValue")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("RoleId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -358,7 +450,7 @@ namespace Clinic.Migrations
                     b.ToTable("AspNetRoleClaims", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -372,8 +464,9 @@ namespace Clinic.Migrations
                     b.Property<string>("ClaimValue")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -382,7 +475,7 @@ namespace Clinic.Migrations
                     b.ToTable("AspNetUserClaims", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
                         .HasMaxLength(128)
@@ -395,8 +488,9 @@ namespace Clinic.Migrations
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -405,13 +499,13 @@ namespace Clinic.Migrations
                     b.ToTable("AspNetUserLogins", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("RoleId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("UserId", "RoleId");
 
@@ -420,10 +514,10 @@ namespace Clinic.Migrations
                     b.ToTable("AspNetUserRoles", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("LoginProvider")
                         .HasMaxLength(128)
@@ -443,40 +537,57 @@ namespace Clinic.Migrations
 
             modelBuilder.Entity("Clinic.Areas.Identity.Data.Administrator", b =>
                 {
-                    b.HasBaseType("Clinic.Areas.Identity.Data.ApplicationUser");
+                    b.HasOne("Clinic.Areas.Identity.Data.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasDiscriminator().HasValue("Administrator");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Clinic.Areas.Identity.Data.Doctor", b =>
                 {
-                    b.HasBaseType("Clinic.Areas.Identity.Data.ApplicationUser");
+                    b.HasOne("Clinic.Areas.Identity.Data.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Property<long?>("PermissionNumber")
-                        .HasColumnType("bigint");
-
-                    b.HasDiscriminator().HasValue("Doctor");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Clinic.Areas.Identity.Data.LabManager", b =>
                 {
-                    b.HasBaseType("Clinic.Areas.Identity.Data.ApplicationUser");
+                    b.HasOne("Clinic.Areas.Identity.Data.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasDiscriminator().HasValue("LabManager");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Clinic.Areas.Identity.Data.LabTechnician", b =>
                 {
-                    b.HasBaseType("Clinic.Areas.Identity.Data.ApplicationUser");
+                    b.HasOne("Clinic.Areas.Identity.Data.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasDiscriminator().HasValue("LabTechnician");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Clinic.Areas.Identity.Data.Registrar", b =>
                 {
-                    b.HasBaseType("Clinic.Areas.Identity.Data.ApplicationUser");
+                    b.HasOne("Clinic.Areas.Identity.Data.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasDiscriminator().HasValue("Registrar");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Clinic.Data.Models.Appointment", b =>
@@ -484,7 +595,7 @@ namespace Clinic.Migrations
                     b.HasOne("Clinic.Areas.Identity.Data.Doctor", "Doctor")
                         .WithMany("Appointments")
                         .HasForeignKey("DoctorId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Clinic.Data.Models.Patient", "Patient")
@@ -496,7 +607,7 @@ namespace Clinic.Migrations
                     b.HasOne("Clinic.Areas.Identity.Data.Registrar", "Registrar")
                         .WithMany("Appointments")
                         .HasForeignKey("RegistrarId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Doctor");
@@ -565,16 +676,16 @@ namespace Clinic.Migrations
                     b.Navigation("GlossaryDictionary");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
-                    b.HasOne("Clinic.Areas.Identity.Data.ApplicationRole", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
                     b.HasOne("Clinic.Areas.Identity.Data.ApplicationUser", null)
                         .WithMany()
@@ -583,7 +694,7 @@ namespace Clinic.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.HasOne("Clinic.Areas.Identity.Data.ApplicationUser", null)
                         .WithMany()
@@ -592,9 +703,9 @@ namespace Clinic.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
-                    b.HasOne("Clinic.Areas.Identity.Data.ApplicationRole", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -607,7 +718,7 @@ namespace Clinic.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
                     b.HasOne("Clinic.Areas.Identity.Data.ApplicationUser", null)
                         .WithMany()
@@ -619,25 +730,6 @@ namespace Clinic.Migrations
             modelBuilder.Entity("Clinic.Areas.Identity.Data.Address", b =>
                 {
                     b.Navigation("Patients");
-                });
-
-            modelBuilder.Entity("Clinic.Data.Models.Appointment", b =>
-                {
-                    b.Navigation("LaboratoryExaminations");
-
-                    b.Navigation("PhysicalExaminations");
-                });
-
-            modelBuilder.Entity("Clinic.Data.Models.GlossaryDictionary", b =>
-                {
-                    b.Navigation("LaboratoryExaminations");
-
-                    b.Navigation("PhysicalExaminations");
-                });
-
-            modelBuilder.Entity("Clinic.Data.Models.Patient", b =>
-                {
-                    b.Navigation("Appointments");
                 });
 
             modelBuilder.Entity("Clinic.Areas.Identity.Data.Doctor", b =>
@@ -656,6 +748,25 @@ namespace Clinic.Migrations
                 });
 
             modelBuilder.Entity("Clinic.Areas.Identity.Data.Registrar", b =>
+                {
+                    b.Navigation("Appointments");
+                });
+
+            modelBuilder.Entity("Clinic.Data.Models.Appointment", b =>
+                {
+                    b.Navigation("LaboratoryExaminations");
+
+                    b.Navigation("PhysicalExaminations");
+                });
+
+            modelBuilder.Entity("Clinic.Data.Models.GlossaryDictionary", b =>
+                {
+                    b.Navigation("LaboratoryExaminations");
+
+                    b.Navigation("PhysicalExaminations");
+                });
+
+            modelBuilder.Entity("Clinic.Data.Models.Patient", b =>
                 {
                     b.Navigation("Appointments");
                 });
