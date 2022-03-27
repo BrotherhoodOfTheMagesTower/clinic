@@ -15,12 +15,12 @@
 
             <label>last name <InputText type="text" @bind-Value="patient.LastName" class="form-control w-75"> </InputText></label><br />
 
-            <label>pesel <InputText type="text" @bind-Value="patient.Pesel" class="form-control w-75"> </InputText></label><br />
-
+        @*    <label>pesel <InputText type="text" @bind-Value="patient.Pesel" class="form-control w-75"> </InputText></label><br />
+*@
             <label>birth date <InputDate @bind-Value="patient.BirthDate" @bind-Value:format="dd/MM/yyyy HH:mm" class="form-control w-75"> </InputDate></label><br />
 
-            <label>phone number <InputText type="text" @bind-Value="patient.PhoneNumber" class="form-control w-75"> </InputText></label><br />
-
+         @*   <label>phone number <InputText type="text" @bind-Value="patient.PhoneNumber" class="form-control w-75"> </InputText></label><br />
+*@
             <label> gender </label><br>
             <InputRadioGroup @bind-Value="patient.Gender">
                @foreach (var g in (Gender[])Enum.GetValues(typeof(Gender)))
@@ -33,24 +33,21 @@
 
             <h3>Do you want to add an address?</h3>
 
-            <InputRadioGroup @bind-Value="isAdressChecked">
-                 <div><InputRadio Value="false" checked />No</div>
-                 <div><InputRadio Value="true"/>Yes</div>
-            </InputRadioGroup>
+            <InputCheckbox @bind-Value="IsAdressChecked" @onchange="@ChangeCheckBox"></InputCheckbox>
 
-            @if (isAdressChecked)
+            @if (IsAdressChecked)
             {
                 <h3>Enter the patient's: </h3>
-                <label>city <InputText type="text" @bind-Value="patient.Address.City" class="form-control w-75"> </InputText></label><br />
+               <label>city <InputText type="text" @bind-Value="address.City" class="form-control w-75"> </InputText></label><br />
 
-                <label>street <InputText type="text" @bind-Value="patient.Address.Street" class="form-control w-75"> </InputText></label><br />
-
-                <label>postal code <InputText type="text" @bind-Value="patient.Address.PostalCode" class="form-control w-75"> </InputText></label><br />
+                <label>street <InputText type="text" @bind-Value="address.Street" class="form-control w-75"> </InputText></label><br />
+            
+     @*           <label>postal code <InputText type="text" @bind-Value="patient.Address.PostalCode" class="form-control w-75"> </InputText></label><br />
 
                 <label>house number <InputText type="text" @bind-Value="patient.Address.HouseNumber" class="form-control w-75"> </InputText></label><br />
 
                 <label>local number <InputText type="text" @bind-Value="patient.Address.LocalNumber" class="form-control w-75"> </InputText></label><br />
-            }
+        *@    }
             <br/><br />
             <div><button type="submit" class="btn btn-primary">Add patient</button></div>
             </EditForm>
@@ -61,15 +58,16 @@
 </AuthorizeView>
 
 @code{
-    public bool isAdressChecked;
+    private bool IsAdressChecked { get; set; }
 
     protected override void OnInitialized()
     {
         newPatient = new EditContext(patient);
-         isAdressChecked = false;
+        IsAdressChecked = false;
         base.OnInitialized();
     }
-    readonly Patient patient = new();
+    private Patient patient = new();
+    private Address address = new();
     EditContext newPatient;
 
     //TO DO
@@ -77,12 +75,21 @@
     {
 
     }
-    private void addAdress()
+    //private void addAdress()
+    //{
+    //    IsAdressChecked = !isAdressChecked;
+    //    if (isAdressChecked)
+    //    {
+    //        patient.Address.Patient.PatientId = patient.PatientId;
+    //    }
+    //}
+
+    private void ChangeCheckBox()
     {
-        isAdressChecked = !isAdressChecked;
-        if (isAdressChecked)
+        if (IsAdressChecked == false)
         {
-            patient.Address.Patient.PatientId = patient.PatientId;
+            IsAdressChecked = true;
         }
+        else IsAdressChecked = false;
     }
 }
