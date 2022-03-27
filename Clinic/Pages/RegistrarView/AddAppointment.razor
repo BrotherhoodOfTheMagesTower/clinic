@@ -1,5 +1,6 @@
 ﻿@page "/AddNewAppointment"
 @using Clinic.Data
+@using Clinic.Data.Enums
 @using Clinic.Data.Models
 
 <PageTitle>Add Appointment</PageTitle>
@@ -15,7 +16,7 @@
                 <option value="" selected disabled hidden>Choose here...</option>
                 @foreach (var Doctor in AllDoctors)
                 {
-                    <option value=@Doctor.Id>@Doctor.User.LastName @Doctor.User.FirstName</option>
+                    <option value=@Doctor.Id>@Doctor.LastName @Doctor.FirstName</option>
                 }
             </InputSelect><br />
 
@@ -24,7 +25,7 @@
                 <option value="Guid.Empty" selected disabled hidden>Choose here...</option>
                 @foreach (var Patient in AllPatients)
                 {
-                    <option value=@Patient.PatientId.ToString()>@Patient.LastName @Patient.FirstName </option>
+                    <option value=@Patient.Id.ToString()>@Patient.LastName @Patient.FirstName </option>
 
                 }
             </InputSelect><br />
@@ -65,21 +66,21 @@
     private string patientId;
 
     //testowo utworzone obiekty klas, docelowo do lisy wczytane będzie to co zwróci funkcja getAllDoctors i getAllPatients
-    static ApplicationUser user1 = new ApplicationUser() { FirstName = "Zbigniew", LastName = "Nowak" };
-    static ApplicationUser user2 = new ApplicationUser() { FirstName = "Andrzej", LastName = "Maćkowski" };
+    //static ApplicationUser user1 = new ApplicationUser() { FirstName = "Zbigniew", LastName = "Nowak" };
+    //static ApplicationUser user2 = new ApplicationUser() { FirstName = "Andrzej", LastName = "Maćkowski" };
 
     private List<Doctor> AllDoctors = new List<Doctor>()
     {
-        new Doctor() {Id="id", PermissionNumber=123, User=user1},
-        new Doctor() {Id="id2", PermissionNumber=345, User=user2}
+        new Doctor() {Id="id", PermissionNumber=123, FirstName = "Zbigniew", LastName = "Nowak"},
+        new Doctor() {Id="id2", PermissionNumber=345, FirstName = "Andrzej", LastName = "Maćkowski" }
     };
 
     private List<Patient> AllPatients = new List<Patient>()
     {
-        new Patient() {PatientId=Guid.NewGuid(), FirstName="Adam", LastName="Nowak", Gender=Gender.Male},
-        new Patient() {PatientId=Guid.NewGuid(), FirstName="Marcin", LastName="Kowalski", Gender=Gender.Male},
-        new Patient() {PatientId=Guid.NewGuid(), FirstName="Daniel", LastName="Anczyk", Gender=Gender.Male},
-        new Patient() {PatientId=Guid.NewGuid(), FirstName="Dawid", LastName="Nowakowski", Gender=Gender.Male}
+        new Patient() {Id=Guid.NewGuid(), FirstName="Adam", LastName="Nowak", Gender=Gender.MALE},
+        new Patient() {Id=Guid.NewGuid(), FirstName="Marcin", LastName="Kowalski", Gender=Gender.MALE},
+        new Patient() {Id=Guid.NewGuid(), FirstName="Daniel", LastName="Anczyk", Gender=Gender.MALE},
+        new Patient() {Id=Guid.NewGuid(), FirstName="Dawid", LastName="Nowakowski", Gender=Gender.MALE}
     };
 
     private void addAppointment() //to do
@@ -88,10 +89,10 @@
         assignPatientsAndDoctorsToAppointmentById();
 
         System.DateTime validatedDateTime = appointmentDate.Add(TimeSpan.Parse(appointmentTime));
-        appointment.AppointmentDate = validatedDateTime;
+        appointment.RegisteredTo = validatedDateTime;
 
         //wypisywanie danych w konsoli
-        Console.WriteLine($"Data - doctor last name: {appointment.Doctor.User.LastName}, patient last name: {appointment.Patient.LastName}, date: {appointment.AppointmentDate}.");
+        Console.WriteLine($"Data - doctor last name: {appointment.Doctor.LastName}, patient last name: {appointment.Patient.LastName}, date: {appointment.RegisteredTo}.");
 
     }
 
@@ -109,7 +110,7 @@
     {
         foreach (var Patient in AllPatients) 
         {
-            if (Patient.PatientId.Equals(Guid.Parse(patientId)))
+            if (Patient.Id.Equals(Guid.Parse(patientId)))
                 appointment.Patient = Patient;
         }
 

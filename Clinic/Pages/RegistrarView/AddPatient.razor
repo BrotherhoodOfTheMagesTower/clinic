@@ -1,4 +1,5 @@
 ﻿@page "/AddPatient"
+@using Clinic.Data.Enums
 @using Clinic.Data.Models
 @using Clinic.Data
 
@@ -25,7 +26,7 @@
             <InputRadioGroup @bind-Value="patient.Gender">
                @foreach (var g in (Gender[])Enum.GetValues(typeof(Gender)))
                 {
-                   <div><InputRadio Value="g" />@g</div>
+                   <div><InputRadio Value="g" />@g.ToString().ToLower()</div>
                 }
             </InputRadioGroup>
 
