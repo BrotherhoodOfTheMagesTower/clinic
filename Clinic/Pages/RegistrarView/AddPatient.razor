@@ -6,46 +6,50 @@
 
 <AuthorizeView Roles = "Registrar" Context="patientAdding">
     <Authorized>
-            <h2>Add new patient</h2>  
+            <h2>Add new patient</h2>  <br /><br />
 
             <EditForm EditContext="newPatient" OnValidSubmit="addPatient" class="w-50 bg-gray px-4 py-3 rounded">
 
             <h3>Enter the patient's:</h3>
-            <label>name <InputText type="text" @bind-Value="firstName"> </InputText></label><br />
+            <label>name <InputText type="text" @bind-Value="patient.FirstName" class="form-control w-75"> </InputText></label><br />
 
-            <label>last name <InputText type="text" @bind-Value="lastName"> </InputText></label><br />
+            <label>last name <InputText type="text" @bind-Value="patient.LastName" class="form-control w-75"> </InputText></label><br />
 
-            <label>pesel <InputText type="text" @bind-Value="pesel"> </InputText></label><br />
+            <label>pesel <InputText type="text" @bind-Value="patient.Pesel" class="form-control w-75"> </InputText></label><br />
 
-            <label>birth date <InputText type="date" @bind-Value="birthDate"> </InputText></label><br />
+            <label>birth date <InputDate @bind-Value="patient.BirthDate" @bind-Value:format="dd/MM/yyyy HH:mm" class="form-control w-75"> </InputDate></label><br />
 
-            <label>phone number <InputText type="text" @bind-Value="phoneNumber"> </InputText></label><br />
+            <label>phone number <InputText type="text" @bind-Value="patient.PhoneNumber" class="form-control w-75"> </InputText></label><br />
 
             <label> gender </label><br>
-            <InputRadioGroup @bind-Value="gender">
+            <InputRadioGroup @bind-Value="patient.Gender">
                @foreach (var g in (Gender[])Enum.GetValues(typeof(Gender)))
                 {
                    <div><InputRadio Value="g" />@g</div>
                 }
             </InputRadioGroup>
 
-            <br/><br />
+            <br/>
 
             <h3>Do you want to add an address?</h3>
-            <input type="checkbox" @onchange="addAdress"/> Add adress
+
+            <InputRadioGroup @bind-Value="isAdressChecked">
+                 <div><InputRadio Value="false" checked />No</div>
+                 <div><InputRadio Value="true"/>Yes</div>
+            </InputRadioGroup>
 
             @if (isAdressChecked)
             {
                 <h3>Enter the patient's: </h3>
-                <label>city <InputText type="text" @bind-Value="city"> </InputText></label><br />
+                <label>city <InputText type="text" @bind-Value="patient.Address.City" class="form-control w-75"> </InputText></label><br />
 
-                <label>street <InputText type="text" @bind-Value="street"> </InputText></label><br />
+                <label>street <InputText type="text" @bind-Value="patient.Address.Street" class="form-control w-75"> </InputText></label><br />
 
-                <label>postal code <InputText type="text" @bind-Value="postalCode"> </InputText></label><br />
+                <label>postal code <InputText type="text" @bind-Value="patient.Address.PostalCode" class="form-control w-75"> </InputText></label><br />
 
-                <label>house number <InputText type="text" @bind-Value="houseNumber"> </InputText></label><br />
+                <label>house number <InputText type="text" @bind-Value="patient.Address.HouseNumber" class="form-control w-75"> </InputText></label><br />
 
-                <label>local number <InputText type="text" @bind-Value="localNumber"> </InputText></label><br />
+                <label>local number <InputText type="text" @bind-Value="patient.Address.LocalNumber" class="form-control w-75"> </InputText></label><br />
             }
             <br/><br />
             <div><button type="submit" class="btn btn-primary">Add patient</button></div>
@@ -57,37 +61,28 @@
 </AuthorizeView>
 
 @code{
+    public bool isAdressChecked;
+
     protected override void OnInitialized()
     {
         newPatient = new EditContext(patient);
-
+         isAdressChecked = false;
         base.OnInitialized();
     }
     readonly Patient patient = new();
     EditContext newPatient;
 
-    private String firstName;
-    private String lastName;
-    private String pesel;
-    private String birthDate;
-    private String phoneNumber;
-    private Gender gender;
-
-    private bool isAdressChecked = false;
-
-    private String street;
-    private String city;
-    private String postalCode;
-    private String houseNumber;
-    private String localNumber;
-
     //TO DO
     private void addPatient()
     {
-        
+
     }
     private void addAdress()
     {
         isAdressChecked = !isAdressChecked;
+        if (isAdressChecked)
+        {
+            patient.Address.Patient.PatientId = patient.PatientId;
+        }
     }
 }
