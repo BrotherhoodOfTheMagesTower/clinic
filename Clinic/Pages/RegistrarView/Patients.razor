@@ -1,0 +1,77 @@
+﻿@page "/Patients"
+@using Clinic.Data.Enums
+@using Clinic.Data.Models
+@using Clinic.Data
+
+@inject NavigationManager NavigationManager;
+
+<PageTitle>Patients</PageTitle>
+
+<AuthorizeView Roles = "Registrar">
+    <Authorized>
+        <h3 class="mb-3 fw-bold"><b>Patients</b></h3> <br />
+        <div>
+            @*<InputText type="text" @bind-Value="searchPatient" class="form-control w-75"/>
+            <button type="submit" class="btn btn-primary"  @onclick="() => SearchPatient()">Search</button>*@
+            <button type="submit" class="btn btn-primary"  @onclick="() => NavigateToAddPatient()">Add patient</button>
+        </div><br />
+           
+            @if (PatientsList != null)
+            {
+                <TableTemplate Items="PatientsList">
+				    <TableHeader>
+				        <th> First Name </th>
+				        <th> Last Name </th>
+                        <th> Gender </th>
+				        <th> Pesel </th>
+				        <th> Birth Date </th>
+				        <th> Phone number </th>
+				        <th> Action </th>
+				    </TableHeader>
+				    <RowTemplate Context="patient">
+				        <td> @patient.FirstName </td>
+				        <td> @patient.LastName </td>
+                        <td> @patient.Gender.ToString().ToLower() </td>
+				        <td> @patient.Pesel </td>
+				        <td> @patient.BirthDate </td>
+				        <td> @patient.PhoneNumber </td>
+				        <th>
+                            <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => EditPatient(patient.Id))">Edit</a>
+                        </th>
+				    </RowTemplate>
+				</TableTemplate>
+			}else{
+                   <h3 class="mb-3 fw-bold">There are no patients in the base</h3> <br />
+            }
+            <br /><br />
+    </Authorized>
+    <NotAuthorized>
+        <h1>Access denied!</h1>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code{
+    public string searchPatient;
+    private List<Patient> PatientsList = new List<Patient>()
+    {
+        new Patient() {Id=Guid.NewGuid(), FirstName="Adam", LastName="Nowak", Gender=Gender.MALE},
+        new Patient() {Id=Guid.NewGuid(), FirstName="Marcin", LastName="Kowalski", Gender=Gender.MALE},
+        new Patient() {Id=Guid.NewGuid(), FirstName="Daniel", LastName="Anczyk", Gender=Gender.MALE},
+        new Patient() {Id=Guid.NewGuid(), FirstName="Dawid", LastName="Nowakowski", Gender=Gender.MALE}
+    };
+
+    public void EditPatient(Guid Id)
+    {
+        NavigationManager.NavigateTo($"AddPatient");
+    }
+
+    private void NavigateToAddPatient()
+    {
+        NavigationManager.NavigateTo($"AddPatient");
+    }
+
+    public void SearchPatient()
+    {
+        Console.Write(searchPatient);
+    }
+}

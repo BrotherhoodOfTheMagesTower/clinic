@@ -1,0 +1,65 @@
+﻿@page "/AddAddress"
+@using Clinic.Data.Enums
+@using Clinic.Data.Models
+@using Clinic.Data
+
+@inject NavigationManager NavigationManager;
+
+<PageTitle>Add Patient's Address</PageTitle>
+
+<AuthorizeView Roles = "Registrar" Context="addressAdding">
+    <Authorized>
+            <h2 class="mb-3 fw-bold">Add patient's address</h2>  <br />
+
+            <EditForm EditContext="newAddress" OnValidSubmit="addAddress" class="w-50 bg-gray px-4 py-3 rounded">
+
+            <h3 class="mb-3 fw-bold">Enter the patient's:</h3>
+            <label class="d-block mb-1 ml-1"/>city 
+            <InputText type="text" @bind-Value="address.City" class="form-control w-75"/>
+
+            <label class="d-block mb-1 ml-1"/>street 
+            <InputText type="text" @bind-Value="address.Street" class="form-control w-75"/>
+
+            <label class="d-block mb-1 ml-1"/>postal code
+            <InputText type="text" @bind-Value="address.PostalCode" class="form-control w-75"/> 
+
+            <label class="d-block mb-1 ml-1"/>house number
+            <InputText type="text" @bind-Value="address.HouseNumber" class="form-control w-75"/>
+
+            <label class="d-block mb-1 ml-1"/>local number 
+            <InputText type="text" @bind-Value="address.LocalNumber" class="form-control w-75"/>
+
+            <br/>
+            <div>  
+            <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+            </EditForm>
+            <button type="submit" class="btn btn-primary" @onclick="() => NavigateToPatients()">Back</button>
+				
+    </Authorized>
+    <NotAuthorized>
+        <h1>Access denied!</h1>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code{
+
+    protected override void OnInitialized()
+    {
+        newAddress = new EditContext(address);
+        base.OnInitialized();
+    }
+    private Address address = new();
+    EditContext newAddress;
+
+    //TO DO
+    private void addAddress()
+    {
+
+    }
+
+     private void NavigateToPatients()
+    {
+        NavigationManager.NavigateTo($"AddPatient");
+    }
+}
