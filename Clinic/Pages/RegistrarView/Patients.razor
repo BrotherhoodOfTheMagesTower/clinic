@@ -9,11 +9,11 @@
 
 <AuthorizeView Roles = "Registrar">
     <Authorized>
-        <h3 class="mb-3 fw-bold"><b>Patients</b></h3> <br />
+        <h3 class="mb-3 fw-bold"><b>Patients @searchPatient</b></h3> <br />
         <div>
-            @*<InputText type="text" @bind-Value="searchPatient" class="form-control w-75"/>
-            <button type="submit" class="btn btn-primary"  @onclick="() => SearchPatient()">Search</button>*@
-            <button type="submit" class="btn btn-primary"  @onclick="() => NavigateToAddPatient()">Add patient</button>
+            <input type="text" @bind="searchPatient" class="form-control w-75"/>
+            <button type="submit" class="btn btn-primary" @onclick="SearchPatient">Search</button>
+            <button type="submit" class="btn btn-primary"  @onclick="(() => NavigateToAddPatient())">Add patient</button>
         </div><br />
            
             @if (PatientsList != null)
@@ -29,14 +29,14 @@
 				        <th> Action </th>
 				    </TableHeader>
 				    <RowTemplate Context="patient">
-				        <td> @patient.FirstName </td>
+                        <td> @patient.FirstName </td>
 				        <td> @patient.LastName </td>
                         <td> @patient.Gender.ToString().ToLower() </td>
 				        <td> @patient.Pesel </td>
 				        <td> @patient.BirthDate </td>
 				        <td> @patient.PhoneNumber </td>
 				        <th>
-                            <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => EditPatient(patient.Id))">Edit</a>
+                            <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToEditPatient(patient.Id.ToString()))">Edit</a>
                         </th>
 				    </RowTemplate>
 				</TableTemplate>
@@ -52,6 +52,8 @@
 
 @code{
     public string searchPatient;
+
+    //TO DO
     private List<Patient> PatientsList = new List<Patient>()
     {
         new Patient() {Id=Guid.NewGuid(), FirstName="Adam", LastName="Nowak", Gender=Gender.MALE},
@@ -60,18 +62,23 @@
         new Patient() {Id=Guid.NewGuid(), FirstName="Dawid", LastName="Nowakowski", Gender=Gender.MALE}
     };
 
-    public void EditPatient(Guid Id)
+    public void NavigateToEditPatient(string Id)
     {
-        NavigationManager.NavigateTo($"AddPatient");
+        NavigationManager.NavigateTo($"AddPatient/{Id}");
     }
 
     private void NavigateToAddPatient()
     {
-        NavigationManager.NavigateTo($"AddPatient");
+        string Id = "-1";
+        NavigationManager.NavigateTo($"AddPatient/{Id}");
     }
 
+    //TO DO
+    //Wyszukiwanie listy pacjentów spełniających warunki wyszukiwania z zmiennej searchPatient
     public void SearchPatient()
     {
-        Console.Write(searchPatient);
+
+    }
+
     }
 }
