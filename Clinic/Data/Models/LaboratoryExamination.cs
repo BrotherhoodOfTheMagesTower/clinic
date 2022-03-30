@@ -1,4 +1,5 @@
 ﻿using Clinic.Areas.Identity.Data;
+using Clinic.Data.Enums;
 
 namespace Clinic.Data.Models
 {
@@ -11,7 +12,7 @@ namespace Clinic.Data.Models
         public DateTime? ExecutedOrCancelledAt { get; set; }
         public string? ManagerNotes { get; set; }
         public DateTime? ApprovedOrCancelledAt { get; set; }
-        public AppointmentStatus Status { get; set; }
+        public ExaminationStatus Status { get; set; }
         public Appointment Appointment { get; set; }
         public GlossaryDictionary GlossaryDictionary { get; set; }
         public LabTechnician? LabTechnician { get; set; }

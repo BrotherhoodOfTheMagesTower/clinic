@@ -1,0 +1,124 @@
+﻿@page "/AddPatient/{EditPatientId}"
+@using Clinic.Data.Enums
+@using Clinic.Data.Models
+@using Clinic.Data
+
+@inject NavigationManager NavigationManager;
+
+@if (EditPatientId.Equals("-1"))
+{
+    <PageTitle>Add Patient</PageTitle>
+}else
+{
+    <PageTitle>Edit Patient</PageTitle>
+}
+
+<AuthorizeView Roles = "Registrar" Context="patientAdding">
+    <Authorized>
+            @if (EditPatientId.Equals("-1"))
+            {
+                <h2 class="mb-3 fw-bold">Add new patient</h2>  <br />
+            }else
+            {
+                <h2 class="mb-3 fw-bold">Edit existing patient</h2>  <br />
+            }
+
+            <EditForm EditContext="newPatient" OnValidSubmit="addPatient" class="w-50 bg-gray px-4 py-3 rounded">
+
+            <h3 class="mb-3 fw-bold">Enter the patient's:</h3>
+            <label class="d-block mb-1 ml-1"/>name 
+            <InputText @bind-Value="@patient.FirstName" class="form-control w-75"/>
+
+            <label class="d-block mb-1 ml-1"/>last name 
+            <InputText @bind-Value="@patient.LastName" class="form-control w-75"/>
+
+            <label class="d-block mb-1 ml-1"/>pesel 
+            <InputText @bind-Value="@patient.Pesel" class="form-control w-75"/> 
+
+            <label class="d-block mb-1 ml-1"/>birth date 
+            <InputDate @bind-Value="@patient.BirthDate" class="form-control w-75"/>
+
+            <label class="d-block mb-1 ml-1"/>phone number 
+            <InputText @bind-Value="@patient.PhoneNumber" class="form-control w-75"/>
+
+            <label class="d-block mb-1 ml-1"/> gender
+            <InputRadioGroup @bind-Value="@patient.Gender">
+               @foreach (var g in (Gender[])Enum.GetValues(typeof(Gender)))
+                {
+                   if (g == patient.Gender)
+                    {
+                      <div><InputRadio Value="g" checked/>@g.ToString().ToLower()</div>  
+                    }
+                    else
+                    {
+                     <div><InputRadio Value="g" />@g.ToString().ToLower()</div>   
+                    }
+                }
+            </InputRadioGroup>
+            <br/>
+            <div>
+            <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+            </EditForm>
+            @if (patient.Address == null)
+            {
+                <button type="submit" class="btn btn-primary" @onclick="() => NavigateToAddAddress(patient.Id.ToString())">Add address</button>
+            }
+            else
+            {
+                <button type="submit" class="btn btn-primary" @onclick="() => NavigateToEditAddress(patient.Id.ToString())">Edit address</button>
+            }  
+            <button type="submit" class="btn btn-primary" @onclick="() => NavigateToPatients()">Back</button>
+				
+    </Authorized>
+    <NotAuthorized>
+        <h1>Access denied!</h1>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code{
+    [Parameter]
+    public string EditPatientId { get; set; }
+
+    protected override void OnInitialized()
+    {
+        newPatient = new EditContext(patient);
+        base.OnInitialized();
+    }
+    private Patient patient = new();
+    EditContext newPatient;
+
+    //TO DO
+    //Przypisanie wartości do pacjenta
+    protected override async Task OnInitializedAsync()
+    {
+        if (!EditPatientId.Equals("-1"))
+        {
+            //Poniższy kod testowo (do usunięcia potem)
+            Address address = new Address() { Id = new Guid(), City = "Racibórz", PostalCode = "47-400" };
+            patient = new Patient() { Id = Guid.Parse(EditPatientId), FirstName = "Adam", LastName = "Nowak", Gender = Gender.MALE, BirthDate = new DateTime(), Pesel = "12345678901", PhoneNumber = "123456789", Address = address };
+        }
+    }
+
+    //TO DO
+    //Zapisanie danych do bazy
+    private void addPatient()
+    {
+
+    }
+
+     private void NavigateToAddAddress(string Id)
+    {
+        NavigationManager.NavigateTo($"AddAddress/{Id}");
+    }
+
+     private void NavigateToPatients()
+    {
+        NavigationManager.NavigateTo($"Patients");
+    }
+
+    private void NavigateToEditAddress(string Id)
+    {
+        NavigationManager.NavigateTo($"AddAddress/{Id}");
+    }
+}
