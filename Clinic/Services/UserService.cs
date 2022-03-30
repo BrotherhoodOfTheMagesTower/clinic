@@ -1,6 +1,7 @@
 ﻿using Clinic.Areas.Identity.Data;
 using Clinic.Data;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Clinic.Services
@@ -43,5 +44,19 @@ namespace Clinic.Services
 
         //    await _context.SaveChangesAsync();
         //}
+
+        public async Task CreateNewDoctorUser(Doctor user)
+        {
+
+            var store = new UserStore<ApplicationUser>(_context);
+            var userManager = new UserManager<ApplicationUser>(store, null, null, null, null, null, null, null, null);
+
+            await userManager.CreateAsync(user.User);
+            await _context.SaveChangesAsync();
+            await userManager.AddToRoleAsync(user.User, "Doctor");
+            await _context.SaveChangesAsync();
+            _context.Doctors.Add(user);
+            await _context.SaveChangesAsync();
+        }
     }
 }

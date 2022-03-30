@@ -45,6 +45,13 @@
                 </NavLink>
             </div>
         </AuthorizeView>
+        <AuthorizeView Roles = "Administrator">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="CreateUser">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Create user
+                </NavLink>
+            </div>
+        </AuthorizeView>
         <AuthorizeView Roles = "Registrar">
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="Patients">

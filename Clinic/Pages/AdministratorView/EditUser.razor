@@ -32,7 +32,7 @@
                             <label for="new-email">New Email and user name</label>
                             <input type="text" value="@email" @oninput="@OnEmailInput" class="form-control" id="new-email" />
                         </div>
-                        <button id="change-email-button" type="submit" @onclick="async () => await ChangeEmailAndUserName(email)" class="w-100 btn btn-lg btn-primary">Change email and user name</button>
+                        <button id="change-email-button" type="submit" @onclick="async () => await ChangeEmailAndUserName(email)" class="w-40 btn btn-lg btn-primary">Change email and user name</button>
                     </EditForm>
 
                     @*// First & Last Name
@@ -52,9 +52,9 @@
                     <EditForm Model="User" Context="Password">
                         <div class="form-group">
                             <label for="psswd">Password</label>
-                            <input type="text" value="@password" @oninput="@OnPasswordInput" class="form-control" id="psswd" />
+                            <input type="text" placeholder="New Password" value="@password" @oninput="@OnPasswordInput" class="form-control" id="psswd" />
                         </div>
-                        <button id="change-psswd" type="submit" @onclick="async () => ChangePassword(password)" class="w-100 btn btn-lg btn-danger">Change password</button>
+                        <button id="change-psswd" type="submit" @onclick="async () => ChangePassword(password)" class="btn btn-lg btn-danger">Change password</button>
                     </EditForm>
                 }
                 else

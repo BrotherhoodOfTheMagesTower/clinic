@@ -77,6 +77,9 @@
         RolesWithSelection = new List<AllRolesView>();
         foreach(var role in AllRoles)
         {
+            if (role.Name == "Administrator")
+                continue;
+
             if(UserRoles.Contains(role.Name))
             {
                 RolesWithSelection.Add(new AllRolesView 

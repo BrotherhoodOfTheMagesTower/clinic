@@ -8,23 +8,35 @@
 <AuthorizeView Roles = "Administrator">
     <Authorized>
         <div class="col-12">
-            <h2>Add or remove roles for users</h2>  
-            <h3><b>User - Role</b></h3>    
+            <h2>Add or remove roles for users</h2> 
             @if (usersWithRoles != null)
             {
-                <div class="card-body">
                     @if(usersWithRoles.Any())
                     {
-                        foreach(var user in usersWithRoles)
+                        <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>Roles</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                    <tbody>
+                        @foreach (var user in usersWithRoles)
                         {
-                            <h5 class="card-title" @onclick="() => NavigateToEditUserRoles(user.Item1.Id)">@user.Item1.UserName - @user.Item2</h5>
+                            <tr>
+                                <td>@user.Item1.Email</td>
+                                <td>@user.Item2</td>
+                                <td class="align-self-auto nav-link" @onclick="() => NavigateToEditUserRoles(user.Item1.Id)">Edit</td>
+                            </tr>
                         }
+                    </tbody>
+                    </table>
                     }
                     else
                     {
                         <h5 class="card-title">No users in database</h5>
                     }
-                </div>
             }
             else
             {

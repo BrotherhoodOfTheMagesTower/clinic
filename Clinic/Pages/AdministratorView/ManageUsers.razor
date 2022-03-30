@@ -5,27 +5,44 @@
 
 <PageTitle>Manage Users</PageTitle>
 
-<AuthorizeView Roles = "Administrator">
+<AuthorizeView Roles="Administrator">
     <Authorized>
         <div class="col-12">
-            <h2>Add, edit or disable user accounts</h2>  
-            <h3><b>Users:</b></h3>    
+            <h2>Edit or disable user accounts</h2>
             @if (users != null)
             {
-                <div class="card-body">
-                    <h5 class="card-title"><b>E-mail</b></h5>
-                    @if(users.Any())
+                    @if (users.Any())
                     {
-                        foreach(var user in users)
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>Email confirmed</th>
+                                <th>Phone number</th>
+                                <th>Phone number confirmed</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                    <tbody>
+                        @foreach (var user in users)
                         {
-                            <h5 class="card-title" @onclick="() => NavigateToEditUser(user.Id)">@user.Email</h5>
+                            <tr>
+                                <td>@user.Email</td>
+                                <td>@user.EmailConfirmed</td>
+                                <td>@user.PhoneNumber</td>
+                                <td>@user.PhoneNumberConfirmed</td>
+                                <td class="align-self-auto nav-link" @onclick="() => NavigateToEditUser(user.Id)">Edit</td>
+                                <td class="align-self-auto link-danger" @onclick="() => NavigateToDisableUser(user.Id)">Disable</td>
+                            </tr>
                         }
+                    </tbody>
+                    </table>
                     }
                     else
                     {
                         <h5 class="card-title">No users in database</h5>
                     }
-                </div>
             }
             else
             {
@@ -38,7 +55,7 @@
     </NotAuthorized>
 </AuthorizeView>
 
-@code{
+@code {
     private List<ApplicationUser>? users;
     protected override async Task OnInitializedAsync()
     {
@@ -48,5 +65,10 @@
     private void NavigateToEditUser(string userId)
     {
         NavigationManager.NavigateTo($"EditUser/{userId}");
+    }
+    
+    private void NavigateToDisableUser(string userId)
+    {
+        NavigationManager.NavigateTo($"DisableUser/{userId}");
     }
 }
