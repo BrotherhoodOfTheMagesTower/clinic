@@ -1,0 +1,70 @@
+﻿@page "/ApproveExamination"
+@using Clinic.Data.Enums
+@using Clinic.Data.Models
+@using Clinic.Data
+
+@inject NavigationManager NavigationManager;
+
+<PageTitle>Approve examinations</PageTitle>
+
+<AuthorizeView Roles="Lab Manager">
+    <Authorized>
+        <h3 class="mb-3 fw-bold"><b>Examinations for approval</b></h3> <br />
+           
+            @if (ExaminationsList != null)
+            {
+                <TableTemplate Items="ExaminationsList">
+				    <TableHeader>
+                        <th> Examination's Id </th>
+				        <th> Code </th>
+				        <th> Name </th>
+				        <th> Status </th>
+                        <th> Result </th>
+				        <th> Actions </th>
+				    </TableHeader>
+				    <RowTemplate Context="examination">
+                        <td> @examination.Id </td>
+                        <td> @examination.GlossaryDictionary.Code.ToString().ToLower() </td>
+				        <td> @examination.GlossaryDictionary.Name </td>
+				        <td> @examination.Status.ToString().ToLower() </td>
+                        <td> @examination.Result </td>
+				        <th>
+                            <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => approveExamination(examination.Id.ToString()))">Approve | </a>
+                            <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToEditExamination(examination.Id.ToString()))">Add note</a>
+                        </th>
+				    </RowTemplate>
+				</TableTemplate>
+			}else{
+                   <h3 class="mb-3 fw-bold">There are no examinations to be approved</h3> <br />
+            }
+            <br /><br />
+    </Authorized>
+    <NotAuthorized>
+        <h1>Access denied!</h1>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    
+    //TO DO
+    //Lista badań gotowych
+    private List<LaboratoryExamination> ExaminationsList = new List<LaboratoryExamination>()
+    {
+        new LaboratoryExamination() {Id=Guid.NewGuid(), DoctorsNotes="coś tam 1", OrderedAt=new DateTime(), GlossaryDictionary=new GlossaryDictionary() {Code=GlossaryCode.LAB_BLOOD, Name="jakaś tam 1", Type=GlossaryType.LABORATORY}},
+        new LaboratoryExamination() {Id=Guid.NewGuid(), DoctorsNotes="coś tam 2", OrderedAt=new DateTime(), GlossaryDictionary=new GlossaryDictionary() {Code=GlossaryCode.LAB_COVID, Name="jakaś tam 2", Type=GlossaryType.LABORATORY}},
+        new LaboratoryExamination() {Id=Guid.NewGuid(), DoctorsNotes="coś tam 3", OrderedAt=new DateTime(), GlossaryDictionary=new GlossaryDictionary() {Code=GlossaryCode.LAB_URINE, Name="jakaś tam 3", Type=GlossaryType.LABORATORY}},
+        new LaboratoryExamination() {Id=Guid.NewGuid(), DoctorsNotes="coś tam 4", OrderedAt=new DateTime(), GlossaryDictionary=new GlossaryDictionary() {Code=GlossaryCode.LAB_BLOOD, Name="jakaś tam 4", Type=GlossaryType.LABORATORY}}
+    };
+
+    //Zatwierdzanie badania
+    public void approveExamination(string Id)
+    {
+        
+    }
+
+     public void NavigateToEditExamination(string Id)
+    {
+        NavigationManager.NavigateTo($"EditLabExamination/{Id}");
+    }
+
+ }

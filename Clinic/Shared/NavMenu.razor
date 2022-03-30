@@ -59,6 +59,20 @@
                 </NavLink>
             </div>
         </AuthorizeView>
+        <AuthorizeView Roles = "Lab Technician, Lab Manager">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="LabExaminations">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Examinations
+                </NavLink>
+            </div>
+        </AuthorizeView>
+        <AuthorizeView Roles = "Lab Manager">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="ApproveExamination">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Approve Examinations
+                </NavLink>
+            </div>
+        </AuthorizeView>
     </nav>
 </div>
 
