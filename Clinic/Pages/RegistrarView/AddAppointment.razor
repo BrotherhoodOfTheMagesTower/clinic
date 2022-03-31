@@ -1,46 +1,98 @@
-﻿@page "/AddNewAppointment"
+﻿@page "/AddAppointment/{EditAppointmentId}"
 @using Clinic.Data
 @using Clinic.Data.Enums
 @using Clinic.Data.Models
 
-<PageTitle>Add Appointment</PageTitle>
+@inject NavigationManager NavigationManager;
+
+@if (EditAppointmentId.Equals("-1"))
+{
+    <PageTitle>Add Appointment</PageTitle>
+}else
+{
+    <PageTitle>Edit Appointment</PageTitle>
+}
 
 <AuthorizeView Roles="Registrar" Context="appointmentAdding">
     <Authorized>
         
+            @if (EditAppointmentId.Equals("-1"))
+            {
+                <h2 class="mb-3 fw-bold">Add a new appointment </h2><br />
+            }else
+            {
+                <h2 class="mb-3 fw-bold">Edit a appointment </h2><br />
+            }
 
         <EditForm EditContext="newAppointment" OnValidSubmit="addAppointment" class="w-50 bg-gray px-4 py-3 rounded">
-            <h2 class="mb-3 fw-bold">Add a new appointment </h2><br />
             <label class="d-block mb-1 ml-1">Doctor:</label>
             <InputSelect @bind-Value="doctorId" class="form-control w-75">
-                <option value="" selected disabled hidden>Choose here...</option>
+                @if (EditAppointmentId.Equals("-1"))
+                {
+                    <option value="" selected disabled hidden>Choose here...</option>
+                }
                 @foreach (var Doctor in AllDoctors)
                 {
-                    <option value=@Doctor.Id>@Doctor.LastName @Doctor.FirstName</option>
+                    if (Doctor.Id.ToString().Equals(EditAppointmentId))
+                    {
+                        <option value=@Doctor.Id selected>@Doctor.LastName @Doctor.FirstName</option>
+                    }
+                    else
+                    {
+                        <option value=@Doctor.Id>@Doctor.LastName @Doctor.FirstName</option>
+                    }
                 }
             </InputSelect><br />
 
             <label class="d-block mb-1 ml-1">Patient:</label>
             <InputSelect @bind-Value="patientId" class="form-control w-75">
-                <option value="Guid.Empty" selected disabled hidden>Choose here...</option>
+                @if (EditAppointmentId.Equals("-1"))
+                {
+                    <option value="Guid.Empty" selected disabled hidden>Choose here...</option>
+                }
                 @foreach (var Patient in AllPatients)
                 {
-                    <option value=@Patient.Id.ToString()>@Patient.LastName @Patient.FirstName </option>
-
+                    if (Patient.Id.ToString().Equals(EditAppointmentId))
+                    {
+                        <option value=@Patient.Id.ToString() selected>@Patient.LastName @Patient.FirstName </option>
+                    }
+                    else
+                    {
+                        <option value=@Patient.Id.ToString()>@Patient.LastName @Patient.FirstName </option>
+                    }
                 }
             </InputSelect><br />
 
 
             <label class="d-block mb-1 ml-1">Date:</label>
 
-            <InputDate @bind-Value="appointmentDate" class="form-control w-75"> </InputDate><br />
+            <InputDate @bind-Value="@appointmentDate" class="form-control w-75"> </InputDate><br />
 
             <label class="d-block mb-1 ml-1">Time:</label>
-            <InputText type="time" @bind-Value="appointmentTime" step=30 class="form-control w-75"></InputText><br />
-            <div><button type="submit" class="btn btn-primary">Add appointment</button></div>
+            <InputText type="time" @bind-Value="@appointmentTime" step=30 class="form-control w-75"></InputText><br />
+
+            @if (!EditAppointmentId.Equals("-1"))
+            {
+                <InputRadioGroup @bind-Value="@appointment.Status">
+               @foreach (var g in (AppointmentStatus[])Enum.GetValues(typeof(AppointmentStatus)))
+                {
+                   if (g == appointment.Status)
+                    {
+                      <div><InputRadio Value="g" checked/>@g.ToString().ToLower()</div>  
+                    }
+                    else
+                    {
+                     <div><InputRadio Value="g" />@g.ToString().ToLower()</div>   
+                    }
+                }
+            </InputRadioGroup>
+            }
+            <br /><br />
+
+            <div><button type="submit" class="btn btn-primary">Save</button></div>
 
         </EditForm>
-
+        <button type="submit" class="btn btn-primary" @onclick="() => NavigateToAppointments()">Back</button>
     </Authorized>
     <NotAuthorized>
         <h1>Access denied!</h1>
@@ -49,6 +101,9 @@
 
 
 @code {
+    [Parameter]
+    public string EditAppointmentId { get; set; }
+
     protected override void OnInitialized()
     {
         newAppointment = new EditContext(appointment);
@@ -57,8 +112,18 @@
         appointmentTime = "15:00:00";
         base.OnInitialized();
     }
-    readonly Appointment appointment = new();
+    Appointment appointment = new();
     EditContext newAppointment;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!EditAppointmentId.Equals("-1"))
+        {
+            //Poniższy kod testowo (do usunięcia potem)
+            appointmentDate = new DateTime(2022, 05, 03);
+            appointmentTime = "13:30:00";
+        }
+    }
 
     private string appointmentTime;
     private DateTime appointmentDate;
@@ -119,5 +184,10 @@
             if (Doctor.Id.Equals(doctorId))
                 appointment.Doctor = Doctor;
         }
+    }
+
+    private void NavigateToAppointments()
+    {
+        NavigationManager.NavigateTo($"Appointments");
     }
 }
