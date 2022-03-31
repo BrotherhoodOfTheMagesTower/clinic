@@ -1,13 +1,13 @@
-using Clinic.Data;
-using Microsoft.EntityFrameworkCore;
-using Clinic.Areas.Identity.Data;
-using Microsoft.AspNetCore.Components.Authorization;
 using Clinic.Areas.Identity;
-using Microsoft.AspNetCore.Identity;
+using Clinic.Areas.Identity.Data;
+using Clinic.Data;
 using Clinic.Services;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-var connectionString = builder.Configuration.GetConnectionString("ApplicationDbContextConnection"); 
+var connectionString = builder.Configuration.GetConnectionString("ApplicationDbContextConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
      options.UseSqlServer(connectionString));
 builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
@@ -19,6 +19,7 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<ApplicationUser>>();
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<DoctorService>();
 
 var app = builder.Build();
 
