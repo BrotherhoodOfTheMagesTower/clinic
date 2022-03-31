@@ -1,0 +1,82 @@
+﻿@page "/Appointments"
+@using Clinic.Data.Enums
+@using Clinic.Data.Models
+@using Clinic.Data
+
+@inject NavigationManager NavigationManager;
+
+<PageTitle>Appointments</PageTitle>
+
+<AuthorizeView Roles = "Registrar">
+    <Authorized>
+        <h3 class="mb-3 fw-bold"><b>Appointments </b></h3> <br />
+        <div>
+            <input type="text" @bind="searchAppointment" class="form-control w-75"/>
+            <button type="submit" class="btn btn-primary" @onclick="SearchAppointment">Search</button>
+            <button type="submit" class="btn btn-primary"  @onclick="(() => NavigateToAddAppointment())">Add appointment</button>
+        </div><br />
+           
+            @if (AppointmentsList != null)
+            {
+                <TableTemplate Items="AppointmentsList">
+				    <TableHeader>
+				        <th> Patient's first name </th>
+				        <th> Last name </th>
+                        <th> Appointment's date </th>
+				        <th> Status </th>
+				        <th> Doctor's first name </th>
+				        <th> Last name </th>
+				        <th> Action </th>
+				    </TableHeader>
+				    <RowTemplate Context="appointment">
+                        <td> @appointment.Patient.FirstName </td>
+				        <td> @appointment.Patient.LastName </td>
+				        <td> @appointment.RegisteredTo</td>
+				        <td> @appointment.Status.ToString().ToLower() </td>
+                        <td> @appointment.Doctor.FirstName </td>
+				        <td> @appointment.Doctor.LastName </td>
+				        <th>
+                            <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToEditAppointment(appointment.Id.ToString()))">Edit</a>
+                        </th>
+				    </RowTemplate>
+				</TableTemplate>
+			}else{
+                   <h3 class="mb-3 fw-bold">There are no appointments in the base</h3> <br />
+            }
+            <br /><br />
+    </Authorized>
+    <NotAuthorized>
+        <h1>Access denied!</h1>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code{
+    public string searchAppointment;
+
+
+    //TO DO
+    private List<Appointment> AppointmentsList = new List<Appointment>()
+    {
+        new Appointment() {Id=new Guid(),RegisteredTo=new DateTime(),Status=AppointmentStatus.BOOKED,Patient=new Patient { FirstName = "Kasia", LastName = "Jakaś" },Doctor= new Doctor { FirstName = "Adam", LastName = "Jakiś" } },
+        new Appointment() {Id=new Guid(),RegisteredTo=new DateTime(),Status=AppointmentStatus.BOOKED,Patient=new Patient { FirstName = "Tosia", LastName = "Jakaś" },Doctor= new Doctor { FirstName = "Adam", LastName = "Jakiś" } }
+    };
+
+    public void NavigateToEditAppointment(string Id)
+    {
+        NavigationManager.NavigateTo($"AddAppointment/{Id}");
+    }
+
+    private void NavigateToAddAppointment()
+    {
+        string Id = "-1";
+        NavigationManager.NavigateTo($"AddAppointment/{Id}");
+    }
+
+    //TO DO
+    //Wyszukiwanie listy pacjentów spełniających warunki wyszukiwania z zmiennej searchPatient
+    public void SearchAppointment()
+    {
+
+    }
+
+    }

@@ -54,8 +54,8 @@
         </AuthorizeView>
         <AuthorizeView Roles = "Registrar">
             <div class="nav-item px-3">
-                <NavLink class="nav-link" href="AddNewAppointment">
-                    <span class="oi oi-list-rich" aria-hidden="true"></span> Add appointment
+                <NavLink class="nav-link" href="Appointments">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Appointments
                 </NavLink>
             </div>
         </AuthorizeView>
@@ -73,6 +73,14 @@
                 </NavLink>
             </div>
         </AuthorizeView>
+         <AuthorizeView Roles = "Doctor">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="DoctorAppointments">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Appointments
+                </NavLink>
+            </div>
+        </AuthorizeView>
+  
     </nav>
 </div>
 
