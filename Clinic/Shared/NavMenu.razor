@@ -14,16 +14,6 @@
                 <span class="oi oi-home" aria-hidden="true"></span> Home
             </NavLink>
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
-            </NavLink>
-        </div>
         <AuthorizeView>
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="CheckRole">
@@ -42,6 +32,13 @@
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="ManageUsers">
                     <span class="oi oi-list-rich" aria-hidden="true"></span> Manage users
+                </NavLink>
+            </div>
+        </AuthorizeView>
+        <AuthorizeView Roles = "Administrator">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="CreateUser">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Create user
                 </NavLink>
             </div>
         </AuthorizeView>

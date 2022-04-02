@@ -16,7 +16,7 @@
         <form method="post">
             <div class="card">
                 <div class="card-header">
-                    <h2>Edit user <b>@User.UserName</b></h2>
+                    <h2 class="text-center" style="margin-top:8px">Edit user <b>@User.UserName</b></h2>
                 </div>
             </div>
             <div class="card-body">
@@ -24,15 +24,15 @@
                 {
                     // E-Mail & UserName change
                     <EditForm Model="User" Context="Email">
-                        <div class="form-group">
+                        <div class="form-group mx-sm-3 mb-2">
                             <label for="email">Email and user name</label>
                             <InputText class="form-control" id="email" disabled @bind-Value="User.Email" />
                         </div>
-                        <div class="form-group">
-                            <label for="new-email">New Email and user name</label>
+                        <div class="form-group mx-sm-3 mb-2">
+                            <label style="margin-top:15px" for="new-email">New Email and user name</label>
                             <input type="text" value="@email" @oninput="@OnEmailInput" class="form-control" id="new-email" />
                         </div>
-                        <button id="change-email-button" type="submit" @onclick="async () => await ChangeEmailAndUserName(email)" class="w-100 btn btn-lg btn-primary">Change email and user name</button>
+                        <button style="margin-top:5px" id="change-email-button" type="submit" @onclick="async () => await ChangeEmailAndUserName(email)" class="w-40 btn btn-primary">Change email and user name</button>
                     </EditForm>
 
                     @*// First & Last Name
@@ -50,11 +50,11 @@
 
                     // Password
                     <EditForm Model="User" Context="Password">
-                        <div class="form-group">
-                            <label for="psswd">Password</label>
-                            <input type="text" value="@password" @oninput="@OnPasswordInput" class="form-control" id="psswd" />
+                        <div class="form-group mx-sm-3 mb-2">
+                            <label style="margin-top:25px" for="psswd">Password</label>
+                            <input type="text" placeholder="New Password" value="@password" @oninput="@OnPasswordInput" class="form-control" id="psswd" />
                         </div>
-                        <button id="change-psswd" type="submit" @onclick="async () => ChangePassword(password)" class="w-100 btn btn-lg btn-danger">Change password</button>
+                        <button style="margin-top:5px" id="change-psswd" type="submit" @onclick="async () => ChangePassword(password)" class="btn btn-danger">Change password</button>
                     </EditForm>
                 }
                 else
@@ -79,7 +79,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        User = userService.GetUserByIdAsync(Id);
+        User = userService.GetUserById(Id);
     }
 
     private async Task<bool> IsUserInRole(string role)
@@ -114,7 +114,7 @@
         {
             await userManager.SetEmailAsync(User, newEmail);
 
-            var newUser = userService.GetUserByIdAsync(User.Id);
+            var newUser = userService.GetUserById(User.Id);
             var emailConfirmationToken = await userManager.GenerateEmailConfirmationTokenAsync(newUser);
             await userManager.ConfirmEmailAsync(User, emailConfirmationToken);
             await userManager.SetUserNameAsync(newUser, newEmail);
