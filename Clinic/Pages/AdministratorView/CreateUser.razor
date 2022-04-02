@@ -1,8 +1,10 @@
 ﻿@page "/CreateUser"
+@using Clinic.Constants
 @using Clinic.Services
 @using Microsoft.AspNetCore.Identity
 @inject UserService userService;
 @inject NavigationManager NavigationManager
+@inject IToastService toastService
 
 <PageTitle>Create user</PageTitle>
 
@@ -11,48 +13,49 @@
         <form method="post">
             <div class="card">
                 <div class="card-header">
-                    <h2>Create new user <b></b></h2>
+                    <h2 class="text-center" style="margin-top:8px"><b>Create new user</b></h2>
                 </div>
             </div>
             <div class="card-body">
                 <EditForm Model="User" Context="FirstNameLastName">
-                    <div class="form-group">
-                        <label for="first-name">First name</label>
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-form-label" for="first-name">First name</label>
                         <InputText class="form-control" id="first-name" @bind-Value="firstName" />
                     </div>
-                    <div class="form-group">
-                        <label for="second-name">Last name</label>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-form-label" for="second-name">Last name</label>
                         <InputText class="form-control" id="last-name" @bind-Value="lastName" />
                     </div>
                     <EditForm Model="User" Context="Email">
-                        <div class="form-group">
-                            <label for="email">Email and user name</label>
-                            <input type="text" value="@email" @oninput="@OnEmailInput" class="form-control" id="new-email" />
+                        <div class="form-group mx-sm-3 mb-2">
+                            <label class="col-form-label" for="email">Email and user name</label>
+                            <input type="text" class="form-control" @oninput="OnEmailInput" id="new-email" />
                         </div>
                     </EditForm>
                 </EditForm>
                 <EditForm Model="User" Context="Password">
-                    <div class="form-group">
-                        <label for="psswd">Password</label>
-                        <input type="text" value="@password" @oninput="@OnPasswordInput" class="form-control" id="psswd" />
+                    <DataAnnotationsValidator />
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-form-label" for="psswd">Password</label>
+                        <input type="text" @oninput="@OnPasswordInput" class="form-control" id="psswd" />
                     </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-form-label" for="psswd">Permission number</label>
+                        <input placeholder="Only for doctors" type="text" @oninput="@OnPermNumberInput" class="form-control" style="margin-bottom: 15px" id="psswd" />
+                    </div>
+                    <div>
+                        <h4 class="modal-header" style="margin-top: 10px">Select role for new user <b></b></h4>
+                    </div>
+                    <InputRadioGroup @bind-Value="selectedRole">
+                        @foreach (var role in RolesWithSelection)
+                        {
+                            <div class="form-check"><InputRadio Value="role.Role.Name" class="form-check-input" /><span style="padding-left: 5px">@role.Role.Name</span></div>
+                        }
+                    </InputRadioGroup>
                 </EditForm>
-                <h3>Select roles for new user <b></b></h3>
-                @if (RolesWithSelection.Any())
-                {
-                    foreach (var role in RolesWithSelection)
-                    {
-                        <div class="form-check-label m-1">
-                            <EditForm Context="checkbox" Model="User">
-                                <InputCheckbox @bind-Value="role.IsSelected" @onclick="() => UpdateSelected(role)" class="form-check-input" />
-                                <label class="form-check-label">
-                                    @role.Role
-                                </label>
-                            </EditForm>
-                        </div>
-                    }
-                }
-                <button href="/ManageUsers" @onclick="async () => CreateNewUser()" type="submit" class="btn btn-lg btn-danger">Add new user to database</button>
+                <button @onclick="async () => await CreateNewUser()" type="button" style="margin-top: 20px" class="btn btn-lg btn-danger">Add new user to database</button>
             </div>
         </form>
     </Authorized>
@@ -60,14 +63,19 @@
         <h1>Access denied!</h1>
     </NotAuthorized>
 </AuthorizeView>
-@code {
+
+@code
+{
     private ApplicationUser User { get; set; } = new();
     private List<IdentityRole> AllRoles { get; set; }
     private List<AllRolesView> RolesWithSelection { get; set; }
-    private string email { get; set; }
+    private string email { get; set; } = "";
     private string password { get; set; } = "";
+    private string permissionNumber { get; set; } = "";
     private string firstName { get; set; } = "";
     private string lastName { get; set; } = "";
+    private string selectedRole { get; set; } = "";
+    private bool WasUserAddedToDatabase { get; set; }
 
     private class AllRolesView
     {
@@ -101,6 +109,11 @@
         password = args.Value.ToString();
     }
 
+    public void OnPermNumberInput(ChangeEventArgs args)
+    {
+        permissionNumber = args.Value.ToString();
+    }
+
     private void UpdateSelected(AllRolesView role)
     {
         var isSelected = role.IsSelected;
@@ -112,26 +125,37 @@
 
     private async Task CreateNewUser()
     {
-        var id = Guid.NewGuid();
-        var doctor = new Doctor
-            {
-                Id = id.ToString(),
-                FirstName = firstName,
-                LastName = lastName,
-                PermissionNumber = 1,
-                User = new ApplicationUser
-                {
-                    Id = id.ToString(),
-                    Email = email,
-                    UserName = email,
-                    EmailConfirmed = true,
-                    SecurityStamp = Guid.NewGuid().ToString()
-                }
-            };
-        var psswd = new PasswordHasher<ApplicationUser>();
-        var hashed = psswd.HashPassword(doctor.User, password);
-        doctor.User.PasswordHash = hashed;
+        //TODO: Add BE validation if user does not already exist in the database
+        //TODO: Make 'Add new user to database' button unclickable when validation fails (FE validation)
 
-        await userService.CreateNewDoctorUser(doctor);
+        bool shouldCheckIfUserWasAddedToDb = true;
+
+        if (selectedRole.Equals(Roles.Doctor))
+        {
+            try
+            {
+                WasUserAddedToDatabase = await userService.CreateNewDoctorUser(firstName, lastName, email, password, long.Parse(permissionNumber));
+            }
+            catch(FormatException f)
+            {
+                if (f.Message.Equals("Input string was not in a correct format."))
+                    toastService.ShowError("Please provide a valid Permission Number", "Oops!");
+
+                shouldCheckIfUserWasAddedToDb = false;
+            }
+        }
+        
+        else if (selectedRole.Equals(Roles.Registrar))
+            WasUserAddedToDatabase = await userService.CreateNewRegistrarUser(firstName, lastName, email, password);
+        else if (selectedRole.Equals(Roles.LabTechnician))
+            WasUserAddedToDatabase = await userService.CreateNewLabTechnicianUser(firstName, lastName, email, password);
+        else if (selectedRole.Equals(Roles.LabManager))
+            WasUserAddedToDatabase = await userService.CreateNewLabManagerUser(firstName, lastName, email, password);
+
+        if (WasUserAddedToDatabase && shouldCheckIfUserWasAddedToDb)
+            toastService.ShowSuccess($"Account was successfully created and {firstName} {lastName} was added to the database.", "Well done!");
+        else if(!WasUserAddedToDatabase && shouldCheckIfUserWasAddedToDb)
+            toastService.ShowError("Sorry! A user with this E-mail already exists in the database.", "Oops!");
+
     }
 }

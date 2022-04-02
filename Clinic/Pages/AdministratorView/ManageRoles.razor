@@ -7,31 +7,29 @@
 
 <AuthorizeView Roles = "Administrator">
     <Authorized>
-        <div class="col-12">
-            <h2>Add or remove roles for users</h2> 
+            <div class="card-header" style="margin-bottom: 40px" >
+                <h2 class="text-center" style="margin-top:8px"><b>Add or remove roles for users</b></h2>
+            </div>
             @if (usersWithRoles != null)
             {
                     @if(usersWithRoles.Any())
                     {
-                        <table class="table">
-                        <thead>
-                            <tr>
+                        <TableTemplate Items="usersWithRoles">
+                        <TableHeader>
+                                <th>First Name</th>
+                                <th>Last Name</th>
                                 <th>Email</th>
-                                <th>Roles</th>
+                                <th>Role</th>
                                 <th></th>
-                            </tr>
-                        </thead>
-                    <tbody>
-                        @foreach (var user in usersWithRoles)
-                        {
-                            <tr>
+                        </TableHeader>
+                        <RowTemplate Context="user">
+                                <td>TODO: provide getter for Names</td>
+                                <td></td>
                                 <td>@user.Item1.Email</td>
                                 <td>@user.Item2</td>
-                                <td class="align-self-auto nav-link" @onclick="() => NavigateToEditUserRoles(user.Item1.Id)">Edit</td>
-                            </tr>
-                        }
-                    </tbody>
-                    </table>
+                                <td role="button" @onclick="() => NavigateToEditUserRoles(user.Item1.Id)"><span style="color:red">Edit</span></td>
+                        </RowTemplate>
+                    </TableTemplate>
                     }
                     else
                     {
@@ -42,7 +40,6 @@
             {
                 <h5 class="card-title">No users in database</h5>
             }
-        </div>
     </Authorized>
     <NotAuthorized>
         <h1>Access denied!</h1>
@@ -57,7 +54,11 @@
         usersWithRoles = new List<Tuple<ApplicationUser, string>>();
 
         foreach (var user in users)
+        {
+            if (user.Email.Equals("admin@admin.com"))
+                continue;
             usersWithRoles.Add(Tuple.Create(user, GetRolesForUser(user.Id)));
+        }
     }
 
     private string GetRolesForUser(string userId)
