@@ -5,48 +5,73 @@
 
 <PageTitle>Manage Users</PageTitle>
 
-<AuthorizeView Roles = "Administrator">
+<AuthorizeView Roles="Administrator">
     <Authorized>
-        <div class="col-12">
-            <h2>Add, edit or disable user accounts</h2>  
-            <h3><b>Users:</b></h3>    
+            <div class="card-header" style="margin-bottom: 40px" >
+                <h2 class="text-center" style="margin-top:8px"><b>Edit or disable user accounts</b></h2>
+            </div>
             @if (users != null)
             {
-                <div class="card-body">
-                    <h5 class="card-title"><b>FirstName LastName - UserName</b></h5>
-                    @if(users.Any())
-                    {
-                        foreach(var user in users)
-                        {
-                            <h5 class="card-title" @onclick="() => NavigateToEditUser(user.Id)">@user.FirstName @user.LastName - @user.UserName</h5>
-                        }
-                    }
-                    else
-                    {
-                        <h5 class="card-title">No users in database</h5>
-                    }
-                </div>
+                @if (users.Any())
+                {
+                    <TableTemplate Items="users">
+                        <TableHeader>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Email</th>
+                            <th>Email confirmed</th>
+                            <th>Phone number</th>
+                            <th>Phone number confirmed</th>
+                            <th></th>
+                            <th></th>
+                        </TableHeader>
+                        <RowTemplate Context="user">
+                            <td>@user.Item2</td>
+                            <td>@user.Item3</td>
+                            <td>@user.Item1.Email</td>
+                            <td>@user.Item1.EmailConfirmed</td>
+                            <td>@user.Item1.PhoneNumber</td>
+                            <td>@user.Item1.PhoneNumberConfirmed</td>
+                            <td role="button" class="align-self-auto nav-link" @onclick="() => NavigateToEditUser(user.Item1.Id)">Edit</td>
+                            <td role="button" class="align-self-auto link-danger" @onclick="() => NavigateToDisableUser(user.Item1.Id)">Disable</td>
+                        </RowTemplate>
+                    </TableTemplate>
+                }
+                else
+                {
+                    <h5 class="card-title">Loading...</h5>
+                }
             }
             else
             {
                 <h5 class="card-title">No users in database</h5>
             }
-        </div>
     </Authorized>
     <NotAuthorized>
         <h1>Access denied!</h1>
     </NotAuthorized>
 </AuthorizeView>
 
-@code{
-    private List<ApplicationUser>? users;
+@code {
+    private List<Tuple<ApplicationUser, string?, string?>> users = new();
+
     protected override async Task OnInitializedAsync()
     {
-        users = await userService.GetAllUsersAsync();
+        var appUsers = await userService.GetAllUsersAsync();
+        foreach (var appUser in appUsers)
+        {
+            var names = userService.GetFirstAndLastNameForSpecificUser(appUser.Id);
+            users.Add(Tuple.Create(appUser, names.Item1, names.Item2));
+        }
     }
 
     private void NavigateToEditUser(string userId)
     {
         NavigationManager.NavigateTo($"EditUser/{userId}");
+    }
+
+    private void NavigateToDisableUser(string userId)
+    {
+        NavigationManager.NavigateTo($"DisableUser/{userId}");
     }
 }

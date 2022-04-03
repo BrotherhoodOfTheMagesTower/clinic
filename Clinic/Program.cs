@@ -4,8 +4,8 @@ using Clinic.Areas.Identity.Data;
 using Microsoft.AspNetCore.Components.Authorization;
 using Clinic.Areas.Identity;
 using Microsoft.AspNetCore.Identity;
-using Clinic.Constants;
 using Clinic.Services;
+using Blazored.Toast;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("ApplicationDbContextConnection"); 
@@ -18,8 +18,8 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.R
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<ApplicationUser>>();
-builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddBlazoredToast();
 
 var app = builder.Build();
 

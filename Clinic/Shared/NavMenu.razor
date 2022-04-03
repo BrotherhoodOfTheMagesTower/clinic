@@ -14,16 +14,6 @@
                 <span class="oi oi-home" aria-hidden="true"></span> Home
             </NavLink>
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
-            </NavLink>
-        </div>
         <AuthorizeView>
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="CheckRole">
@@ -45,13 +35,49 @@
                 </NavLink>
             </div>
         </AuthorizeView>
-        <AuthorizeView Roles = "Registrar">
+        <AuthorizeView Roles = "Administrator">
             <div class="nav-item px-3">
-                <NavLink class="nav-link" href="AddPatient">
-                    <span class="oi oi-list-rich" aria-hidden="true"></span> Add patient
+                <NavLink class="nav-link" href="CreateUser">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Create user
                 </NavLink>
             </div>
         </AuthorizeView>
+        <AuthorizeView Roles = "Registrar">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="Patients">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Patients
+                </NavLink>
+            </div>
+        </AuthorizeView>
+        <AuthorizeView Roles = "Registrar">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="Appointments">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Appointments
+                </NavLink>
+            </div>
+        </AuthorizeView>
+        <AuthorizeView Roles = "Lab Technician, Lab Manager">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="LabExaminations">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Examinations
+                </NavLink>
+            </div>
+        </AuthorizeView>
+        <AuthorizeView Roles = "Lab Manager">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="ApproveExamination">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Approve Examinations
+                </NavLink>
+            </div>
+        </AuthorizeView>
+         <AuthorizeView Roles = "Doctor">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="DoctorAppointments">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Appointments
+                </NavLink>
+            </div>
+        </AuthorizeView>
+  
     </nav>
 </div>
 

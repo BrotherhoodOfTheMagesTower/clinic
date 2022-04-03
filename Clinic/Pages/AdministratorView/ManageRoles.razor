@@ -7,30 +7,39 @@
 
 <AuthorizeView Roles = "Administrator">
     <Authorized>
-        <div class="col-12">
-            <h2>Add or remove roles for users</h2>  
-            <h3><b>User - Role</b></h3>    
+            <div class="card-header" style="margin-bottom: 40px" >
+                <h2 class="text-center" style="margin-top:8px"><b>Add or remove roles for users</b></h2>
+            </div>
             @if (usersWithRoles != null)
             {
-                <div class="card-body">
                     @if(usersWithRoles.Any())
                     {
-                        foreach(var user in usersWithRoles)
-                        {
-                            <h5 class="card-title" @onclick="() => NavigateToEditUserRoles(user.Item1.Id)">@user.Item1.UserName - @user.Item2</h5>
-                        }
+                        <TableTemplate Items="usersWithRoles">
+                        <TableHeader>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th></th>
+                        </TableHeader>
+                        <RowTemplate Context="user">
+                                <td>@user.Item2</td>
+                                <td>@user.Item3</td>
+                                <td>@user.Item1.Email</td>
+                                <td>@user.Item4</td>
+                                <td role="button" @onclick="() => NavigateToEditUserRoles(user.Item1.Id)"><span style="color:red">Edit</span></td>
+                        </RowTemplate>
+                    </TableTemplate>
                     }
                     else
                     {
-                        <h5 class="card-title">No users in database</h5>
+                        <h5 class="card-title">Loading...</h5>
                     }
-                </div>
             }
             else
             {
                 <h5 class="card-title">No users in database</h5>
             }
-        </div>
     </Authorized>
     <NotAuthorized>
         <h1>Access denied!</h1>
@@ -38,29 +47,21 @@
 </AuthorizeView>
 
 @code{
-    private List<Tuple<ApplicationUser, string>>? usersWithRoles;
+    private List<Tuple<ApplicationUser, string?, string?, string>> usersWithRoles = new(); // AppUser, FirstName, LastName, Roles
+
     protected override async Task OnInitializedAsync()
     {
-        var users = await userService.GetAllUsersAsync();
-        usersWithRoles = new List<Tuple<ApplicationUser, string>>();
+        var appUsers = await userService.GetAllUsersAsync();
 
-        foreach (var user in users)
-            usersWithRoles.Add(Tuple.Create(user, GetRolesForUser(user.Id)));
-    }
-
-    private string GetRolesForUser(string userId)
-    {
-        var roles = userService.GetRolesForUser(userId);
-
-        if (roles != null)
+        foreach (var appUser in appUsers)
         {
-            if (roles.Count == 1)
-                return roles.First();
-            else if(roles.Count != 0)
-                return string.Join(", ", roles);
-        }
+            if (appUser.Email.Equals("admin@admin.com"))
+                continue;
 
-        return "";
+            var names = userService.GetFirstAndLastNameForSpecificUser(appUser.Id);
+            usersWithRoles.Add(Tuple.Create
+                (appUser, names.Item1, names.Item2, userService.GetRolesForUserInOneStringSplittedByAComa(appUser.Id)));
+        }
     }
 
     private void NavigateToEditUserRoles(string userId)

@@ -13,7 +13,7 @@
         <form method="post">
             <div class="card">
                 <div class="card-header">
-                    <h2>Edit roles for user <b>@User.UserName</b></h2>  
+                    <h2 class="text-center" style="margin-top:8px">Edit roles for user <b>@User.UserName</b></h2>  
                 </div>
             </div>
             <div class="card-body">
@@ -72,11 +72,14 @@
     protected override async Task OnInitializedAsync()
     {   
         AllRoles = userService.GetAllRoles();
-        User = userService.GetUserByIdAsync(Id);
+        User = userService.GetUserById(Id);
         UserRoles = GetRolesForUser(User.Id).ToList();
         RolesWithSelection = new List<AllRolesView>();
         foreach(var role in AllRoles)
         {
+            if (role.Name == "Administrator")
+                continue;
+
             if(UserRoles.Contains(role.Name))
             {
                 RolesWithSelection.Add(new AllRolesView 

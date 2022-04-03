@@ -1,0 +1,99 @@
+﻿@page "/AddAddress/{EditPatientId}"
+@using Clinic.Data.Enums
+@using Clinic.Data.Models
+@using Clinic.Data
+
+@inject NavigationManager NavigationManager;
+
+
+@if (!hasAddress)
+{
+    <PageTitle>Add Patient's Address</PageTitle>
+}else
+{
+    <PageTitle>Edit Patient's Address</PageTitle>
+}
+
+<AuthorizeView Roles = "Registrar" Context="addressAdding">
+    <Authorized>
+            
+            @if (!hasAddress)
+            {
+                <h2 class="mb-3 fw-bold">Add patient's address</h2>  <br />
+            }else
+            {
+                <h2 class="mb-3 fw-bold">Edit patient's address</h2>  <br />
+            }
+
+            <EditForm EditContext="newAddress" OnValidSubmit="addAddress" class="w-50 bg-gray px-4 py-3 rounded">
+
+            <h3 class="mb-3 fw-bold">Enter the patient's:</h3>
+
+            <label class="d-block mb-1 ml-1"/>city 
+            <InputText @bind-Value="@address.City" class="form-control w-75"/>
+
+            <label class="d-block mb-1 ml-1"/>street 
+            <InputText @bind-Value="@address.Street" class="form-control w-75"/>
+
+            <label class="d-block mb-1 ml-1"/>postal code
+            <InputText @bind-Value="@address.PostalCode" class="form-control w-75"/> 
+
+            <label class="d-block mb-1 ml-1"/>house number
+            <InputText @bind-Value="@address.HouseNumber" class="form-control w-75"/>
+
+            <label class="d-block mb-1 ml-1"/>local number 
+            <InputText @bind-Value="@address.LocalNumber" class="form-control w-75"/>
+
+            <br/>
+            <div>  
+            <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+            </EditForm>
+            <button type="submit" class="btn btn-primary" @onclick="() => NavigateToPatients()">Back</button>
+				
+    </Authorized>
+    <NotAuthorized>
+        <h1>Access denied!</h1>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code{
+    [Parameter]
+    public string EditPatientId { get; set; }
+
+    //czy dany pacjent ma adres
+    private bool hasAddress;
+
+    protected override void OnInitialized()
+    {
+        newAddress = new EditContext(address);
+        base.OnInitialized();
+    }
+    private Address address = new();
+    private Patient patient = new();
+    EditContext newAddress;
+
+    //TO DO
+    //Przypisanie wartości do pacjenta i do adresu (o ile pacjent miał adres) i ustawienie odpowednio zmiennej hasAddress
+    protected override async Task OnInitializedAsync()
+    {
+        //Poniższy kod testowo (do usunięcia potem)
+        patient = new Patient() { Id = Guid.Parse(EditPatientId), FirstName = "Adam", LastName = "Nowak", Gender = Gender.MALE, Pesel = "12345678901", PhoneNumber = "123456789" };
+        address = new Address() { Id = new Guid(), City = "Racibórz", PostalCode = "47-400" };
+        hasAddress = true;
+    }
+
+    //TO DO
+    //Zapisanie danych do bazy
+    private void addAddress()
+    {
+
+    }
+
+     private void NavigateToPatients()
+    {
+        NavigationManager.NavigateTo($"AddPatient/{EditPatientId}");
+    }
+
+
+}
