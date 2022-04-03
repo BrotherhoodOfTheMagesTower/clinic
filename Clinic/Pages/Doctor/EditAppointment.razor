@@ -26,20 +26,20 @@
             <button type="button" class="btn btn-primary" @onclick="(() => NavigateToPatientExaminationHistory(appointment.Patient.Id.ToString()))">Show examinations and appointments history</button> <br /><br />
 
             <h3 class="mb-3 fw-bold">Appointment:</h3>
-            <label class="d-block mb-1 ml-1" />Id:
+            <label class="d-block mb-1 ml-1" >Id:</label>
             <label class="form-control w-75">@appointment.Id</label>
 
-            <label class="d-block mb-1 ml-1" />Date:
+            <label class="d-block mb-1 ml-1" >Date:</label>
             <label class="form-control w-75">@appointment.RegisteredTo.Day/@appointment.RegisteredTo.Month/@appointment.RegisteredTo.Year</label><br />
 
 
-            <label class="d-block mb-1 ml-1" />Diagnosis:
+            <label class="d-block mb-1 ml-1" >Diagnosis: </label>
             <InputText @bind-Value="appointment.Diagnosis" class="form-control w-75" />
 
-            <label class="d-block mb-1 ml-1" />Description:
+            <label class="d-block mb-1 ml-1" >Description:</label>
             <InputTextArea @bind-Value="appointment.Description" class="form-control w-75" />
 
-            <label class="d-block mb-1 ml-1" /> Status:
+            <label class="d-block mb-1 ml-1" > Status:</label>
             <InputRadioGroup @bind-Value="@appointment.Status">
                 @foreach (var s in (AppointmentStatus[])Enum.GetValues(typeof(AppointmentStatus)))
                 {

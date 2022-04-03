@@ -14,16 +14,16 @@
 
             <h3 class="mb-3 fw-bold">Enter the examination's data:</h3>
 
-            <label class="d-block mb-1 ml-1"/>id 
+            <label class="d-block mb-1 ml-1">id </label>
             <InputText @bind-Value="EditExaminationId" readonly="readonly" class="form-control w-75"/>
             
-            <label class="d-block mb-1 ml-1"/>code 
+            <label class="d-block mb-1 ml-1">code </label>
             <InputText @bind-Value="code" readonly="readonly" class="form-control w-75"/>
             
-            <label class="d-block mb-1 ml-1"/>name 
+            <label class="d-block mb-1 ml-1">name </label>
             <InputText @bind-Value="@examination.GlossaryDictionary.Name" readonly="readonly" class="form-control w-75"/>
 
-            <label class="d-block mb-1 ml-1"/> status
+            <label class="d-block mb-1 ml-1"> status</label>
             <InputRadioGroup @bind-Value="@examination.Status">
                @foreach (var g in (ExaminationStatus[])Enum.GetValues(typeof(ExaminationStatus)))
                 {
@@ -38,12 +38,12 @@
                 }
             </InputRadioGroup>
 
-            <label class="d-block mb-1 ml-1"/>result 
+            <label class="d-block mb-1 ml-1">result </label>
             <InputText @bind-Value="@examination.Result" class="form-control w-75"/> 
 
             <AuthorizeView Roles="Doctor" Context="noteAdding">
                 <Authorized>
-                    <label class="d-block mb-1 ml-1"/>note 
+                    <label class="d-block mb-1 ml-1">note </label>
                     <InputText @bind-Value="@examination.ManagerNotes" class="form-control w-75"/>
                 </Authorized>
             </AuthorizeView>
