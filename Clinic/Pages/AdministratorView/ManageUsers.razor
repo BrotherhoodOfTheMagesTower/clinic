@@ -26,20 +26,20 @@
                             <th></th>
                         </TableHeader>
                         <RowTemplate Context="user">
-                            <td>TODO: provide getter for Names</td>
-                            <td></td>
-                            <td>@user.Email</td>
-                            <td>@user.EmailConfirmed</td>
-                            <td>@user.PhoneNumber</td>
-                            <td>@user.PhoneNumberConfirmed</td>
-                            <td role="button" class="align-self-auto nav-link" @onclick="() => NavigateToEditUser(user.Id)">Edit</td>
-                            <td role="button" class="align-self-auto link-danger" @onclick="() => NavigateToDisableUser(user.Id)">Disable</td>
+                            <td>@user.Item2</td>
+                            <td>@user.Item3</td>
+                            <td>@user.Item1.Email</td>
+                            <td>@user.Item1.EmailConfirmed</td>
+                            <td>@user.Item1.PhoneNumber</td>
+                            <td>@user.Item1.PhoneNumberConfirmed</td>
+                            <td role="button" class="align-self-auto nav-link" @onclick="() => NavigateToEditUser(user.Item1.Id)">Edit</td>
+                            <td role="button" class="align-self-auto link-danger" @onclick="() => NavigateToDisableUser(user.Item1.Id)">Disable</td>
                         </RowTemplate>
                     </TableTemplate>
                 }
                 else
                 {
-                    <h5 class="card-title">No users in database</h5>
+                    <h5 class="card-title">Loading...</h5>
                 }
             }
             else
@@ -53,10 +53,16 @@
 </AuthorizeView>
 
 @code {
-    private List<ApplicationUser>? users;
+    private List<Tuple<ApplicationUser, string?, string?>> users = new();
+
     protected override async Task OnInitializedAsync()
     {
-        users = await userService.GetAllUsersAsync();
+        var appUsers = await userService.GetAllUsersAsync();
+        foreach (var appUser in appUsers)
+        {
+            var names = userService.GetFirstAndLastNameForSpecificUser(appUser.Id);
+            users.Add(Tuple.Create(appUser, names.Item1, names.Item2));
+        }
     }
 
     private void NavigateToEditUser(string userId)

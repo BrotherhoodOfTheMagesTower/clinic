@@ -3,15 +3,17 @@
 @using Clinic.Services
 @using Microsoft.AspNetCore.WebUtilities
 @using System.Text
+@using System.ComponentModel.DataAnnotations
 @inject UserService userService;
 @inject NavigationManager NavigationManager
 @inject RoleManager<IdentityRole> roleManager
 @inject UserManager<ApplicationUser> userManager
+@inject IToastService toastService
 
 
 <PageTitle>Edit user</PageTitle>
 
-<AuthorizeView Roles="Administrator">
+<AuthorizeView Roles="Administrator" Context="EditUserDetails">
     <Authorized>
         <form method="post">
             <div class="card">
@@ -23,38 +25,42 @@
                 @if (User != null)
                 {
                     // E-Mail & UserName change
-                    <EditForm Model="User" Context="Email">
+                    <EditForm EditContext="emailContext">
+                        <DataAnnotationsValidator />
                         <div class="form-group mx-sm-3 mb-2">
                             <label for="email">Email and user name</label>
-                            <InputText class="form-control" id="email" disabled @bind-Value="User.Email" />
+                            <input class="form-control" id="email" disabled value="@initialEmail" />
                         </div>
                         <div class="form-group mx-sm-3 mb-2">
                             <label style="margin-top:15px" for="new-email">New Email and user name</label>
-                            <input type="text" value="@email" @oninput="@OnEmailInput" class="form-control" id="new-email" />
+                            <InputText class="form-control" id="new-email" @bind-Value="User.Email" />
+                            <ValidationMessage For="() => User.Email" />
                         </div>
-                        <button style="margin-top:5px" id="change-email-button" type="submit" @onclick="async () => await ChangeEmailAndUserName(email)" class="w-40 btn btn-primary">Change email and user name</button>
+                        <button style="margin-top:5px" disabled="@(!emailContext.Validate() || !emailContext.IsModified())" id="change-email-button" type="submit" @onclick="async () => await ChangeEmailAndUserName()" class="w-40 btn btn-primary">Change email and user name</button>
                     </EditForm>
 
                     @*// First & Last Name
-                    <EditForm Model="User" Context="FirstNameLastName">
+                        <EditForm Model="User" Context="FirstNameLastName">
                         <div class="form-group">
-                            <label for="first-name">First name</label>
-                            <InputText class="form-control" id="first-name" @bind-Value="User.FirstName" />
+                        <label for="first-name">First name</label>
+                        <InputText class="form-control" id="first-name" @bind-Value="User.FirstName" />
                         </div>
                         <div class="form-group">
-                            <label for="second-name">Last name</label>
-                            <InputText class="form-control" id="last-name" @bind-Value="User.LastName" />
+                        <label for="second-name">Last name</label>
+                        <InputText class="form-control" id="last-name" @bind-Value="User.LastName" />
                         </div>
                         <button id="change-names-button" type="submit" @onclick="async () => ChangeFirstAndLastName()" class="w-100 btn btn-lg btn-primary">Change first and last name</button>
-                    </EditForm>*@
+                        </EditForm>*@
 
                     // Password
-                    <EditForm Model="User" Context="Password">
+                    <EditForm EditContext="passContext">
+                        <DataAnnotationsValidator />
                         <div class="form-group mx-sm-3 mb-2">
                             <label style="margin-top:25px" for="psswd">Password</label>
-                            <input type="text" placeholder="New Password" value="@password" @oninput="@OnPasswordInput" class="form-control" id="psswd" />
+                            <InputText placeholder="New Password" class="form-control" id="psswd" @bind-Value="pass.Password" />
+                            <ValidationMessage For="() => pass.Password" />
                         </div>
-                        <button style="margin-top:5px" id="change-psswd" type="submit" @onclick="async () => ChangePassword(password)" class="btn btn-danger">Change password</button>
+                        <button style="margin-top:5px" disabled="@(!passContext.Validate() || !passContext.IsModified())" id="change-psswd" type="submit" @onclick="async () => await ChangePassword()" class="btn btn-danger">Change password</button>
                     </EditForm>
                 }
                 else
@@ -73,13 +79,29 @@
 @code {
     [Parameter]
     public string Id { get; set; }
-    private ApplicationUser User { get; set; }
-    private string email { get; set; }
-    private string password { get; set; } = "";
+    private ApplicationUser User { get; set; } = new();
+    private string initialEmail;
+
+    EditContext emailContext;
+    EditContext passContext;
+    Pass pass = new();
+
+    private class Pass
+    {
+        [Required(ErrorMessage = "The password is required.")]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+        [DataType(DataType.Password)]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$^+=!*()@%&]).{6,}$", ErrorMessage = "Password must have at least one non alphanumeric character, at least one digit ('0'-'9') and at least one uppercase ('A'-'Z').")]
+        [Display(Name = "Password")]
+        public string Password { get; set; }
+    }
 
     protected override async Task OnInitializedAsync()
     {
         User = userService.GetUserById(Id);
+        emailContext = new EditContext(User);
+        passContext = new EditContext(pass);
+        initialEmail = User.Email;
     }
 
     private async Task<bool> IsUserInRole(string role)
@@ -108,32 +130,34 @@
     //    }
     //}
 
-    private async Task ChangeEmailAndUserName(string newEmail)
+    private async Task ChangeEmailAndUserName()
     {
-        if (newEmail != "" && newEmail != null)
+        if (!User.Email.Equals("") && User.Email != null)
         {
-            await userManager.SetEmailAsync(User, newEmail);
+            await userManager.SetEmailAsync(User, User.Email);
 
             var newUser = userService.GetUserById(User.Id);
             var emailConfirmationToken = await userManager.GenerateEmailConfirmationTokenAsync(newUser);
             await userManager.ConfirmEmailAsync(User, emailConfirmationToken);
-            await userManager.SetUserNameAsync(newUser, newEmail);
+            var result = await userManager.SetUserNameAsync(newUser, User.Email);
+            if (result.Succeeded)
+            {
+                initialEmail = User.Email;
+                toastService.ShowSuccess($"The email & user name was successfully changed from {initialEmail} to {User.Email}", "Well done!");
+            }
+            else
+                toastService.ShowError($"Sorry, something went wrong! The email & user name have not been changed.", "Oops!");
         }
     }
 
-    private async Task ChangePassword(string newPassword)
+    private async Task ChangePassword()
     {
         var token = await userManager.GeneratePasswordResetTokenAsync(User);
-        await userManager.ResetPasswordAsync(User, token, newPassword);
-    }
+        var result = await userManager.ResetPasswordAsync(User, token, pass.Password);
 
-    public void OnEmailInput(ChangeEventArgs args)
-    {
-        email = args.Value.ToString();
-    }
-
-    public void OnPasswordInput(ChangeEventArgs args)
-    {
-        password = args.Value.ToString();
+        if (result.Succeeded)
+            toastService.ShowSuccess($"The password was successfully changed to {pass.Password}", "Well done!");
+        else
+            toastService.ShowError($"Sorry, something went wrong! The password has not been changed.", "Oops!");
     }
 }

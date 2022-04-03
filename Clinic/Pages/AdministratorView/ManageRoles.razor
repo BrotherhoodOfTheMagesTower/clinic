@@ -23,17 +23,17 @@
                                 <th></th>
                         </TableHeader>
                         <RowTemplate Context="user">
-                                <td>TODO: provide getter for Names</td>
-                                <td></td>
-                                <td>@user.Item1.Email</td>
                                 <td>@user.Item2</td>
+                                <td>@user.Item3</td>
+                                <td>@user.Item1.Email</td>
+                                <td>@user.Item4</td>
                                 <td role="button" @onclick="() => NavigateToEditUserRoles(user.Item1.Id)"><span style="color:red">Edit</span></td>
                         </RowTemplate>
                     </TableTemplate>
                     }
                     else
                     {
-                        <h5 class="card-title">No users in database</h5>
+                        <h5 class="card-title">Loading...</h5>
                     }
             }
             else
@@ -47,33 +47,21 @@
 </AuthorizeView>
 
 @code{
-    private List<Tuple<ApplicationUser, string>>? usersWithRoles;
+    private List<Tuple<ApplicationUser, string?, string?, string>> usersWithRoles = new(); // AppUser, FirstName, LastName, Roles
+
     protected override async Task OnInitializedAsync()
     {
-        var users = await userService.GetAllUsersAsync();
-        usersWithRoles = new List<Tuple<ApplicationUser, string>>();
+        var appUsers = await userService.GetAllUsersAsync();
 
-        foreach (var user in users)
+        foreach (var appUser in appUsers)
         {
-            if (user.Email.Equals("admin@admin.com"))
+            if (appUser.Email.Equals("admin@admin.com"))
                 continue;
-            usersWithRoles.Add(Tuple.Create(user, GetRolesForUser(user.Id)));
+
+            var names = userService.GetFirstAndLastNameForSpecificUser(appUser.Id);
+            usersWithRoles.Add(Tuple.Create
+                (appUser, names.Item1, names.Item2, userService.GetRolesForUserInOneStringSplittedByAComa(appUser.Id)));
         }
-    }
-
-    private string GetRolesForUser(string userId)
-    {
-        var roles = userService.GetRolesForUser(userId);
-
-        if (roles != null)
-        {
-            if (roles.Count == 1)
-                return roles.First();
-            else if(roles.Count != 0)
-                return string.Join(", ", roles);
-        }
-
-        return "";
     }
 
     private void NavigateToEditUserRoles(string userId)

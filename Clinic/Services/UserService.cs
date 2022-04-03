@@ -31,48 +31,140 @@ namespace Clinic.Services
             return roleNames;
         }
 
+        public string GetRolesForUserInOneStringSplittedByAComa(string userId)
+        {
+            var roles = GetRolesForUser(userId);
+
+            if (roles != null)
+            {
+                if (roles.Count == 1)
+                    return roles.First();
+                else if (roles.Count != 0)
+                    return string.Join(", ", roles);
+            }
+
+            return "";
+        }
+
         public async Task<string> GetUserName(string userId)
             => (await _context.Users.FirstOrDefaultAsync(x => x.Id == userId))!.UserName;
 
         public List<IdentityRole> GetAllRoles()
             => _context.Roles.ToList();
 
-        public ApplicationUser GetUserById(string userId)
+        public ApplicationUser? GetUserById(string userId)
             => _context.Users.Where(x => x.Id == userId).FirstOrDefault();
-        
-        public ApplicationUser GetUserByEmail(string email)
+
+        public ApplicationUser? GetUserByEmail(string email)
             => _context.Users.Where(x => x.Email == email).FirstOrDefault();
 
-        public async Task SetFirstAndLastNameForSpecificUser(string userId, string firstName, string lastName)
+        public Tuple<string?, string?> GetFirstAndLastNameForSpecificUser(string userId)
         {
-            var role = GetRolesForUser(userId).FirstOrDefault();
-            if(role is not null)
-            {
-                switch (role)
-                {
-                    case Roles.Doctor:
-                        _context.Doctors.Where(x => x.Id == userId).First().FirstName = firstName;
-                        _context.Doctors.Where(x => x.Id == userId).First().LastName = lastName;
-                        break;
-                    case Roles.Registrar:
-                        _context.Registrars.Where(x => x.Id == userId).First().FirstName = firstName;
-                        _context.Registrars.Where(x => x.Id == userId).First().LastName = lastName;
-                        break;
-                    case Roles.LabTechnician:
-                        _context.LabTechnicians.Where(x => x.Id == userId).First().FirstName = firstName;
-                        _context.LabTechnicians.Where(x => x.Id == userId).First().LastName = lastName;
-                        break;
-                    case Roles.LabManager:
-                        _context.LabManagers.Where(x => x.Id == userId).First().FirstName = firstName;
-                        _context.LabManagers.Where(x => x.Id == userId).First().LastName = lastName;
-                        break;
-                }
+            var roles = GetRolesForUser(userId);
 
-                await _context.SaveChangesAsync();
+            if (roles is not null)
+            {
+                foreach (var role in roles)
+                {
+                    switch (role)
+                    {
+                        case Roles.Doctor:
+                            var doc = _context.Doctors.Where(x => x.Id == userId).FirstOrDefault();
+                            if (doc is not null)
+                            {
+                                return Tuple.Create(doc.FirstName, doc.LastName);
+                            }
+                            else continue;
+
+                        case Roles.Registrar:
+                            var reg = _context.Registrars.Where(x => x.Id == userId).FirstOrDefault();
+                            if (reg is not null)
+                            {
+                                return Tuple.Create(reg.FirstName, reg.LastName);
+                            }
+                            else continue;
+                        case Roles.LabTechnician:
+                            var tech = _context.LabTechnicians.Where(x => x.Id == userId).FirstOrDefault();
+                            if (tech is not null)
+                            {
+                                return Tuple.Create(tech.FirstName, tech.LastName);
+                            }
+                            else continue;
+                        case Roles.LabManager:
+                            var man = _context.LabManagers.Where(x => x.Id == userId).FirstOrDefault();
+                            if (man is not null)
+                            {
+                                return Tuple.Create(man.FirstName, man.LastName);
+                            }
+                            else continue;
+                    }
+                }
+                return new Tuple<string?, string?>(null, null);
             }
+            return new Tuple<string?, string?>(null, null);
         }
 
-        public async Task<bool> CreateNewDoctorUser(string firstName, string lastName, string email, string password, long permissionNumber)
+        public async Task<bool> SetFirstAndLastNameForSpecificUserAsync(string userId, string firstName, string lastName)
+        {
+            var roles = GetRolesForUser(userId);
+
+            if(roles is not null)
+            {
+                foreach (var role in roles)
+                {
+                    switch (role)
+                    {
+                        case Roles.Doctor:
+                            var doc = _context.Doctors.Where(x => x.Id == userId).FirstOrDefault();
+                            if (doc is not null)
+                            {
+                                doc.FirstName = firstName;
+                                doc.LastName = lastName;
+                                await _context.SaveChangesAsync();
+                                return true;
+                            }
+                            else continue;
+
+                        case Roles.Registrar:
+                            var reg = _context.Registrars.Where(x => x.Id == userId).FirstOrDefault();
+                            if (reg is not null)
+                            {
+                                reg.FirstName = firstName;
+                                reg.LastName = lastName;
+                                await _context.SaveChangesAsync();
+                                return true;
+                            }
+                            else continue;
+                        case Roles.LabTechnician:
+                            var tech = _context.LabTechnicians.Where(x => x.Id == userId).FirstOrDefault();
+                            if (tech is not null)
+                            {
+                                tech.FirstName = firstName;
+                                tech.LastName = lastName;
+                                await _context.SaveChangesAsync();
+                                return true;
+                            }
+                            else continue;
+                        case Roles.LabManager:
+                            var man = _context.LabManagers.Where(x => x.Id == userId).FirstOrDefault();
+                            if (man is not null)
+                            {
+                                man.FirstName = firstName;
+                                man.LastName = lastName;
+                                await _context.SaveChangesAsync();
+                                return true;
+                            }
+                            else continue;
+                    }
+                }
+
+                return false;
+            }
+
+            return false;
+        }
+
+        public async Task<bool> CreateNewDoctorUser(string? firstName, string? lastName, string email, string password, long permissionNumber)
         {
             var obj = GetUserByEmail(email);
             if (obj is not null)
@@ -112,8 +204,8 @@ namespace Clinic.Services
                 return true;
             }
         }
-        
-        public async Task<bool> CreateNewRegistrarUser(string firstName, string lastName, string email, string password)
+
+        public async Task<bool> CreateNewRegistrarUser(string? firstName, string? lastName, string email, string password)
         {
             var obj = GetUserByEmail(email);
             if (obj is not null)
@@ -151,9 +243,9 @@ namespace Clinic.Services
 
                 return true;
             }
-        } 
-        
-        public async Task<bool> CreateNewLabTechnicianUser(string firstName, string lastName, string email, string password)
+        }
+
+        public async Task<bool> CreateNewLabTechnicianUser(string? firstName, string? lastName, string email, string password)
         {
             var obj = GetUserByEmail(email);
             if (obj is not null)
@@ -192,8 +284,8 @@ namespace Clinic.Services
                 return true;
             }
         }
-        
-        public async Task<bool> CreateNewLabManagerUser(string firstName, string lastName, string email, string password)
+
+        public async Task<bool> CreateNewLabManagerUser(string? firstName, string? lastName, string email, string password)
         {
             var obj = GetUserByEmail(email);
             if (obj is not null)
