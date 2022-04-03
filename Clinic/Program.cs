@@ -19,6 +19,8 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<ApplicationUser>>();
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<LabManagerService>();
+builder.Services.AddScoped<LabTechnicianService>();
 builder.Services.AddScoped<DoctorService>();
 
 var app = builder.Build();
