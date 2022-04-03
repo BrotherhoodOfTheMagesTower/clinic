@@ -15,16 +15,19 @@ namespace Clinic.Services
         public void Activate(Doctor tUser)
         {
             tUser.IsActive = true;
+            Update(tUser);
         }
 
         public void Add(Doctor tUser)
         {
             _context.Doctors.Add(tUser);
+            _context.SaveChanges();
         }
 
         public void Disable(Doctor tUser)
         {
             tUser.IsActive = false;
+            Update(tUser);
         }
 
         public Doctor? GetById(string id)
@@ -35,7 +38,8 @@ namespace Clinic.Services
 
         public void Update(Doctor tUser)
         {
-            throw new NotImplementedException();
+            _context.Doctors.Update(tUser);
+            _context.SaveChanges();
         }
 
         public List<Doctor> GetAllDoctors()
