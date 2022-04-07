@@ -1,14 +1,14 @@
-using Clinic.Data;
-using Microsoft.EntityFrameworkCore;
-using Clinic.Areas.Identity.Data;
-using Microsoft.AspNetCore.Components.Authorization;
 using Clinic.Areas.Identity;
-using Microsoft.AspNetCore.Identity;
+using Clinic.Areas.Identity.Data;
+using Clinic.Data;
 using Clinic.Services;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Blazored.Toast;
 
 var builder = WebApplication.CreateBuilder(args);
-var connectionString = builder.Configuration.GetConnectionString("ApplicationDbContextConnection"); 
+var connectionString = builder.Configuration.GetConnectionString("ApplicationDbContextConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
      options.UseSqlServer(connectionString));
 builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
@@ -19,6 +19,12 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<ApplicationUser>>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<RegistrarService>();
+builder.Services.AddScoped<PatientService>();
+builder.Services.AddScoped<AppointmentService>();
+builder.Services.AddScoped<LabManagerService>();
+builder.Services.AddScoped<LabTechnicianService>();
+builder.Services.AddScoped<DoctorService>();
 builder.Services.AddBlazoredToast();
 
 var app = builder.Build();
