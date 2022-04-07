@@ -86,7 +86,7 @@ namespace Clinic.Areas.Identity.Pages.Account
             public bool RememberMe { get; set; }
         }
 
-        public async Task OnGetAsync(string returnUrl = null)
+        public async Task OnGetAsync(string returnUrl = null) //TODO: returnUrl = /Logout. The same returnUrl is passed below in OnPostAsync when users clicks again Login. Why?
         {
             if (!string.IsNullOrEmpty(ErrorMessage))
             {

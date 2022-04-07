@@ -1,7 +1,17 @@
 ﻿@inherits LayoutComponentBase
+@using Blazored.Toast.Configuration;
 
 <PageTitle>Clinic</PageTitle>
 
+@*TODO: add appropriate icons (maybe from open-iconic? (wwwroot -> css))*@
+<BlazoredToasts Position="ToastPosition.BottomRight"
+                Timeout="10"
+                IconType="IconType.Material"
+                ErrorIcon="" 
+                InfoIcon=""
+                SuccessIcon=""
+                WarningIcon="" 
+                ShowProgressBar="true" />
 <div class="page">
     <div class="sidebar">
         <NavMenu />
