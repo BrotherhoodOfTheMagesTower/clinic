@@ -15,16 +15,19 @@ namespace Clinic.Services
         public void Activate(Registrar tUser)
         {
             tUser.IsActive = true;
+            Update(tUser);
         }
 
         public void Add(Registrar tUser)
         {
             _context.Registrars.Add(tUser);
+            _context.SaveChanges();
         }
 
         public void Disable(Registrar tUser)
         {
             tUser.IsActive = false;
+            Update(tUser);
         }
 
         public Registrar GetById(string id)
@@ -40,6 +43,7 @@ namespace Clinic.Services
         public void Update(Registrar tUser)
         {
             _context.Registrars.Update(tUser);
+            _context.SaveChanges();
         }
     }
 }

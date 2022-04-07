@@ -16,11 +16,13 @@ namespace Clinic.Services
         public void Add(Appointment appointment)
         {
             _context.Appointments.Add(appointment);
+            _context.SaveChanges();
         }
 
         public void Update(Appointment appointment)
         {
             _context.Appointments.Update(appointment);
+            _context.SaveChanges();
         }
 
         public List<Appointment> GetAllAppointmets()

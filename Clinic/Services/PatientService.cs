@@ -14,10 +14,8 @@ namespace Clinic.Services
 
         public void Add(Patient patient)
         {
-            if (patient != null)
-            {
-                _context.Patients.Add(patient);
-            }
+            _context.Patients.Add(patient);
+            _context.SaveChanges();
         }
         public Patient GetById(Guid id)
         {
@@ -29,10 +27,8 @@ namespace Clinic.Services
 
         public void Update(Patient patient)
         {
-            if (patient != null)
-            {
-                _context.Patients.Update(patient);
-            }
+            _context.Patients.Update(patient);
+            _context.SaveChanges();
         }
     }
 }
