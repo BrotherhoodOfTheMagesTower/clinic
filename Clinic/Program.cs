@@ -14,11 +14,14 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.R
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 //Add services to the container.
-builder.Services.AddRazorPages();
+builder.Services.AddRazorPages()
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<ApplicationUser>>();
-builder.Services.AddSingleton<WeatherForecastService>();
+builder.Services.AddSingleton<WeatherForecastService>();;
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<RegistrarService>();
+builder.Services.AddScoped<PatientService>();
+builder.Services.AddScoped<AppointmentService>();
 builder.Services.AddScoped<LabManagerService>();
 builder.Services.AddScoped<LabTechnicianService>();
 builder.Services.AddScoped<DoctorService>();
