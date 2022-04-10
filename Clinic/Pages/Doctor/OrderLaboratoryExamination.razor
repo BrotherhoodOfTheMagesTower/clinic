@@ -8,7 +8,7 @@
 
 @inject NavigationManager NavigationManager;
 
-<PageTitle>Edit appointment</PageTitle>
+<PageTitle>Order laboratory examination</PageTitle>
 
 
 
@@ -60,13 +60,13 @@
     new GlossaryDictionary {Code = GlossaryCode.LAB_URINE, Name = "Urine examination", Type = GlossaryType.LABORATORY }
     };
 
-    protected override void OnInitialized()
-    {
-        examinationToOrder = new EditContext(examination);
-        examination.Status = ExaminationStatus.APPROVED;
-        examination.OrderedAt = DateTime.Now;
-        base.OnInitialized();
-    }
+    //protected override void OnInitialized()
+    //{
+    //    examinationToOrder = new EditContext(examination);
+    //    examination.Status = ExaminationStatus.APPROVED;
+    //    examination.OrderedAt = DateTime.Now;
+    //    base.OnInitialized();
+    //}
     private LaboratoryExamination examination = new();
     EditContext examinationToOrder;
 
@@ -74,13 +74,17 @@
     //TO DO
     protected override async Task OnInitializedAsync()
     {
-
+        examinationToOrder = new EditContext(examination);
+ 
+        base.OnInitialized();
     }
 
     //TO DO
     //Zapisanie danych do bazy
     private void OrderExamination()
     {
+        examination.Status = ExaminationStatus.APPROVED;
+        examination.OrderedAt = DateTime.Now;
         //przypisanie do examination obiektu GlossaryDictionary na podstawie kodu wybranego w select
         foreach (var d in allGlossaryDictionares) 
         {

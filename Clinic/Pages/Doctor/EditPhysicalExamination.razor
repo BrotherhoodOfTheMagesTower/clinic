@@ -1,0 +1,64 @@
+﻿@page "/EditPhysicalExamination/{ExaminationId}"
+@using Clinic.Data.Enums
+@using Clinic.Data.Models
+@using Clinic.Data
+
+@inject NavigationManager NavigationManager;
+
+<PageTitle>Edit physical examinations</PageTitle>
+
+<AuthorizeView Roles="Doctor" Context="examinationEditing">
+    <Authorized>
+        <EditForm EditContext="newExamination" OnValidSubmit="changeExistingExamination" class="w-50 bg-gray px-4 py-3 rounded">
+
+            <h1 class="mb-3 fw-bold">Edit physical examinations</h1><br />
+            <h3 class="mb-3 fw-bold">Examination:</h3>
+
+            <label class="d-block mb-1 ml-1">id </label>
+            <label class="form-control w-75" >@ExaminationId </label><br />
+
+            <label class="d-block mb-1 ml-1">Name: </label>
+            <label class="form-control w-75" > @examination.GlossaryDictionary.Name </label><br />
+
+            <label class="d-block mb-1 ml-1">Result: </label>
+            <InputText @bind-Value=@examination.Result class="form-control w-75" ></InputText><br />
+            <div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+        </EditForm>
+    </Authorized>
+    <NotAuthorized>
+        <h1>Access denied!</h1>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    [Parameter]
+    public string ExaminationId { get; set; }
+
+    protected override void OnInitialized()
+    {
+        newExamination = new EditContext(examination);
+        base.OnInitialized();
+    }
+    private PhysicalExamination examination = new();
+    EditContext newExamination;
+
+    //TO DO
+    //Przypisanie wartości do badania
+    protected override async Task OnInitializedAsync()
+    {
+        //Poniższy kod testowo (do usunięcia potem)
+        examination = new PhysicalExamination() { Id = Guid.Parse(ExaminationId), Result="wynik jest taki:", GlossaryDictionary = new GlossaryDictionary { Code = GlossaryCode.PHY_EAR, Name = "Ear examination", Type = GlossaryType.PHYSICAL } };
+        
+        
+    }
+
+    //TO DO
+    //Zapisanie danych do bazy
+    private void changeExistingExamination()
+    {
+
+    }
+
+ }
