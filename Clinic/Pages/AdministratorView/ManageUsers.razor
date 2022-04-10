@@ -8,7 +8,7 @@
 <AuthorizeView Roles="Administrator">
     <Authorized>
             <div class="card-header" style="margin-bottom: 40px" >
-                <h2 class="text-center" style="margin-top:8px"><b>Edit or disable user accounts</b></h2>
+                <h2 class="text-center" style="margin-top:8px"><b>Edit or enable/disable user accounts</b></h2>
             </div>
             @if (users != null)
             {
@@ -16,24 +16,31 @@
                 {
                     <TableTemplate Items="users">
                         <TableHeader>
-                            <th>First Name</th>
-                            <th>Last Name</th>
-                            <th>Email</th>
-                            <th>Email confirmed</th>
-                            <th>Phone number</th>
-                            <th>Phone number confirmed</th>
+                            <th class="text-center">First Name</th>
+                            <th class="text-center">Last Name</th>
+                            <th class="text-center">Email</th>
+                            <th class="text-center">Phone number</th>
+                            <th class="text-center">Role</th>
+                            <th class="text-center">Is enabled</th>
                             <th></th>
                             <th></th>
                         </TableHeader>
                         <RowTemplate Context="user">
-                            <td>@user.Item2</td>
-                            <td>@user.Item3</td>
-                            <td>@user.Item1.Email</td>
-                            <td>@user.Item1.EmailConfirmed</td>
-                            <td>@user.Item1.PhoneNumber</td>
-                            <td>@user.Item1.PhoneNumberConfirmed</td>
+                            <td class="text-center">@user.Item2</td>
+                            <td class="text-center">@user.Item3</td>
+                            <td class="text-center">@user.Item1.Email</td>
+                            @if(@user.Item1.PhoneNumber is not null)
+                            {
+                                <td class="text-center">@user.Item1.PhoneNumber</td>
+                            } else
+                            {
+                                <td class="text-center">-</td>
+                            }
+
+                            <td class="text-center">@user.Item4</td>
+                            <td class="text-center">@user.Item5</td>
                             <td role="button" class="align-self-auto nav-link" @onclick="() => NavigateToEditUser(user.Item1.Id)">Edit</td>
-                            <td role="button" class="align-self-auto link-danger" @onclick="() => NavigateToDisableUser(user.Item1.Id)">Disable</td>
+                            <td role="button" class="align-self-auto link-danger" @onclick="() => NavigateToEnableOrDisableUser(user.Item1.Id)">Enable/Disable</td>
                         </RowTemplate>
                     </TableTemplate>
                 }
@@ -53,7 +60,7 @@
 </AuthorizeView>
 
 @code {
-    private List<Tuple<ApplicationUser, string?, string?>> users = new();
+    private List<Tuple<ApplicationUser, string?, string?, string, bool>> users = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -61,7 +68,7 @@
         foreach (var appUser in appUsers)
         {
             var names = userService.GetFirstAndLastNameForSpecificUser(appUser.Id);
-            users.Add(Tuple.Create(appUser, names.Item1, names.Item2));
+            users.Add(Tuple.Create(appUser, names.Item1, names.Item2, userService.GetRolesForUserInOneStringSplittedByAComa(appUser.Id), userService.CheckIfAccountIsActive(appUser.Id)));
         }
     }
 
@@ -70,8 +77,8 @@
         NavigationManager.NavigateTo($"EditUser/{userId}");
     }
 
-    private void NavigateToDisableUser(string userId)
+    private void NavigateToEnableOrDisableUser(string userId)
     {
-        NavigationManager.NavigateTo($"DisableUser/{userId}");
+        NavigationManager.NavigateTo($"EnableOrDisableAcc/{userId}");
     }
 }
