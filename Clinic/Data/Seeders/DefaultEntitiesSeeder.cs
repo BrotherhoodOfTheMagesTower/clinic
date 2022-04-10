@@ -156,7 +156,7 @@ namespace Clinic.Data
             }
 
             //Seed 2 Lab Managers
-            if (!context.LabManagers.Any())
+            if (!context.LabManagers.Any() || context!.LabTechnicians.Count() < 2)
             {
                 if (context!.Users.FirstOrDefault(x => x.Email == "labmanager@1.com") == null)
                 {
