@@ -45,5 +45,8 @@ namespace Clinic.Services
             _context.Registrars.Update(tUser);
             _context.SaveChanges();
         }
+
+        public List<Registrar> GetAllRegistrars()
+           => _context.Registrars.ToList();
     }
 }
