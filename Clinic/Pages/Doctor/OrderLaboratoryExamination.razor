@@ -4,18 +4,40 @@
 @using Clinic.Data.Models
 @using System.Globalization
 @using System.ComponentModel.DataAnnotations
-<h3>EditAppointment</h3>
+@using System.Diagnostics
 
 @inject NavigationManager NavigationManager;
 
-<PageTitle>Edit appointment</PageTitle>
+<PageTitle>Order laboratory examination</PageTitle>
 
 
 
-<AuthorizeView Roles="Doctor" Context="examinationEditing">
+<AuthorizeView Roles="Doctor" Context="examinationOrderByDoctor">
     <Authorized>
-        <h1>@Id></h1>
-        </Authorized>
+         
+        <EditForm EditContext="examinationToOrder" OnValidSubmit="OrderExamination" class="w-50 bg-gray px-4 py-3 rounded">
+
+            <h1 class="mb-3 fw-bold">Order laboratory examination</h1><br />
+            <h3 class="mb-3 fw-bold">Examination:</h3>
+
+            <label class="d-block mb-1 ml-1"> Name: </label>
+            <InputSelect class="mb-3 fw-bold"  @bind-Value="@glossaryCode">
+                @foreach (var c in allGlossaryDictionares)
+                {
+                    <option Value=@c.Code>@c.Name</option>
+                }
+            </InputSelect>
+
+            <label class="d-block mb-1 ml-1">Doctor's notes:</label>
+            <InputTextArea @bind-Value="@examination.DoctorsNotes" class="form-control w-75" />
+
+
+            <br />
+            <div>
+                <button type="submit" class="btn btn-primary">Order</button>
+            </div>
+        </EditForm>
+    </Authorized>
     <NotAuthorized>
         <h1>Access denied!</h1>
     </NotAuthorized>
@@ -26,4 +48,51 @@
     //id wizyty, ktore zostalo przekazane z poprzedniego widoku, trzeba na jego podstawie zwrocic z bazy danych wizyte do edytowania
     [Parameter]
     public string Id { get; set; }
+
+    //Kod badania
+    private string glossaryCode;
+
+    //testowa lista glossarydictionares, docelowo ma byc zwrocona z bazy
+    private List<GlossaryDictionary> allGlossaryDictionares = new List<GlossaryDictionary>()
+    {
+    new GlossaryDictionary {Code = GlossaryCode.LAB_BLOOD, Name = "Blood examination", Type = GlossaryType.LABORATORY },
+    new GlossaryDictionary {Code = GlossaryCode.LAB_COVID, Name = "Covid examination", Type = GlossaryType.LABORATORY },
+    new GlossaryDictionary {Code = GlossaryCode.LAB_URINE, Name = "Urine examination", Type = GlossaryType.LABORATORY }
+    };
+
+    //protected override void OnInitialized()
+    //{
+    //    examinationToOrder = new EditContext(examination);
+    //    examination.Status = ExaminationStatus.APPROVED;
+    //    examination.OrderedAt = DateTime.Now;
+    //    base.OnInitialized();
+    //}
+    private LaboratoryExamination examination = new();
+    EditContext examinationToOrder;
+
+
+    //TO DO
+    protected override async Task OnInitializedAsync()
+    {
+        examinationToOrder = new EditContext(examination);
+ 
+        base.OnInitialized();
+    }
+
+    //TO DO
+    //Zapisanie danych do bazy
+    private void OrderExamination()
+    {
+        examination.Status = ExaminationStatus.APPROVED;
+        examination.OrderedAt = DateTime.Now;
+        //przypisanie do examination obiektu GlossaryDictionary na podstawie kodu wybranego w select
+        foreach (var d in allGlossaryDictionares) 
+        {
+            if (d.Code.ToString().Equals(glossaryCode))
+                examination.GlossaryDictionary = d;
+        }
+
+         Debug.WriteLine($"Code: {examination.GlossaryDictionary.Code}, notes: {examination.DoctorsNotes}");
+
+    }
 }

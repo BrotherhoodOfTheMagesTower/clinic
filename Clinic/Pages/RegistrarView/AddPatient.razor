@@ -26,22 +26,22 @@
             <EditForm EditContext="newPatient" OnValidSubmit="addPatient" class="w-50 bg-gray px-4 py-3 rounded">
 
             <h3 class="mb-3 fw-bold">Enter the patient's:</h3>
-            <label class="d-block mb-1 ml-1"/>name 
+            <label class="d-block mb-1 ml-1">name</label> 
             <InputText @bind-Value="@patient.FirstName" class="form-control w-75"/>
 
-            <label class="d-block mb-1 ml-1"/>last name 
+            <label class="d-block mb-1 ml-1">last name </label>
             <InputText @bind-Value="@patient.LastName" class="form-control w-75"/>
 
-            <label class="d-block mb-1 ml-1"/>pesel 
+            <label class="d-block mb-1 ml-1">pesel </label>
             <InputText @bind-Value="@patient.Pesel" class="form-control w-75"/> 
 
-            <label class="d-block mb-1 ml-1"/>birth date 
+            <label class="d-block mb-1 ml-1">birth date </label>
             <InputDate @bind-Value="@patient.BirthDate" class="form-control w-75"/>
 
-            <label class="d-block mb-1 ml-1"/>phone number 
+            <label class="d-block mb-1 ml-1">phone number </label>
             <InputText @bind-Value="@patient.PhoneNumber" class="form-control w-75"/>
 
-            <label class="d-block mb-1 ml-1"/> gender
+            <label class="d-block mb-1 ml-1"> gender</label>
             <InputRadioGroup @bind-Value="@patient.Gender">
                @foreach (var g in (Gender[])Enum.GetValues(typeof(Gender)))
                 {
@@ -80,11 +80,6 @@
     [Parameter]
     public string EditPatientId { get; set; }
 
-    protected override void OnInitialized()
-    {
-        newPatient = new EditContext(patient);
-        base.OnInitialized();
-    }
     private Patient patient = new();
     EditContext newPatient;
 
@@ -92,6 +87,8 @@
     //Przypisanie wartości do pacjenta
     protected override async Task OnInitializedAsync()
     {
+        newPatient = new EditContext(patient);
+        base.OnInitialized();
         if (!EditPatientId.Equals("-1"))
         {
             //Poniższy kod testowo (do usunięcia potem)

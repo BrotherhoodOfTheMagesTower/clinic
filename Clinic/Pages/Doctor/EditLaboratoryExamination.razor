@@ -9,50 +9,43 @@
 
 <AuthorizeView Roles="Doctor" Context="examinationEditing">
     <Authorized>
-        <h3 class="mb-3 fw-bold"><b>Edit laboratory examinations</b></h3> <br />
         <EditForm EditContext="newExamination" OnValidSubmit="changeExistingExamination" class="w-50 bg-gray px-4 py-3 rounded">
 
-            <h3 class="mb-3 fw-bold">Enter the examination's data:</h3>
+            <h1 class="mb-3 fw-bold">Edit laboratory examinations</h1><br />
+            <h3 class="mb-3 fw-bold">Examination:</h3>
 
-            <label class="d-block mb-1 ml-1"/>id 
-            <InputText @bind-Value="EditExaminationId" readonly="readonly" class="form-control w-75"/>
+            <label class="d-block mb-1 ml-1">id </label>
+            <label class="form-control w-75" >@EditExaminationId </label><br />
+
+            <label class="d-block mb-1 ml-1">Name: </label>
+            <label class="form-control w-75" > @examination.GlossaryDictionary.Name </label><br />
+
+            <label class="d-block mb-1 ml-1"> Status:</label>
+            <label class="form-control w-75"> @status </label> <br />
+          
+
+            <label class="d-block mb-1 ml-1">Doctor notes: </label>
+            <InputTextArea @bind-Value="@examination.DoctorsNotes" class="form-control w-75" /> <br />
+
+            @if (examination.Status == ExaminationStatus.APPROVED)
+
+            {
+                <label class="d-block mb-1 ml-1">Result: </label>
+                <label class="form-control w-75" > @examination.Result </label><br />
+
+                <label class="d-block mb-1 ml-1">Lab Technician: </label>
+                <label class="form-control w-75" >@examination.LabTechnician.FirstName @examination.LabTechnician.LastName </label><br />
+
+                <label class="d-block mb-1 ml-1">Execution date: </label>
+                <label class="form-control w-75" >@examination.ExecutedOrCancelledAt </label><br />
             
-            <label class="d-block mb-1 ml-1"/>code 
-            <InputText @bind-Value="code" readonly="readonly" class="form-control w-75"/>
-            
-            <label class="d-block mb-1 ml-1"/>name 
-            <InputText @bind-Value="@examination.GlossaryDictionary.Name" readonly="readonly" class="form-control w-75"/>
+            }
 
-            <label class="d-block mb-1 ml-1"/> status
-            <InputRadioGroup @bind-Value="@examination.Status">
-               @foreach (var g in (ExaminationStatus[])Enum.GetValues(typeof(ExaminationStatus)))
-                {
-                   if (g == examination.Status)
-                    {
-                        <div><InputRadio Value="g" checked/>@g.ToString().ToLower()</div>
-                    }
-                    else if (g != ExaminationStatus.APPROVED)
-                    {
-                        <div><InputRadio Value="g" />@g.ToString().ToLower()</div> 
-                    }
-                }
-            </InputRadioGroup>
 
-            <label class="d-block mb-1 ml-1"/>result 
-            <InputText @bind-Value="@examination.Result" class="form-control w-75"/> 
-
-            <AuthorizeView Roles="Doctor" Context="noteAdding">
-                <Authorized>
-                    <label class="d-block mb-1 ml-1"/>note 
-                    <InputText @bind-Value="@examination.ManagerNotes" class="form-control w-75"/>
-                </Authorized>
-            </AuthorizeView>
-
-            <br/>
             <div>
-            <button type="submit" class="btn btn-primary">Save</button>
+                <button type="submit" class="btn btn-primary">Save</button>
             </div>
-        </EditForm> 
+        </EditForm>
     </Authorized>
     <NotAuthorized>
         <h1>Access denied!</h1>
@@ -64,8 +57,7 @@
     public string EditExaminationId { get; set; }
 
     //Kod badania
-    public string code;
-
+    public string status;
     protected override void OnInitialized()
     {
         newExamination = new EditContext(examination);
@@ -79,8 +71,11 @@
     protected override async Task OnInitializedAsync()
     {
         //Poniższy kod testowo (do usunięcia potem)
-        examination = new LaboratoryExamination() {Id=Guid.Parse(EditExaminationId), DoctorsNotes="coś tam 1", OrderedAt=new DateTime(), Status=ExaminationStatus.COMMISIONED,GlossaryDictionary=new GlossaryDictionary() {Code=GlossaryCode.LAB_BLOOD, Name="jakaś tam 1", Type=GlossaryType.LABORATORY}};
-        code = examination.GlossaryDictionary.Code.ToString().ToLower();
+        examination = new LaboratoryExamination() { Id = Guid.Parse(EditExaminationId), Result ="wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to ", ExecutedOrCancelledAt=new DateTime(2022, 12, 25, 10, 30, 00),ManagerNotes = "Według kierownika laboratorium należy:", DoctorsNotes = "zalecenia do badania sa takie: ", OrderedAt = new DateTime(), Status = ExaminationStatus.APPROVED, LabTechnician=new LabTechnician {Id = Guid.NewGuid().ToString(), LastName="Kowal", FirstName="Maciej"}, GlossaryDictionary = new GlossaryDictionary { Code = GlossaryCode.LAB_BLOOD, Name = "Blood examination", Type = GlossaryType.LABORATORY } };
+        
+        //to musi zostać
+        status = examination.Status.ToString().ToLower();
+        
     }
 
     //TO DO

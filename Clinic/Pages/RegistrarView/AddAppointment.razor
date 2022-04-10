@@ -104,19 +104,16 @@
     [Parameter]
     public string EditAppointmentId { get; set; }
 
-    protected override void OnInitialized()
+    Appointment appointment = new();
+    EditContext newAppointment;
+
+    protected override async Task OnInitializedAsync()
     {
         newAppointment = new EditContext(appointment);
         //default data and time
         appointmentDate=DateTime.Today;
         appointmentTime = "15:00:00";
         base.OnInitialized();
-    }
-    Appointment appointment = new();
-    EditContext newAppointment;
-
-    protected override async Task OnInitializedAsync()
-    {
         if (!EditAppointmentId.Equals("-1"))
         {
             //Poniższy kod testowo (do usunięcia potem)
