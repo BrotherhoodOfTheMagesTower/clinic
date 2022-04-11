@@ -1,4 +1,9 @@
-﻿@page "/EditUserRoles/{Id}"
+﻿@*This view will be not used anymore, since we don't need a feature, 
+    where the Admin may change a role for particular user.
+*@
+
+@*
+@page "/EditUserRoles/{Id}"
 @using Microsoft.AspNetCore.Identity
 @using Clinic.Services
 @inject UserService userService;
@@ -145,4 +150,4 @@
 
         NavigateToEditUserRoles(User.Id);
     }
-}
+}*@

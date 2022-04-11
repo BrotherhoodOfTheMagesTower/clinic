@@ -1,4 +1,8 @@
-﻿@page "/ManageRoles"
+﻿@*This view will be not used anymore, since we don't need a feature, 
+    where the Admin may change a role for particular user.
+*@
+
+@*@page "/ManageRoles"
 @using Clinic.Services
 @inject UserService userService;
 @inject NavigationManager NavigationManager
@@ -68,4 +72,4 @@
     {
         NavigationManager.NavigateTo($"EditUserRoles/{userId}");
     }
-}
+}*@

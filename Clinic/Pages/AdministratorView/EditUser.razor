@@ -29,38 +29,59 @@
                         <DataAnnotationsValidator />
                         <div class="form-group mx-sm-3 mb-2">
                             <label for="email">Email and user name</label>
-                            <input class="form-control" id="email" disabled value="@initialEmail" />
+                            <div class="col-sm-6 col-md-4">
+                                <input class="form-control" id="email" disabled value="@initialEmail" />
+                            </div>
                         </div>
                         <div class="form-group mx-sm-3 mb-2">
                             <label style="margin-top:15px" for="new-email">New Email and user name</label>
-                            <InputText class="form-control" id="new-email" @bind-Value="User.Email" />
-                            <ValidationMessage For="() => User.Email" />
+                            <div class="col-sm-6 col-md-4">
+                                <InputText class="form-control" id="new-email" @bind-Value="User.Email" />
+                                <ValidationMessage For="() => User.Email" />
+                            </div>
                         </div>
-                        <button style="margin-top:5px" disabled="@(!emailContext.Validate() || !emailContext.IsModified())" id="change-email-button" type="submit" @onclick="async () => await ChangeEmailAndUserName()" class="w-40 btn btn-primary">Change email and user name</button>
+                        <div style="margin-left: 10px " class="col-sm-6 col-md-4 text-center">
+                            <button style="margin-top:5px" disabled="@(!emailContext.Validate() || !emailContext.IsModified())" id="change-email-button" type="submit" @onclick="async () => await ChangeEmailAndUserName()" class="w-40 btn btn-primary">Change email and user name</button>
+                        </div>
                     </EditForm>
 
-                    @*// First & Last Name
-                        <EditForm Model="User" Context="FirstNameLastName">
-                        <div class="form-group">
-                        <label for="first-name">First name</label>
-                        <InputText class="form-control" id="first-name" @bind-Value="User.FirstName" />
+                    // First & Last Name
+                    <EditForm EditContext="namesContext">
+                        <DataAnnotationsValidator />
+                        <div class="form-group mx-sm-3 mb-2">
+                            <div class="form-group">
+                                <label for="first-name">First name</label>
+                                <div class="col-sm-6 col-md-4">
+                                    <InputText class="form-control" id="first-name" @bind-Value="Doctor.FirstName" />
+                                    <ValidationMessage For="() => Doctor.FirstName" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="second-name">Last name</label>
+                                <div class="col-sm-6 col-md-4">
+                                    <InputText class="form-control" id="last-name" @bind-Value="Doctor.LastName" />
+                                    <ValidationMessage For="() => Doctor.LastName" />
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                        <label for="second-name">Last name</label>
-                        <InputText class="form-control" id="last-name" @bind-Value="User.LastName" />
+                        <div style="margin-left: 10px " class="col-sm-6 col-md-4 text-center">
+                            <button style="margin-top:5px" disabled="@(!namesContext.Validate() || !namesContext.IsModified())" id="change-names-button" type="submit" @onclick="async () => await ChangeFirstAndLastName()" class="w-40 btn btn-primary">Change first and last name</button>
                         </div>
-                        <button id="change-names-button" type="submit" @onclick="async () => ChangeFirstAndLastName()" class="w-100 btn btn-lg btn-primary">Change first and last name</button>
-                        </EditForm>*@
+                    </EditForm>
 
                     // Password
                     <EditForm EditContext="passContext">
                         <DataAnnotationsValidator />
                         <div class="form-group mx-sm-3 mb-2">
                             <label style="margin-top:25px" for="psswd">Password</label>
-                            <InputText placeholder="New Password" class="form-control" id="psswd" @bind-Value="pass.Password" />
-                            <ValidationMessage For="() => pass.Password" />
+                            <div class="col-sm-6 col-md-4">
+                                <InputText placeholder="New Password" class="form-control" id="psswd" @bind-Value="pass.Password" />
+                                <ValidationMessage For="() => pass.Password" />
+                            </div>
                         </div>
-                        <button style="margin-top:5px" disabled="@(!passContext.Validate() || !passContext.IsModified())" id="change-psswd" type="submit" @onclick="async () => await ChangePassword()" class="btn btn-danger">Change password</button>
+                        <div style="margin-left: 10px " class="col-sm-6 col-md-4 text-center">
+                            <button style="margin-top:5px" disabled="@(!passContext.Validate() || !passContext.IsModified())" id="change-psswd" type="submit" @onclick="async () => await ChangePassword()" class="btn btn-danger">Change password</button>
+                        </div>
                     </EditForm>
                 }
                 else
@@ -80,10 +101,12 @@
     [Parameter]
     public string Id { get; set; }
     private ApplicationUser User { get; set; } = new();
+    private Doctor Doctor { get; set; } = new();
     private string initialEmail;
 
     EditContext emailContext;
     EditContext passContext;
+    EditContext namesContext;
     Pass pass = new();
 
     private class Pass
@@ -101,6 +124,11 @@
         User = userService.GetUserById(Id);
         emailContext = new EditContext(User);
         passContext = new EditContext(pass);
+        var names = userService.GetFirstAndLastNameForSpecificUser(Id);
+
+        Doctor.FirstName = names.Item1; Doctor.LastName = names.Item2;
+
+        namesContext = new EditContext(Doctor);
         initialEmail = User.Email;
     }
 
@@ -122,13 +150,14 @@
         NavigationManager.NavigateTo("ManageUsers");
     }
 
-    //private async Task ChangeFirstAndLastName()
-    //{
-    //    if (User.FirstName != "" && User.LastName != "") // please provide a validation for empty strings -> if string is empty pass a "Unknown" value
-    //    {
-    //        await userService.SetFirstAndLastNameForSpecificUser(User.Id, User.FirstName, User.LastName);
-    //    }
-    //}
+    private async Task ChangeFirstAndLastName()
+    {
+        var result = await userService.SetFirstAndLastNameForSpecificUserAsync(User.Id, Doctor.FirstName!, Doctor.LastName!);
+        if (result)
+            toastService.ShowSuccess($"The first & last name were successfully changed to {Doctor.FirstName} {Doctor.LastName!}", "Well done!");
+        else
+            toastService.ShowError($"Sorry, something went wrong! The first & last name have not been changed.", "Oops!");
+    }
 
     private async Task ChangeEmailAndUserName()
     {
