@@ -355,20 +355,6 @@ namespace Clinic.Data
                     };
                     context.Appointments.Add(appointment);
                     context.SaveChanges();
-
-                    if(doc.Appointments is null)
-                    {
-                        doc.Appointments = new List<Appointment>() { appointment };
-                    } else doc.Appointments.Add(appointment);
-
-                    if (pat.Appointments is null)
-                    {
-                        pat.Appointments = new List<Appointment>() { appointment };
-                    }
-                    else pat.Appointments.Add(appointment);
-
-                    doctorService.Update(doc);
-                    patientService.Update(pat);
                 }
 
                 //for Patryk Niedopieralski - finished with 4 examinations
@@ -448,70 +434,6 @@ namespace Clinic.Data
 
                     context.Appointments.Add(appointment);
                     context.SaveChanges();
-
-                    if (doc.Appointments is null)
-                    {
-                        doc.Appointments = new List<Appointment>() { appointment };
-                    } else doc.Appointments.Add(appointment);
-
-                    if (pat.Appointments is null)
-                    {
-                        pat.Appointments = new List<Appointment>() { appointment };
-                    } else pat.Appointments.Add(appointment);
-
-                    if(tech1.LaboratoryExaminations is null)
-                    {
-                        tech1.LaboratoryExaminations = new List<LaboratoryExamination>() { labExam_1 };
-                    } else tech1.LaboratoryExaminations.Add(labExam_1);
-
-                    if (tech2.LaboratoryExaminations is null)
-                    {
-                        tech2.LaboratoryExaminations = new List<LaboratoryExamination>() { labExam_2 };
-                    } else tech2.LaboratoryExaminations.Add(labExam_2);
-
-                    if (man1.LaboratoryExaminations is null)
-                    {
-                        man1.LaboratoryExaminations = new List<LaboratoryExamination>() { labExam_1 };
-                    } else man1.LaboratoryExaminations.Add(labExam_1);
-
-                    if (man2.LaboratoryExaminations is null)
-                    {
-                        man2.LaboratoryExaminations = new List<LaboratoryExamination>() { labExam_2 };
-                    } else man2.LaboratoryExaminations.Add(labExam_2);
-
-                    if(labBlood!.LaboratoryExaminations is null)
-                    {
-                        labBlood.LaboratoryExaminations = new List<LaboratoryExamination>() { labExam_1 };
-                    } else labBlood.LaboratoryExaminations.Add(labExam_1);
-
-                    if (labCovid!.LaboratoryExaminations is null)
-                    {
-                        labCovid.LaboratoryExaminations = new List<LaboratoryExamination>() { labExam_2 };
-                    } else labCovid.LaboratoryExaminations.Add(labExam_2);
-
-                    if (phyEar!.PhysicalExaminations is null)
-                    {
-                        phyEar.PhysicalExaminations = new List<PhysicalExamination>() { phyExam_1 };
-                    }
-                    else phyEar.PhysicalExaminations.Add(phyExam_1);
-
-                    if (phyThroat!.PhysicalExaminations is null)
-                    {
-                        phyThroat.PhysicalExaminations = new List<PhysicalExamination>() { phyExam_2 };
-                    }
-                    else phyThroat.PhysicalExaminations.Add(phyExam_2);
-
-                    doctorService.Update(doc);
-                    patientService.Update(pat);
-                    labTechnicianService.Update(tech1);
-                    labTechnicianService.Update(tech2);
-                    labManagerService.Update(man1);
-                    labManagerService.Update(man2);
-                    glossaryService.Update(labBlood);
-                    glossaryService.Update(labCovid);
-                    glossaryService.Update(phyEar);
-                    glossaryService.Update(phyThroat);
-
                 }
 
                 //for Patryk Niedopieralski - booked without examinations
@@ -536,19 +458,6 @@ namespace Clinic.Data
                     };
                     context.Appointments.Add(appointment);
                     context.SaveChanges();
-
-                    if (doc.Appointments is null)
-                    {
-                        doc.Appointments = new List<Appointment>() { appointment };
-                    } else doc.Appointments.Add(appointment);
-
-                    if (pat.Appointments is null)
-                    {
-                        pat.Appointments = new List<Appointment>() { appointment };
-                    } else pat.Appointments.Add(appointment);
-
-                    doctorService.Update(doc);
-                    patientService.Update(pat);
                 }
 
                 //for Patryk Niedopieralski - booked without examinations (but different Doctor)
@@ -573,21 +482,6 @@ namespace Clinic.Data
                     };
                     context.Appointments.Add(appointment);
                     context.SaveChanges();
-
-                    if (doc.Appointments is null)
-                    {
-                        doc.Appointments = new List<Appointment>() { appointment };
-                    }
-                    else doc.Appointments.Add(appointment);
-
-                    if (pat.Appointments is null)
-                    {
-                        pat.Appointments = new List<Appointment>() { appointment };
-                    }
-                    else pat.Appointments.Add(appointment);
-
-                    doctorService.Update(doc);
-                    patientService.Update(pat);
                 }
             }
         }
