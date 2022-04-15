@@ -1,5 +1,6 @@
 ﻿using Clinic.Data;
 using Clinic.Data.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Clinic.Services
 {
@@ -28,6 +29,6 @@ namespace Clinic.Services
         }
 
         public List<LaboratoryExamination> GetAllLabExaminations()
-           => _context.LaboratoryExaminations.ToList();
+           => _context.LaboratoryExaminations.Include(e => e.GlossaryDictionary).ToList();
     }
 }

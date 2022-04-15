@@ -2,6 +2,8 @@
 @using Clinic.Data.Enums
 @using Clinic.Data.Models
 @using Clinic.Data
+@using Clinic.Services
+@inject LaboratoryExaminationService laboratoryExaminationService;
 
 @inject NavigationManager NavigationManager;
 
@@ -15,9 +17,9 @@
             <button type="submit" class="btn btn-primary" @onclick="SearchExaminations">Search</button>
         </div><br />
            
-            @if (ExaminationsList != null)
+            @if (examinationsList != null)
             {
-                <TableTemplate Items="ExaminationsList">
+                <TableTemplate Items="examinationsList">
 				    <TableHeader>
                         <th> Examination's id </th>
 				        <th> Code </th>
@@ -54,14 +56,14 @@
     public string searchExaminations;
 
     //TO DO
-    //Lista badań
-    private List<LaboratoryExamination> ExaminationsList = new List<LaboratoryExamination>()
+    //Lista badań, w zależności co ma byś wyswietlane trzeba zmodyfikować service,
+    //tak żeby pobierać to z bazy, teraz dodatkowo pobierany jest tylko glossary
+    private List<LaboratoryExamination>? examinationsList;
+
+    protected override void OnInitialized()
     {
-        new LaboratoryExamination() {Id=Guid.NewGuid(), DoctorsNotes="coś tam 1", OrderedAt=new DateTime(), GlossaryDictionary=new GlossaryDictionary() {Code=GlossaryCode.LAB_BLOOD, Name="jakaś tam 1", Type=GlossaryType.LABORATORY}},
-        new LaboratoryExamination() {Id=Guid.NewGuid(), DoctorsNotes="coś tam 2", OrderedAt=new DateTime(), GlossaryDictionary=new GlossaryDictionary() {Code=GlossaryCode.LAB_COVID, Name="jakaś tam 2", Type=GlossaryType.LABORATORY}},
-        new LaboratoryExamination() {Id=Guid.NewGuid(), DoctorsNotes="coś tam 3", OrderedAt=new DateTime(), GlossaryDictionary=new GlossaryDictionary() {Code=GlossaryCode.LAB_URINE, Name="jakaś tam 3", Type=GlossaryType.LABORATORY}},
-        new LaboratoryExamination() {Id=Guid.NewGuid(), DoctorsNotes="coś tam 4", OrderedAt=new DateTime(), GlossaryDictionary=new GlossaryDictionary() {Code=GlossaryCode.LAB_BLOOD, Name="jakaś tam 4", Type=GlossaryType.LABORATORY}}
-    };
+        examinationsList = laboratoryExaminationService.GetAllLabExaminations();
+    }
 
     public void NavigateToEditExamination(string Id)
     {

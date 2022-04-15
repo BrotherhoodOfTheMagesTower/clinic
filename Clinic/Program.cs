@@ -26,6 +26,7 @@ builder.Services.AddScoped<AppointmentService>();
 builder.Services.AddScoped<LabManagerService>();
 builder.Services.AddScoped<LabTechnicianService>();
 builder.Services.AddScoped<DoctorService>();
+builder.Services.AddScoped<LaboratoryExaminationService>();
 builder.Services.AddBlazoredToast();
 
 var app = builder.Build();
