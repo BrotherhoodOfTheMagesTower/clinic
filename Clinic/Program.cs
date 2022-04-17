@@ -1,12 +1,12 @@
+using Blazored.Toast;
 using Clinic.Areas.Identity;
 using Clinic.Areas.Identity.Data;
 using Clinic.Data;
+using Clinic.Data.Seeders;
 using Clinic.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Blazored.Toast;
-using Clinic.Data.Seeders;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("ApplicationDbContextConnection");
@@ -26,6 +26,9 @@ builder.Services.AddScoped<AppointmentService>();
 builder.Services.AddScoped<LabManagerService>();
 builder.Services.AddScoped<LabTechnicianService>();
 builder.Services.AddScoped<DoctorService>();
+builder.Services.AddScoped<PhysicalExaminationService>();
+builder.Services.AddScoped<LaboratoryExaminationService>();
+builder.Services.AddScoped<GlossaryService>();
 builder.Services.AddBlazoredToast();
 
 var app = builder.Build();
