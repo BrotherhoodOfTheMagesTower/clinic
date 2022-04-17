@@ -1,11 +1,12 @@
+using Blazored.Toast;
 using Clinic.Areas.Identity;
 using Clinic.Areas.Identity.Data;
 using Clinic.Data;
+using Clinic.Data.Seeders;
 using Clinic.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Blazored.Toast;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("ApplicationDbContextConnection");
@@ -25,6 +26,9 @@ builder.Services.AddScoped<AppointmentService>();
 builder.Services.AddScoped<LabManagerService>();
 builder.Services.AddScoped<LabTechnicianService>();
 builder.Services.AddScoped<DoctorService>();
+builder.Services.AddScoped<PhysicalExaminationService>();
+builder.Services.AddScoped<LaboratoryExaminationService>();
+builder.Services.AddScoped<GlossaryService>();
 builder.Services.AddBlazoredToast();
 
 var app = builder.Build();
@@ -51,14 +55,17 @@ app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 
 var serviceProvider = app.Services?.GetService<IServiceScopeFactory>()?.CreateScope().ServiceProvider;
-
-// Comment this line if you want do debug using IIS Express
 serviceProvider!.GetService<ApplicationDbContext>()!.Database.Migrate();
 
-// Seed default data
-await serviceProvider!.SeedRolesAsync();
-var users = await serviceProvider!.SeedUsersAsync();
+// Provides an administrator account and a default Glossary with 6 predefined Examinations
+await serviceProvider!.SeedRequiredData();
+
+// Seed default users with roles - 3 Doctors, 1 Registrar, 2 Lab Technicians, 2 Lab Managers
+var users = serviceProvider!.SeedUsers();
 await serviceProvider!.AssignRoles(users);
+
+//Seed other default entities - 3 Patients, 2 Addresses, 4 Appointments, 4 Examinations
+await serviceProvider!.SeedDefaultEntities();
 
 app.Run();
 

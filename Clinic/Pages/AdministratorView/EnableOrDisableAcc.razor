@@ -1,0 +1,75 @@
+﻿@page "/EnableOrDisableAcc/{Id}"
+@using Microsoft.AspNetCore.Identity
+@using Clinic.Services
+@using Microsoft.AspNetCore.WebUtilities
+@using System.Text
+@inject UserService userService;
+@inject NavigationManager NavigationManager
+@inject RoleManager<IdentityRole> roleManager
+@inject UserManager<ApplicationUser> userManager
+@inject IToastService toastService;
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="text-center" style="margin-top:8px">Enable or disable account for user <b>@User.UserName</b></h2>
+    </div>
+</div>
+<div class="card-body">
+    @if (IsAccountEnabled)
+    {
+        <h3 class="text-center">The account for user @User.UserName is currently <b>enabled</b>.</h3>
+    }
+    else
+    {
+        <h3 class="text-center">The account for user @User.UserName is currently <b>disabled</b>.</h3>
+    }
+    <div class="container">
+        <div class="col-md-12 text-center">
+            <button @onclick="async () => await EnableAcc()" disabled="@(IsAccountEnabled)" type="button" style="margin-top: 20px" class="btn btn-lg btn-success">Enable account</button>
+        </div>
+        <div class="col-md-12 text-center">
+            <button @onclick="async () => await DisableAcc()" disabled="@(!IsAccountEnabled)" type="button" style="margin-top: 20px" class="btn btn-lg btn-danger">Disable account</button>
+        </div>
+    </div>
+
+</div>
+
+
+@code {
+    private ApplicationUser? User { get; set; }
+    [Parameter]
+    public string Id { get; set; }
+    private bool IsAccountEnabled { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        User = userService.GetUserById(Id);
+        IsAccountEnabled = userService.CheckIfAccountIsActive(Id);
+    }
+
+    private async Task EnableAcc()
+    {
+        var isEnabled = await userService.EnableUserAccount(User!.Id);
+
+        if (isEnabled)
+        {
+            toastService.ShowSuccess($"Account for user {User.Email} has been successfully enabled.", "Success!");
+        }
+        else
+            toastService.ShowError($"Something went wrong... The account for user {User.Email} hasn't been enabled.", "Try again!");
+    }
+
+    private async Task DisableAcc()
+    {
+        var isDisabled = await userService.DisableUserAccount(User!.Id);
+
+        if (isDisabled)
+        {
+            toastService.ShowSuccess($"Account for user {User.Email} has been successfully disabled.", "Success!");
+        }
+        else
+            toastService.ShowError($"Something went wrong... The account for user {User.Email} hasn't been disabled.", "Try again!");
+    }
+}

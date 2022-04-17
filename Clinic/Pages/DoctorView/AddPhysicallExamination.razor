@@ -1,0 +1,97 @@
+﻿@page "/AddPhysicalExamination/{Id}"
+@using Clinic.Data
+@using Clinic.Data.Enums
+@using Clinic.Data.Models
+@using System.Globalization
+@using System.ComponentModel.DataAnnotations
+@using System.Diagnostics
+<h3>EditAppointment</h3>
+
+@inject NavigationManager NavigationManager;
+
+<PageTitle>Add physical examination</PageTitle>
+
+
+
+<AuthorizeView Roles="Doctor" Context="examinationEditing">
+    <Authorized>
+        <EditForm EditContext="examinationToAdd" OnValidSubmit="AddExamination" class="w-50 bg-gray px-4 py-3 rounded">
+
+            <h1 class="mb-3 fw-bold">Add physical examination</h1><br />
+            <h3 class="mb-3 fw-bold">Examination:</h3>
+
+            <label class="d-block mb-1 ml-1"> Name: </label>
+            <InputSelect class="mb-3 fw-bold" @bind-Value="@glossaryCode">
+                @foreach (var c in allGlossaryDictionares)
+                {
+                    <option Value=@c.Code>@c.Name</option>
+                }
+            </InputSelect>
+
+            <label class="d-block mb-1 ml-1">Result:</label>
+            <InputTextArea @bind-Value="@examination.Result" class="form-control w-75" />
+
+
+            <br />
+            <div>
+                <button type="submit" class="btn btn-primary">Order</button>
+            </div>
+        </EditForm>
+    </Authorized>
+    <NotAuthorized>
+        <h1>Access denied!</h1>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+
+    //id wizyty, ktore zostalo przekazane z poprzedniego widoku, trzeba na jego podstawie zwrocic z bazy danych wizyte do edytowania
+    [Parameter]
+    public string Id { get; set; }
+
+    //Kod badania
+    private string glossaryCode;
+
+    //testowa lista glossarydictionares, docelowo ma byc zwrocona z bazy
+    private List<GlossaryDictionary> allGlossaryDictionares = new List<GlossaryDictionary>()
+    {
+    new GlossaryDictionary {Code = GlossaryCode.PHY_EAR, Name = "Ear examination", Type = GlossaryType.PHYSICAL },
+    new GlossaryDictionary {Code = GlossaryCode.PHY_THROAT, Name = "Throat examination", Type = GlossaryType.PHYSICAL },
+    new GlossaryDictionary {Code = GlossaryCode.PHY_USG, Name = "USG examination", Type = GlossaryType.PHYSICAL }
+    };
+
+    //protected override void OnInitialized()
+    //{
+    //    examinationToOrder = new EditContext(examination);
+    //    examination.Status = ExaminationStatus.APPROVED;
+    //    examination.OrderedAt = DateTime.Now;
+    //    base.OnInitialized();
+    //}
+    private PhysicalExamination examination = new();
+    EditContext examinationToAdd;
+
+
+    //TO DO
+    protected override async Task OnInitializedAsync()
+    {
+        examinationToAdd = new EditContext(examination);
+
+        base.OnInitialized();
+    }
+
+    //TO DO
+    //Zapisanie danych do bazy
+    private void AddExamination()
+    {
+        //przypisanie do examination obiektu GlossaryDictionary na podstawie kodu wybranego w select
+        foreach (var d in allGlossaryDictionares)
+        {
+            if (d.Code.ToString().Equals(glossaryCode))
+                examination.GlossaryDictionary = d;
+        }
+
+        Debug.WriteLine($"Code: {examination.GlossaryDictionary.Code}, notes: {examination.Result}");
+
+    }
+  
+}

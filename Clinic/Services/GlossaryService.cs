@@ -1,5 +1,6 @@
 ﻿using Clinic.Data;
 using Clinic.Data.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Clinic.Services
 {
@@ -29,5 +30,11 @@ namespace Clinic.Services
 
         public List<GlossaryDictionary> GetAllDictionaries()
            => _context.GlossaryDictionaries.ToList();
+
+        public async Task<List<GlossaryDictionary>> GetAllDictionariesAsync()
+          => await _context.GlossaryDictionaries
+            .Include(l => l.LaboratoryExaminations)
+            .Include(p => p.PhysicalExaminations)
+            .ToListAsync();
     }
 }

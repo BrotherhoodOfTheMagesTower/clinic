@@ -324,5 +324,167 @@ namespace Clinic.Services
                 return true;
             }
         }
+
+        public async Task<bool> EnableUserAccount(string userId)
+        {
+            var roles = GetRolesForUser(userId);
+
+            if (roles is not null)
+            {
+                foreach (var role in roles)
+                {
+                    switch (role)
+                    {
+                        case Roles.Doctor:
+                            var doc = _context.Doctors.Where(x => x.Id == userId).FirstOrDefault();
+                            if (doc is not null)
+                            {
+                                doc.IsActive = true;
+                                await _context.SaveChangesAsync();
+                                return true;
+                            }
+                            else continue;
+
+                        case Roles.Registrar:
+                            var reg = _context.Registrars.Where(x => x.Id == userId).FirstOrDefault();
+                            if (reg is not null)
+                            {
+                                reg.IsActive = true;
+                                await _context.SaveChangesAsync();
+                                return true;
+                            }
+                            else continue;
+                        case Roles.LabTechnician:
+                            var tech = _context.LabTechnicians.Where(x => x.Id == userId).FirstOrDefault();
+                            if (tech is not null)
+                            {
+                                tech.IsActive = true;
+                                await _context.SaveChangesAsync();
+                                return true;
+                            }
+                            else continue;
+                        case Roles.LabManager:
+                            var man = _context.LabManagers.Where(x => x.Id == userId).FirstOrDefault();
+                            if (man is not null)
+                            {
+                                man.IsActive = true;
+                                await _context.SaveChangesAsync();
+                                return true;
+                            }
+                            else continue;
+                    }
+                }
+                return false;
+            }
+            return false;
+        }
+
+        public async Task<bool> DisableUserAccount(string userId)
+        {
+            var roles = GetRolesForUser(userId);
+
+            if (roles is not null)
+            {
+                foreach (var role in roles)
+                {
+                    switch (role)
+                    {
+                        case Roles.Doctor:
+                            var doc = _context.Doctors.Where(x => x.Id == userId).FirstOrDefault();
+                            if (doc is not null)
+                            {
+                                doc.IsActive = false;
+                                await _context.SaveChangesAsync();
+                                return true;
+                            }
+                            else continue;
+
+                        case Roles.Registrar:
+                            var reg = _context.Registrars.Where(x => x.Id == userId).FirstOrDefault();
+                            if (reg is not null)
+                            {
+                                reg.IsActive = false;
+                                await _context.SaveChangesAsync();
+                                return true;
+                            }
+                            else continue;
+                        case Roles.LabTechnician:
+                            var tech = _context.LabTechnicians.Where(x => x.Id == userId).FirstOrDefault();
+                            if (tech is not null)
+                            {
+                                tech.IsActive = false;
+                                await _context.SaveChangesAsync();
+                                return true;
+                            }
+                            else continue;
+                        case Roles.LabManager:
+                            var man = _context.LabManagers.Where(x => x.Id == userId).FirstOrDefault();
+                            if (man is not null)
+                            {
+                                man.IsActive = false;
+                                await _context.SaveChangesAsync();
+                                return true;
+                            }
+                            else continue;
+                    }
+                }
+                return false;
+            }
+            return false;
+        }
+
+        public bool CheckIfAccountIsActive(string userId)
+        {
+            var roles = GetRolesForUser(userId);
+
+            if (roles is not null)
+            {
+                foreach (var role in roles)
+                {
+                    switch (role)
+                    {
+                        case Roles.Administrator:
+                            var adm = _context.Administrators.Where(x => x.Id == userId).FirstOrDefault();
+                            if (adm is not null)
+                            {
+                                return adm.IsActive;
+                            }
+                            else continue;
+                        
+                        case Roles.Doctor:
+                            var doc = _context.Doctors.Where(x => x.Id == userId).FirstOrDefault();
+                            if (doc is not null)
+                            {
+                                return doc.IsActive;
+                            }
+                            else continue;
+
+                        case Roles.Registrar:
+                            var reg = _context.Registrars.Where(x => x.Id == userId).FirstOrDefault();
+                            if (reg is not null)
+                            {
+                                return reg.IsActive;
+                            }
+                            else continue;
+                        case Roles.LabTechnician:
+                            var tech = _context.LabTechnicians.Where(x => x.Id == userId).FirstOrDefault();
+                            if (tech is not null)
+                            {
+                                return tech.IsActive;
+                            }
+                            else continue;
+                        case Roles.LabManager:
+                            var man = _context.LabManagers.Where(x => x.Id == userId).FirstOrDefault();
+                            if (man is not null)
+                            {
+                                return man.IsActive;
+                            }
+                            else continue;
+                    }
+                }
+                return false;
+            }
+            return false;
+        }
     }
 }

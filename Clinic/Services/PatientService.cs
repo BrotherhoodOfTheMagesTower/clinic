@@ -17,7 +17,7 @@ namespace Clinic.Services
             _context.Patients.Add(patient);
             _context.SaveChanges();
         }
-        public Patient GetById(Guid id)
+        public Patient? GetById(Guid id)
         {
             return _context.Patients.FirstOrDefault(p => p.Id == id);
         }
