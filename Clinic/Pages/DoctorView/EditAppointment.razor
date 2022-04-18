@@ -14,12 +14,10 @@
 
 <PageTitle>Edit appointment</PageTitle>
 
-
-
 <AuthorizeView Roles="Doctor" Context="appointmentEditing">
     <Authorized>
 
-        @if (appointmentToEdit != null)
+        @if (appointmentToEdit != null && appointment!= null && appointment.Patient !=null)
         {
         <EditForm EditContext="appointmentToEdit" OnValidSubmit="ChangeExistingAppointment" class="w-50 bg-gray px-4 py-3 rounded">
 
@@ -28,8 +26,14 @@
             <label class="d-block mb-1 ml-1">Name and surname:</label>
             <label class="form-control w-75">@appointment.Patient.FirstName @appointment.Patient.LastName</label>
             <label class="d-block mb-1 ml-1">Date of birth:</label>
-            <label class="form-control w-75">@appointment.Patient.BirthDate.Value.Day/@appointment.Patient.BirthDate.Value.Month/@appointment.Patient.BirthDate.Value.Year</label><br />
-            
+            @if(appointment.Patient.BirthDate !=null)
+            {
+                <label class="form-control w-75">@appointment.Patient.BirthDate.Value.Day/@appointment.Patient.BirthDate.Value.Month/@appointment.Patient.BirthDate.Value.Year</label><br />
+            }
+            else
+            {
+                <label class="form-control w-75">not provided</label><br />
+            }
             <button type="button" class="btn btn-primary" @onclick="(() => NavigateToPatientExaminationHistory(appointment.Patient.Id.ToString()))">Show examinations and appointments history</button> <br /><br />
 
             <h3 class="mb-3 fw-bold">Appointment:</h3>
@@ -101,8 +105,11 @@
         {
             <h3 class="mb-3 fw-bold">There are no laboratory examinations in the base</h3> <br />
         }
-        <button type="button" class="btn btn-primary" @onclick="(() => NavigateToOrderLaboratoryExamination(appointment.Id.ToString()))">Order laboratory examination</button> <br /><br />
 
+        @if(appointment != null)
+        {
+        <button type="button" class="btn btn-primary" @onclick="(() => NavigateToOrderLaboratoryExamination(appointment.Id.ToString()))">Order laboratory examination</button> <br /><br />
+        }
 
         <h3 class="mb-3 fw-bold">Physical examinations:</h3>
         @if (physicalExaminationsList != null && physicalExaminationsList.Count() > 0)
@@ -131,7 +138,10 @@
             <h3 class="mb-3 fw-bold">There are no physical examinations in the base</h3> <br />
         }
 
-        <button type="button" class="btn btn-primary" @onclick="(() => NavigateToAddPhysicalExamination(appointment.Id.ToString()))">Add physical examination</button> <br /><br />
+        @if(appointment != null)
+        {
+            <button type="button" class="btn btn-primary" @onclick="(() => NavigateToAddPhysicalExamination(appointment.Id.ToString()))">Add physical examination</button> <br /><br />
+        }
 
     </Authorized>
     <NotAuthorized>
@@ -140,10 +150,9 @@
 </AuthorizeView>
 
 @code {
-
     //id wizyty, ktore zostalo przekazane z poprzedniego widoku, trzeba na jego podstawie zwrocic z bazy danych wizyte do edytowania
     [Parameter]
-    public string Id { get; set; }
+    public string Id { get; set; } = String.Empty;
 
     private Appointment? appointment;
     private EditContext? appointmentToEdit;
@@ -151,32 +160,26 @@
     private List<LaboratoryExamination>? laboratoryExaminationsList;
     private List<PhysicalExamination>? physicalExaminationsList;
 
-    protected override void OnInitialized()
-    {
-        //appointment = appointmentService.GetById(new Guid(Id));
-
-        base.OnInitialized();
-    }
-
     protected override async Task OnInitializedAsync()
     {
         appointment = await appointmentService.GetByIdAsync(new Guid(Id));
         appointmentToEdit =  new EditContext( appointment!);
 
-        //laboratoryExaminationsList = (await laboratoryExaminationService.GetAllLabExaminationsForGivenPatientAsync(appointment.Patient.Id)).ToList();
-        //physicalExaminationsList = (await physicalExaminationService.GetAllExaminationsForGivenPatientAsync(appointment.Patient.Id)).ToList();
-        
-        laboratoryExaminationsList = (await appointmentService.GetLaboratoryExaminationsAsync(appointment)).ToList();
-        physicalExaminationsList = (await appointmentService.GetPhysicalExaminationsAsync(appointment)).ToList();
+        if(appointment != null)
+        {
+            laboratoryExaminationsList = (await appointmentService.GetLaboratoryExaminationsAsync(appointment)).ToList();
+            physicalExaminationsList = (await appointmentService.GetPhysicalExaminationsAsync(appointment)).ToList();
+        }
     }
 
     //TO DO
     //Zapisanie danych do bazy
     private void ChangeExistingAppointment()
     {
-
-        Debug.WriteLine($"Data - doctor last name: {appointment.Description}, patient last name: {appointment.Diagnosis}, date: {appointment.RegisteredTo}, date2: {appointment.Patient.FirstName}.");
-
+        @if(appointment != null)
+        {
+            Debug.WriteLine($"Data - doctor last name: {appointment.Description}, patient last name: {appointment.Diagnosis}, date: {appointment.RegisteredTo}, date2: {appointment.Patient.FirstName}.");
+        }
     }
 
     public void NavigateToPatientExaminationHistory(string PatientId)
