@@ -57,13 +57,14 @@ namespace Clinic.Services
                 .Include(l => l.LabTechnician)
                 .Include(g => g.GlossaryDictionary)
                 .Include(a => a.Appointment)
-                .Where(a => a.Id == appointment.Id)
+                .Where(a => a.Appointment == appointment)
                 .ToListAsync();
+
         public async Task<List<PhysicalExamination>> GetPhysicalExaminationsAsync(Appointment appointment)
            => await _context.PhysicalExaminations
                .Include(l => l.GlossaryDictionary)
                .Include(a => a.Appointment)
-               .Where(a => a.Id == appointment.Id)
+               .Where(a => a.Appointment == appointment)
                .ToListAsync();
 
         public List<Appointment> GetPatientAppointments(Patient patient)

@@ -36,5 +36,12 @@ namespace Clinic.Services
             .Include(l => l.LaboratoryExaminations)
             .Include(p => p.PhysicalExaminations)
             .ToListAsync();
+
+        public async Task<List<GlossaryDictionary>> GetAllDictionariesAsync(GlossaryType glossaryType)
+         => await _context.GlossaryDictionaries
+           .Include(l => l.LaboratoryExaminations)
+           .Include(p => p.PhysicalExaminations)
+           .Where(g => g.Type == glossaryType)
+           .ToListAsync();
     }
 }
