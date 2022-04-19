@@ -15,6 +15,7 @@ namespace Clinic.Services
 
         public void Add(LaboratoryExamination laboratoryExaminations)
         {
+            if (laboratoryExaminations == null) return;
             _context.LaboratoryExaminations.Add(laboratoryExaminations);
             _context.SaveChanges();
         }
@@ -24,6 +25,7 @@ namespace Clinic.Services
 
         public void Update(LaboratoryExamination laboratoryExamination)
         {
+            if (laboratoryExamination == null) return;
             _context.LaboratoryExaminations.Update(laboratoryExamination);
             _context.SaveChanges();
         }

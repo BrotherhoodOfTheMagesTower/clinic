@@ -20,6 +20,7 @@ namespace Clinic.Services
 
         public void Add(Doctor tUser)
         {
+            if (tUser == null) return;
             _context.Doctors.Add(tUser);
             _context.SaveChanges();
         }
@@ -38,14 +39,16 @@ namespace Clinic.Services
 
         public void Update(Doctor tUser)
         {
+            if (tUser == null) return;
             _context.Doctors.Update(tUser);
             _context.SaveChanges();
         }
 
         public List<Doctor> GetAllDoctors()
            => _context.Doctors.ToList();
-        public Doctor? GetDoctorByEmail(string email)
-            => _context.Doctors.Where(x => x.User.Email == email).FirstOrDefault();
+        public Doctor? GetDoctorByEmail(string? email)
+            => email != null
+            ? _context.Doctors.Where(x => x.User.Email == email).FirstOrDefault()
+            : null;
     }
-
 }
