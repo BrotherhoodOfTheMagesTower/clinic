@@ -47,5 +47,15 @@ namespace Clinic.Services
            .Include(a => a.Appointment)
            .Include(l => l.LabTechnician)
            .ToListAsync();
+
+        public async Task<List<LaboratoryExamination>> GetLaboratoryExaminationsAsync(Appointment appointment)
+        => await _context.LaboratoryExaminations
+            .Include(l => l.LabManager)
+            .Include(l => l.LabTechnician)
+            .Include(g => g.GlossaryDictionary)
+            .Include(a => a.Appointment)
+            .Where(a => a.Appointment == appointment)
+            .ToListAsync();
+
     }
 }
