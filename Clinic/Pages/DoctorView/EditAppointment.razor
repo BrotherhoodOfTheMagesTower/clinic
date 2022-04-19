@@ -8,7 +8,7 @@
 @using Clinic.Services
 
 @inject NavigationManager NavigationManager;
-@inject IToastService toastService
+@inject IToastService toastService;
 @inject AppointmentService appointmentService;
 @inject LaboratoryExaminationService laboratoryExaminationService;
 @inject PhysicalExaminationService physicalExaminationService;
@@ -163,7 +163,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        appointment = await appointmentService.GetByIdAsync(new Guid(Id));
+        appointment = await appointmentService.GetByIdAsync(Guid.Parse(Id));
         appointmentToEdit =  new EditContext( appointment!);
 
         if(appointment != null)
@@ -178,7 +178,7 @@
         if(appointment != null)
         {
             appointmentService.Update(appointment);
-            toastService.ShowSuccess("Laboratory examination added successfully!");
+            toastService.ShowSuccess("Laboratory examination updated successfully!");
         }
         else
         {

@@ -16,6 +16,7 @@ namespace Clinic.Services
 
         public void Add(Appointment appointment)
         {
+            if (appointment == null) return;
             _context.Appointments.Add(appointment);
             _context.SaveChanges();
         }
@@ -34,6 +35,7 @@ namespace Clinic.Services
 
         public void Update(Appointment appointment)
         {
+            if (appointment == null) return;
             _context.Appointments.Update(appointment);
             _context.SaveChanges();
         }
