@@ -1,5 +1,6 @@
 ﻿using Clinic.Data;
 using Clinic.Data.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Clinic.Services
 {
@@ -29,6 +30,26 @@ namespace Clinic.Services
 
         public List<PhysicalExamination> GetAllExaminations()
            => _context.PhysicalExaminations.ToList();
+        public async Task<List<PhysicalExamination>> GetAllExaminationsAsync()
+       => await _context.PhysicalExaminations
+          .Include(g => g.GlossaryDictionary)
+          .Include(a => a.Appointment)
+          .ToListAsync();
+
+        public async Task<List<PhysicalExamination>> GetAllExaminationsForGivenPatientAsync(Guid id)
+       => await _context.PhysicalExaminations
+         .Include(g => g.GlossaryDictionary)
+         .Include(a => a.Appointment)
+         .Where(p => p.Id == id)
+         .ToListAsync();
+
+        public async Task<List<PhysicalExamination>> GetPhysicalExaminationsAsync(Appointment appointment)
+          => await _context.PhysicalExaminations
+              .Include(l => l.GlossaryDictionary)
+              .Include(a => a.Appointment)
+              .Where(a => a.Appointment == appointment)
+              .ToListAsync();
     }
+
 }
 

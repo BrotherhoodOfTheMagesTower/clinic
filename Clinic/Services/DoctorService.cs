@@ -44,5 +44,8 @@ namespace Clinic.Services
 
         public List<Doctor> GetAllDoctors()
            => _context.Doctors.ToList();
+        public Doctor? GetDoctorByEmail(string email)
+            => _context.Doctors.Where(x => x.User.Email == email).FirstOrDefault();
     }
+
 }
