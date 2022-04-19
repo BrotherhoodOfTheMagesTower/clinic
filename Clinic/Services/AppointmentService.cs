@@ -51,23 +51,12 @@ namespace Clinic.Services
                 .Where(a => a.Doctor.Id == doctor.Id)
                 .ToListAsync();
 
-        public async Task<List<LaboratoryExamination>> GetLaboratoryExaminationsAsync(Appointment appointment)
-            => await _context.LaboratoryExaminations
-                .Include(l => l.LabManager)
-                .Include(l => l.LabTechnician)
-                .Include(g => g.GlossaryDictionary)
-                .Include(a => a.Appointment)
-                .Where(a => a.Appointment == appointment)
-                .ToListAsync();
-
-        public async Task<List<PhysicalExamination>> GetPhysicalExaminationsAsync(Appointment appointment)
-           => await _context.PhysicalExaminations
-               .Include(l => l.GlossaryDictionary)
-               .Include(a => a.Appointment)
-               .Where(a => a.Appointment == appointment)
-               .ToListAsync();
-
         public List<Appointment> GetPatientAppointments(Patient patient)
             => _context.Appointments.Where(a => a.Patient.Id == patient.Id).ToList();
+
+        public async Task<List<Appointment>> GetPatientAppointmentsAsync(Patient patient)
+           => await _context.Appointments
+            .Include(d => d.Doctor)
+            .Where(p => p.Patient == patient).ToListAsync();
     }
 }

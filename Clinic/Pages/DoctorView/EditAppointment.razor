@@ -8,6 +8,7 @@
 @using Clinic.Services
 
 @inject NavigationManager NavigationManager;
+@inject IToastService toastService
 @inject AppointmentService appointmentService;
 @inject LaboratoryExaminationService laboratoryExaminationService;
 @inject PhysicalExaminationService physicalExaminationService;
@@ -167,18 +168,21 @@
 
         if(appointment != null)
         {
-            laboratoryExaminationsList = (await appointmentService.GetLaboratoryExaminationsAsync(appointment)).ToList();
-            physicalExaminationsList = (await appointmentService.GetPhysicalExaminationsAsync(appointment)).ToList();
+            laboratoryExaminationsList = (await laboratoryExaminationService.GetLaboratoryExaminationsAsync(appointment)).ToList();
+            physicalExaminationsList = (await physicalExaminationService.GetPhysicalExaminationsAsync(appointment)).ToList();
         }
     }
 
-    //TO DO
-    //Zapisanie danych do bazy
     private void ChangeExistingAppointment()
     {
-        @if(appointment != null)
+        if(appointment != null)
         {
-            Debug.WriteLine($"Data - doctor last name: {appointment.Description}, patient last name: {appointment.Diagnosis}, date: {appointment.RegisteredTo}, date2: {appointment.Patient.FirstName}.");
+            appointmentService.Update(appointment);
+            toastService.ShowSuccess("Laboratory examination added successfully!");
+        }
+        else
+        {
+             toastService.ShowError("Error while updating!");
         }
     }
 

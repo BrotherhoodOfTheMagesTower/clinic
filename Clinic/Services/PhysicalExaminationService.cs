@@ -42,6 +42,13 @@ namespace Clinic.Services
          .Include(a => a.Appointment)
          .Where(p => p.Id == id)
          .ToListAsync();
+
+        public async Task<List<PhysicalExamination>> GetPhysicalExaminationsAsync(Appointment appointment)
+          => await _context.PhysicalExaminations
+              .Include(l => l.GlossaryDictionary)
+              .Include(a => a.Appointment)
+              .Where(a => a.Appointment == appointment)
+              .ToListAsync();
     }
 
 }
