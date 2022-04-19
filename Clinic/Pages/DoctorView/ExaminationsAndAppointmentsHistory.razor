@@ -67,7 +67,10 @@
     protected override async Task OnInitializedAsync()
     {
         patient = patientService.GetById(new Guid (Id));
-        appointmentsList = (await appointmentService.GetPatientAppointmentsAsync(patient)).ToList();
+        if(patient != null)
+        {
+            appointmentsList = (await appointmentService.GetPatientAppointmentsAsync(patient)).ToList();
+        }
     }
 
     public void NavigateToAppointmentDetails(string Id)

@@ -15,6 +15,7 @@ namespace Clinic.Services
 
         public void Add(GlossaryDictionary glossaryDictionary)
         {
+            if (glossaryDictionary == null) return;
             _context.GlossaryDictionaries.Add(glossaryDictionary);
             _context.SaveChanges();
         }
@@ -24,6 +25,7 @@ namespace Clinic.Services
 
         public void Update(GlossaryDictionary glossaryDictionary)
         {
+            if (glossaryDictionary == null) return;
             _context.GlossaryDictionaries.Update(glossaryDictionary);
             _context.SaveChanges();
         }

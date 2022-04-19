@@ -15,6 +15,7 @@ namespace Clinic.Services
 
         public void Add(PhysicalExamination physicalExamination)
         {
+            if (physicalExamination == null) return;
             _context.PhysicalExaminations.Add(physicalExamination);
             _context.SaveChanges();
         }
@@ -24,6 +25,7 @@ namespace Clinic.Services
 
         public void Update(PhysicalExamination physicalExamination)
         {
+            if (physicalExamination == null) return;
             _context.PhysicalExaminations.Update(physicalExamination);
             _context.SaveChanges();
         }
