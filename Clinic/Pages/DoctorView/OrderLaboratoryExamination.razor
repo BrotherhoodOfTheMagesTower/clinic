@@ -67,7 +67,7 @@
     //Zapisanie danych do bazy
     private void OrderExamination()
     {
-        examination.Appointment = appointmentService.GetById(new Guid(Id));
+        examination.Appointment = appointmentService.GetById(Guid.Parse(Id));
         examination.Status = ExaminationStatus.APPROVED;
         examination.OrderedAt = DateTime.Now;
 
