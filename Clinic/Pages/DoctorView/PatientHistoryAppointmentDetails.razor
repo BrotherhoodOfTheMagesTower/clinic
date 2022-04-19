@@ -54,7 +54,7 @@
                     <th> Action </th>
                 </TableHeader>
                 <RowTemplate Context="examination">
-                    <td> @examination.GlossaryDictionary.Name </td>
+                    <td> @examination.GlossaryDictionary?.Name </td>
                     <td> @examination.OrderedAt </td>
                     <td> @examination.Status.ToString().ToLower() </td>
                     <th>
@@ -78,7 +78,7 @@
                     <th> Action </th>
                 </TableHeader>
                 <RowTemplate Context="examination">
-                    <td> @examination.GlossaryDictionary.Name </td>
+                    <td> @examination.GlossaryDictionary?.Name </td>
                     <td> @examination.Result </td>
                     <th>
                         <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToShowPhysicalExaminationDetails(examination.Id.ToString()))">Edit</a>
@@ -109,12 +109,13 @@
 
     protected override async Task OnInitializedAsync()
     {
-        appointment = await appointmentService.GetByIdAsync(new Guid(Id));
+        appointment = await appointmentService.GetByIdAsync(Guid.Parse(Id));
         if(appointment != null)
         {
             appointmentToEdit = new EditContext(appointment);
-            physicalExaminationsList = appointment.PhysicalExaminations?.ToList();
-            laboratoryExaminationsList = appointment.LaboratoryExaminations?.ToList();
+            physicalExaminationsList = (await physicalExaminationService.GetAllExaminationsForGivenPatientAsync(appointment.Patient)).ToList();
+            laboratoryExaminationsList = (await laboratoryExaminationService.GetAllLabExaminationsForGivenPatientAsync(appointment.Patient)).ToList();
+            
         }
     }
 

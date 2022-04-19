@@ -2,50 +2,58 @@
 @using Clinic.Data.Enums
 @using Clinic.Data.Models
 @using Clinic.Data
+@using Clinic.Services
 
 @inject NavigationManager NavigationManager;
+@inject IToastService toastService;
+@inject LaboratoryExaminationService laboratoryExaminationService;
 
 <PageTitle>Edit laboratory examinations</PageTitle>
 
 <AuthorizeView Roles="Doctor" Context="examinationEditing">
     <Authorized>
-        <EditForm EditContext="newExamination" OnValidSubmit="changeExistingExamination" class="w-50 bg-gray px-4 py-3 rounded">
+        @if(examination != null)
+        {
+            <EditForm EditContext="newExamination" OnValidSubmit="ChangeExistingExamination" class="w-50 bg-gray px-4 py-3 rounded">
 
-            <h1 class="mb-3 fw-bold">Edit laboratory examinations</h1><br />
-            <h3 class="mb-3 fw-bold">Examination:</h3>
+                <h1 class="mb-3 fw-bold">Edit laboratory examinations</h1><br />
+                <h3 class="mb-3 fw-bold">Examination:</h3>
 
-            <label class="d-block mb-1 ml-1">id </label>
-            <label class="form-control w-75" >@EditExaminationId </label><br />
+                <label class="d-block mb-1 ml-1">id </label>
+                <label class="form-control w-75" >@EditExaminationId </label><br />
 
-            <label class="d-block mb-1 ml-1">Name: </label>
-            <label class="form-control w-75" > @examination.GlossaryDictionary.Name </label><br />
+                <label class="d-block mb-1 ml-1">Name: </label>
+                <label class="form-control w-75" > @examination.GlossaryDictionary.Name </label><br />
 
-            <label class="d-block mb-1 ml-1"> Status:</label>
-            <label class="form-control w-75"> @status </label> <br />
+                <label class="d-block mb-1 ml-1"> Status:</label>
+                <label class="form-control w-75"> @status </label> <br />
           
 
-            <label class="d-block mb-1 ml-1">Doctor notes: </label>
-            <InputTextArea @bind-Value="@examination.DoctorsNotes" class="form-control w-75" /> <br />
+                <label class="d-block mb-1 ml-1">Doctor notes: </label>
+                <InputTextArea @bind-Value="@examination.DoctorsNotes" class="form-control w-75" /> <br />
 
-            @if (examination.Status == ExaminationStatus.APPROVED)
+                @if (examination.Status == ExaminationStatus.APPROVED)
 
-            {
-                <label class="d-block mb-1 ml-1">Result: </label>
-                <label class="form-control w-75" > @examination.Result </label><br />
+                {
+                    <label class="d-block mb-1 ml-1">Result: </label>
+                    <label class="form-control w-75" > @examination.Result</label><br />
 
-                <label class="d-block mb-1 ml-1">Lab Technician: </label>
-                <label class="form-control w-75" >@examination.LabTechnician.FirstName @examination.LabTechnician.LastName </label><br />
+                    <label class="d-block mb-1 ml-1">Lab Technician: </label>
+                    <label class="form-control w-75" >@examination.LabTechnician?.FirstName @examination.LabTechnician?.LastName </label><br />
 
-                <label class="d-block mb-1 ml-1">Execution date: </label>
-                <label class="form-control w-75" >@examination.ExecutedOrCancelledAt </label><br />
-            
-            }
+                    <label class="d-block mb-1 ml-1">Execution date: </label>
+                    <label class="form-control w-75" >@examination.ExecutedOrCancelledAt </label><br />
+                }
+                else
+                {
+                     <p>There are no results yet!</p> 
+                }
 
-
-            <div>
-                <button type="submit" class="btn btn-primary">Save</button>
-            </div>
-        </EditForm>
+                <div>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </EditForm>
+        }
     </Authorized>
     <NotAuthorized>
         <h1>Access denied!</h1>
@@ -54,37 +62,31 @@
 
 @code {
     [Parameter]
-    public string EditExaminationId { get; set; }
+    public string EditExaminationId { get; set; } = String.Empty;
 
     //Kod badania
-    public string status;
-    protected override void OnInitialized()
-    {
-        newExamination = new EditContext(examination);
-        base.OnInitialized();
-    }
-    private LaboratoryExamination examination = new();
-    EditContext newExamination;
+    public string? status;
+    private LaboratoryExamination? examination;
+    private EditContext? newExamination;
 
-    //TO DO
-    //Przypisanie wartości do badania
     protected override async Task OnInitializedAsync()
     {
-        //Poniższy kod testowo (do usunięcia potem)
-        examination = new LaboratoryExamination() { Id = Guid.Parse(EditExaminationId), Result ="wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to wynik to ", ExecutedOrCancelledAt=new DateTime(2022, 12, 25, 10, 30, 00),ManagerNotes = "Według kierownika laboratorium należy:", DoctorsNotes = "zalecenia do badania sa takie: ", OrderedAt = new DateTime(), Status = ExaminationStatus.APPROVED, LabTechnician=new LabTechnician {Id = Guid.NewGuid().ToString(), LastName="Kowal", FirstName="Maciej"}, GlossaryDictionary = new GlossaryDictionary { Code = GlossaryCode.LAB_BLOOD, Name = "Blood examination", Type = GlossaryType.LABORATORY } };
-        
-        //to musi zostać
-        status = examination.Status.ToString().ToLower();
-        
+        examination = await laboratoryExaminationService.GetByIdAsync(Guid.Parse(EditExaminationId));
+        if(examination != null)
+        {
+            newExamination = new EditContext(examination);
+            status = examination.Status.ToString().ToLower();
+        }
     }
 
-    //TO DO
-    //Zapisanie danych do bazy
-    private void changeExistingExamination()
+    private void ChangeExistingExamination()
     {
-
+        if (examination != null)
+        {
+            laboratoryExaminationService.Update(examination);
+            toastService.ShowSuccess("Examination has been successfully updated!");
+        }
     }
-
 
     private void NavigateToLabExaminations()
     {
