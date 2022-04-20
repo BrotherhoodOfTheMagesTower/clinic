@@ -3,10 +3,14 @@
 @using Clinic.Data.Models
 @using Clinic.Data
 @using Clinic.Services
+@using System.Security.Claims
 
 @inject NavigationManager NavigationManager;
 @inject LaboratoryExaminationService laboratoryExaminationService;
+@inject LabManagerService labManagerService;
 @inject IToastService toastService;
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor httpContextAccessor
+
 
 
 <PageTitle>Approve examinations</PageTitle>
@@ -57,7 +61,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        examinationsList = await laboratoryExaminationService.GetAllLabExaminationsAsync();
+        examinationsList = await laboratoryExaminationService.GetAllLabExaminationsForApprovmentAsync();
     }
 
     public async Task approveExamination(string Id)
@@ -66,6 +70,9 @@
         if (examination != null)
         {
             examination.Status = ExaminationStatus.APPROVED;
+            examination.ApprovedOrCancelledAt = DateTime.Now;
+            string currentUserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            examination.LabManager = labManagerService.GetById(currentUserId);
             laboratoryExaminationService.Update(examination);
             toastService.ShowSuccess("Examination has been successfully approved!");
         }

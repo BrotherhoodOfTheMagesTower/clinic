@@ -1,4 +1,5 @@
 ﻿using Clinic.Data;
+using Clinic.Data.Enums;
 using Clinic.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,6 +38,15 @@ namespace Clinic.Services
             _context.LaboratoryExaminations.Update(laboratoryExamination);
             _context.SaveChanges();
         }
+
+        public async Task<List<LaboratoryExamination>> GetAllLabExaminationsForApprovmentAsync()
+        => await _context.LaboratoryExaminations
+           .Include(g => g.GlossaryDictionary)
+           .Include(l => l.LabManager)
+           .Include(a => a.Appointment)
+           .Include(l => l.LabTechnician)
+           .Where(l => l.Status == ExaminationStatus.EXECUTED)
+           .ToListAsync();
 
         public async Task<List<LaboratoryExamination>> GetAllLabExaminationsAsync()
          => await _context.LaboratoryExaminations

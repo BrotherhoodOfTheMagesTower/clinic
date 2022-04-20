@@ -3,12 +3,14 @@
 @using Clinic.Data.Models
 @using Clinic.Data
 @using Clinic.Services
+@using System.Security.Claims
 
 
 @inject NavigationManager NavigationManager;
 @inject LaboratoryExaminationService laboratoryExaminationService;
 @inject IToastService toastService;
-
+@inject LabTechnicianService labTechnicianService;
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor httpContextAccessor
 
 
 <PageTitle>Edit laboratory examinations</PageTitle>
@@ -92,8 +94,17 @@
     {
         if (examination != null)
         {
+            string currentUserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            examination.LabTechnician = labTechnicianService.GetById(currentUserId);
+
+            // TODO Distinguish statuses and set date only when changed to executed or canceled
+            examination.ExecutedOrCancelledAt = DateTime.Now;
             laboratoryExaminationService.Update(examination);
             toastService.ShowSuccess("Examination has been successfully saved!");
+        }
+        else
+        {
+            toastService.ShowError("Failed to update examination!");
         }
     }
 
