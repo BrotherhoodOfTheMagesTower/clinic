@@ -38,9 +38,6 @@ namespace Clinic.Services
             _context.SaveChanges();
         }
 
-        public List<LaboratoryExamination> GetAllLabExaminations()
-           => _context.LaboratoryExaminations.Include(e => e.GlossaryDictionary).ToList();
-
         public async Task<List<LaboratoryExamination>> GetAllLabExaminationsAsync()
          => await _context.LaboratoryExaminations
             .Include(g => g.GlossaryDictionary)
