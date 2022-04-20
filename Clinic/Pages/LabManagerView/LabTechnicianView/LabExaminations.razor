@@ -2,6 +2,8 @@
 @using Clinic.Data.Enums
 @using Clinic.Data.Models
 @using Clinic.Data
+@using Clinic.Services
+@inject LaboratoryExaminationService laboratoryExaminationService;
 
 @inject NavigationManager NavigationManager;
 
@@ -11,38 +13,40 @@
     <Authorized>
         <h3 class="mb-3 fw-bold"><b>Laboratory examinations</b></h3> <br />
         <div>
-            <input type="text" @bind="searchExaminations" class="form-control w-75"/>
+            <input type="text" @bind="searchExaminations" class="form-control w-75" />
             <button type="submit" class="btn btn-primary" @onclick="SearchExaminations">Search</button>
         </div><br />
-           
-            @if (ExaminationsList != null)
-            {
-                <TableTemplate Items="ExaminationsList">
-				    <TableHeader>
-                        <th> Examination's id </th>
-				        <th> Code </th>
-				        <th> Name </th>
-                        <th> Order Date </th>
-				        <th> Status </th>
-				        <th> Doctor's note </th>
-				        <th> Action </th>
-				    </TableHeader>
-				    <RowTemplate Context="examination">
-                        <td> @examination.Id </td>
-                        <td> @examination.GlossaryDictionary.Code.ToString().ToLower() </td>
-				        <td> @examination.GlossaryDictionary.Name </td>
-                        <td> @examination.OrderedAt </td>
-				        <td> @examination.Status.ToString().ToLower() </td>
-				        <td> @examination.DoctorsNotes </td>
-				        <th>
-                            <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToEditExamination(examination.Id.ToString()))">Edit</a>
-                        </th>
-				    </RowTemplate>
-				</TableTemplate>
-			}else{
-                   <h3 class="mb-3 fw-bold">There are no examinations in the base</h3> <br />
-            }
-            <br /><br />
+
+        @if (examinationsList != null)
+        {
+            <TableTemplate Items="examinationsList">
+                <TableHeader>
+                    <th> Examination's id </th>
+                    <th> Code </th>
+                    <th> Name </th>
+                    <th> Order Date </th>
+                    <th> Status </th>
+                    <th> Doctor's note </th>
+                    <th> Action </th>
+                </TableHeader>
+                <RowTemplate Context="examination">
+                    <td> @examination.Id </td>
+                    <td> @examination.GlossaryDictionary.Code.ToString().ToLower() </td>
+                    <td> @examination.GlossaryDictionary.Name </td>
+                    <td> @examination.OrderedAt </td>
+                    <td> @examination.Status.ToString().ToLower() </td>
+                    <td> @examination.DoctorsNotes </td>
+                    <th>
+                        <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToEditExamination(examination.Id.ToString()))">Edit</a>
+                    </th>
+                </RowTemplate>
+            </TableTemplate>
+        }
+        else
+        {
+            <h3 class="mb-3 fw-bold">There are no examinations in the base</h3> <br />
+        }
+        <br /><br />
     </Authorized>
     <NotAuthorized>
         <h1>Access denied!</h1>
@@ -53,15 +57,17 @@
     //Pole wyszukiwania
     public string searchExaminations;
 
-    //TO DO
-    //Lista badań
-    private List<LaboratoryExamination> ExaminationsList = new List<LaboratoryExamination>()
+    private List<LaboratoryExamination>? examinationsList;
+
+    protected override async Task OnInitializedAsync()
     {
-        new LaboratoryExamination() {Id=Guid.NewGuid(), DoctorsNotes="coś tam 1", OrderedAt=new DateTime(), GlossaryDictionary=new GlossaryDictionary() {Code=GlossaryCode.LAB_BLOOD, Name="jakaś tam 1", Type=GlossaryType.LABORATORY}},
-        new LaboratoryExamination() {Id=Guid.NewGuid(), DoctorsNotes="coś tam 2", OrderedAt=new DateTime(), GlossaryDictionary=new GlossaryDictionary() {Code=GlossaryCode.LAB_COVID, Name="jakaś tam 2", Type=GlossaryType.LABORATORY}},
-        new LaboratoryExamination() {Id=Guid.NewGuid(), DoctorsNotes="coś tam 3", OrderedAt=new DateTime(), GlossaryDictionary=new GlossaryDictionary() {Code=GlossaryCode.LAB_URINE, Name="jakaś tam 3", Type=GlossaryType.LABORATORY}},
-        new LaboratoryExamination() {Id=Guid.NewGuid(), DoctorsNotes="coś tam 4", OrderedAt=new DateTime(), GlossaryDictionary=new GlossaryDictionary() {Code=GlossaryCode.LAB_BLOOD, Name="jakaś tam 4", Type=GlossaryType.LABORATORY}}
-    };
+        examinationsList = await laboratoryExaminationService.GetAllLabExaminationsAsync();
+    }
+
+    protected override void OnInitialized()
+    {
+
+    }
 
     public void NavigateToEditExamination(string Id)
     {
@@ -73,7 +79,7 @@
     //Do zastanowienia sie czy jest wogole potrzebne wyszukiwani i jak tak to po czym xddd
     public void SearchExaminations()
     {
-       
+
     }
 
  }
