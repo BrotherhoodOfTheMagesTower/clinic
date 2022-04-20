@@ -5,13 +5,16 @@
 @using System.Globalization
 @using System.ComponentModel.DataAnnotations
 @using System.Diagnostics
+@using Clinic.Services
 <h3>EditAppointment</h3>
 
 @inject NavigationManager NavigationManager;
+@inject IToastService toastService
+@inject GlossaryService glossaryService;
+@inject PhysicalExaminationService physicalExaminationService;
+@inject AppointmentService appointmentService;
 
 <PageTitle>Add physical examination</PageTitle>
-
-
 
 <AuthorizeView Roles="Doctor" Context="examinationEditing">
     <Authorized>
@@ -21,16 +24,17 @@
             <h3 class="mb-3 fw-bold">Examination:</h3>
 
             <label class="d-block mb-1 ml-1"> Name: </label>
-            <InputSelect class="mb-3 fw-bold" @bind-Value="@glossaryCode">
-                @foreach (var c in allGlossaryDictionares)
-                {
-                    <option Value=@c.Code>@c.Name</option>
-                }
-            </InputSelect>
-
+            @if(allGlossaryDictionares != null)
+            {
+                <InputSelect class="mb-3 fw-bold" @bind-Value="@glossaryCode">
+                    @foreach (var c in allGlossaryDictionares)
+                    {
+                        <option Value=@c.Code>@c.Name</option>
+                    }
+                </InputSelect>
+            }
             <label class="d-block mb-1 ml-1">Result:</label>
             <InputTextArea @bind-Value="@examination.Result" class="form-control w-75" />
-
 
             <br />
             <div>
@@ -44,54 +48,44 @@
 </AuthorizeView>
 
 @code {
-
     //id wizyty, ktore zostalo przekazane z poprzedniego widoku, trzeba na jego podstawie zwrocic z bazy danych wizyte do edytowania
     [Parameter]
-    public string Id { get; set; }
+    public string Id { get; set; } = String.Empty;
 
-    //Kod badania
-    private string glossaryCode;
-
-    //testowa lista glossarydictionares, docelowo ma byc zwrocona z bazy
-    private List<GlossaryDictionary> allGlossaryDictionares = new List<GlossaryDictionary>()
-    {
-    new GlossaryDictionary {Code = GlossaryCode.PHY_EAR, Name = "Ear examination", Type = GlossaryType.PHYSICAL },
-    new GlossaryDictionary {Code = GlossaryCode.PHY_THROAT, Name = "Throat examination", Type = GlossaryType.PHYSICAL },
-    new GlossaryDictionary {Code = GlossaryCode.PHY_USG, Name = "USG examination", Type = GlossaryType.PHYSICAL }
-    };
-
-    //protected override void OnInitialized()
-    //{
-    //    examinationToOrder = new EditContext(examination);
-    //    examination.Status = ExaminationStatus.APPROVED;
-    //    examination.OrderedAt = DateTime.Now;
-    //    base.OnInitialized();
-    //}
+    private string glossaryCode = String.Empty;
+    private List<GlossaryDictionary>? allGlossaryDictionares; 
     private PhysicalExamination examination = new();
-    EditContext examinationToAdd;
+    private EditContext? examinationToAdd;
 
-
-    //TO DO
     protected override async Task OnInitializedAsync()
     {
         examinationToAdd = new EditContext(examination);
-
-        base.OnInitialized();
+        allGlossaryDictionares = (await glossaryService.GetAllDictionariesAsync(GlossaryType.PHYSICAL)).ToList();
+        glossaryCode = allGlossaryDictionares.First().Code.ToString() ?? "";
     }
 
-    //TO DO
-    //Zapisanie danych do bazy
     private void AddExamination()
     {
-        //przypisanie do examination obiektu GlossaryDictionary na podstawie kodu wybranego w select
-        foreach (var d in allGlossaryDictionares)
+        examination.Appointment = appointmentService.GetById(Guid.Parse(Id));
+        if(allGlossaryDictionares != null)
         {
-            if (d.Code.ToString().Equals(glossaryCode))
-                examination.GlossaryDictionary = d;
+            foreach (var dictionary in allGlossaryDictionares)
+            {
+                if (dictionary.Code.ToString().Equals(glossaryCode))
+                    examination.GlossaryDictionary = dictionary;
+            }
+
+            if(examination.Result!=null)
+            {
+                physicalExaminationService.Add(examination);
+                if (physicalExaminationService.GetById(examination.Id) != null)
+                    toastService.ShowSuccess("Physical examination added successfully!");
+            }
+            else
+            {
+                 toastService.ShowError("Failed to add Physical examination!");
+            }
+
         }
-
-        Debug.WriteLine($"Code: {examination.GlossaryDictionary.Code}, notes: {examination.Result}");
-
     }
-  
 }

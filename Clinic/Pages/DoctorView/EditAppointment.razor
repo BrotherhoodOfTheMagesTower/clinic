@@ -5,16 +5,21 @@
 @using System.Globalization
 @using System.ComponentModel.DataAnnotations
 @using System.Diagnostics
+@using Clinic.Services
 
 @inject NavigationManager NavigationManager;
+@inject IToastService toastService;
+@inject AppointmentService appointmentService;
+@inject LaboratoryExaminationService laboratoryExaminationService;
+@inject PhysicalExaminationService physicalExaminationService;
 
 <PageTitle>Edit appointment</PageTitle>
-
-
 
 <AuthorizeView Roles="Doctor" Context="appointmentEditing">
     <Authorized>
 
+        @if (appointmentToEdit != null && appointment!= null && appointment.Patient !=null)
+        {
         <EditForm EditContext="appointmentToEdit" OnValidSubmit="ChangeExistingAppointment" class="w-50 bg-gray px-4 py-3 rounded">
 
             <h1 class="mb-3 fw-bold">Edit appointment</h1><br />
@@ -22,8 +27,14 @@
             <label class="d-block mb-1 ml-1">Name and surname:</label>
             <label class="form-control w-75">@appointment.Patient.FirstName @appointment.Patient.LastName</label>
             <label class="d-block mb-1 ml-1">Date of birth:</label>
-            <label class="form-control w-75">@appointment.Patient.BirthDate.Value.Day/@appointment.Patient.BirthDate.Value.Month/@appointment.Patient.BirthDate.Value.Year</label><br />
-            
+            @if(appointment.Patient.BirthDate !=null)
+            {
+                <label class="form-control w-75">@appointment.Patient.BirthDate.Value.Day/@appointment.Patient.BirthDate.Value.Month/@appointment.Patient.BirthDate.Value.Year</label><br />
+            }
+            else
+            {
+                <label class="form-control w-75">not provided</label><br />
+            }
             <button type="button" class="btn btn-primary" @onclick="(() => NavigateToPatientExaminationHistory(appointment.Patient.Id.ToString()))">Show examinations and appointments history</button> <br /><br />
 
             <h3 class="mb-3 fw-bold">Appointment:</h3>
@@ -63,11 +74,12 @@
             <button type="submit" class="btn btn-primary">Save</button><br /><br />
 
         </EditForm>
+        }
 
        <h3 class="mb-3 fw-bold">Laboratory examinations:</h3>
-        @if (LaboratoryExaminationsList != null)
+        @if (laboratoryExaminationsList != null && laboratoryExaminationsList.Count() > 0)
         {
-            <TableTemplate Items="LaboratoryExaminationsList">
+            <TableTemplate Items="laboratoryExaminationsList">
                 <TableHeader>
                     <th> Examination's id </th>
                     <th> Code </th>
@@ -94,13 +106,16 @@
         {
             <h3 class="mb-3 fw-bold">There are no laboratory examinations in the base</h3> <br />
         }
-        <button type="button" class="btn btn-primary" @onclick="(() => NavigateToOrderLaboratoryExamination(appointment.Id.ToString()))">Order laboratory examination</button> <br /><br />
 
+        @if(appointment != null)
+        {
+        <button type="button" class="btn btn-primary" @onclick="(() => NavigateToOrderLaboratoryExamination(appointment.Id.ToString()))">Order laboratory examination</button> <br /><br />
+        }
 
         <h3 class="mb-3 fw-bold">Physical examinations:</h3>
-        @if (PhysicalExaminationsList != null)
+        @if (physicalExaminationsList != null && physicalExaminationsList.Count() > 0)
         {
-            <TableTemplate Items="PhysicalExaminationsList">
+            <TableTemplate Items="physicalExaminationsList">
                 <TableHeader>
                     <th> Examination's id </th>
                     <th> Code </th>
@@ -124,10 +139,10 @@
             <h3 class="mb-3 fw-bold">There are no physical examinations in the base</h3> <br />
         }
 
-
-        <button type="button" class="btn btn-primary" @onclick="(() => NavigateToAddPhysicalExamination(appointment.Id.ToString()))">Add physical examination</button> <br /><br />
-
-
+        @if(appointment != null)
+        {
+            <button type="button" class="btn btn-primary" @onclick="(() => NavigateToAddPhysicalExamination(appointment.Id.ToString()))">Add physical examination</button> <br /><br />
+        }
 
     </Authorized>
     <NotAuthorized>
@@ -136,56 +151,39 @@
 </AuthorizeView>
 
 @code {
-
     //id wizyty, ktore zostalo przekazane z poprzedniego widoku, trzeba na jego podstawie zwrocic z bazy danych wizyte do edytowania
     [Parameter]
-    public string Id { get; set; }
+    public string Id { get; set; } = String.Empty;
 
-    //lista badan laboratoryjnych, które mają w sobie id aktualnej wizyty, maja byc zwrocone z bazy
-    private List<LaboratoryExamination> PhysicalExaminationsList = new List<LaboratoryExamination>()
-    {
-        new LaboratoryExamination() {Id=Guid.NewGuid(), Result="wynik1", Appointment=appointment, GlossaryDictionary=new GlossaryDictionary() {Code=GlossaryCode.LAB_BLOOD, Name="jakaś tam 1", Type=GlossaryType.PHYSICAL}},
-        new LaboratoryExamination() {Id=Guid.NewGuid(), Result="wynik2", Appointment=appointment, GlossaryDictionary=new GlossaryDictionary() {Code=GlossaryCode.LAB_COVID, Name="jakaś tam 2", Type=GlossaryType.PHYSICAL}},
-        new LaboratoryExamination() {Id=Guid.NewGuid(), Result="wynik3", Appointment=appointment, GlossaryDictionary=new GlossaryDictionary() {Code=GlossaryCode.LAB_URINE, Name="jakaś tam 3", Type=GlossaryType.PHYSICAL}},
-        new LaboratoryExamination() {Id=Guid.NewGuid(), Result="wynik4", Appointment=appointment, GlossaryDictionary=new GlossaryDictionary() {Code=GlossaryCode.LAB_BLOOD, Name="jakaś tam 4", Type=GlossaryType.PHYSICAL}}
-    };
+    private Appointment? appointment;
+    private EditContext? appointmentToEdit;
 
-    //lista badan fizykalnych, które mają w sobie id aktualnej wizyty, maja byc zwrocone z bazy
-    private List<LaboratoryExamination> LaboratoryExaminationsList = new List<LaboratoryExamination>()
-    {
-        new LaboratoryExamination() {Id=Guid.NewGuid(), DoctorsNotes="coś tam 1", OrderedAt=new DateTime(), Appointment=appointment, GlossaryDictionary=new GlossaryDictionary() {Code=GlossaryCode.PHY_EAR, Name="jakaś tam 1", Type=GlossaryType.LABORATORY}},
-        new LaboratoryExamination() {Id=Guid.NewGuid(), DoctorsNotes="coś tam 2", OrderedAt=new DateTime(), Appointment=appointment, GlossaryDictionary=new GlossaryDictionary() {Code=GlossaryCode.PHY_THROAT, Name="jakaś tam 2", Type=GlossaryType.LABORATORY}},
-        new LaboratoryExamination() {Id=Guid.NewGuid(), DoctorsNotes="coś tam 3", OrderedAt=new DateTime(), Appointment=appointment, GlossaryDictionary=new GlossaryDictionary() {Code=GlossaryCode.PHY_USG, Name="jakaś tam 3", Type=GlossaryType.LABORATORY}},
-        new LaboratoryExamination() {Id=Guid.NewGuid(), DoctorsNotes="coś tam 4", OrderedAt=new DateTime(), Appointment=appointment, GlossaryDictionary=new GlossaryDictionary() {Code=GlossaryCode.PHY_EAR, Name="jakaś tam 4", Type=GlossaryType.LABORATORY}}
-    };
+    private List<LaboratoryExamination>? laboratoryExaminationsList;
+    private List<PhysicalExamination>? physicalExaminationsList;
 
-
-    protected override void OnInitialized()
-    {
-        appointmentToEdit = new EditContext(appointment);
-        base.OnInitialized();
-    }
-
-    private static Appointment appointment = new();
-    EditContext appointmentToEdit;
-
-
-    //TO DO
-    //Przypisanie wartości do badania
     protected override async Task OnInitializedAsync()
     {
-        //Poniższy kod testowo (do usunięcia potem)
-        appointment = new Appointment() { Id = Guid.NewGuid(), Status = AppointmentStatus.BOOKED, RegisteredTo = new DateTime(2022, 12, 25, 10, 30, 00), Doctor = new Doctor() { Id = Guid.NewGuid().ToString(), PermissionNumber = 123, FirstName = "Zbigniew", LastName = "Nowak" }, Patient = new Patient() { Id = Guid.NewGuid(), FirstName = "Tomasz", LastName = "Kowalska", Gender = Gender.MALE, BirthDate = new DateTime(2000, 02, 13) }, Registrar = new Registrar() { Id = Guid.NewGuid().ToString(), FirstName = "Magdalena", LastName = "Wojcik" } };
-   
+        appointment = await appointmentService.GetByIdAsync(Guid.Parse(Id));
+        appointmentToEdit =  new EditContext( appointment!);
+
+        if(appointment != null)
+        {
+            laboratoryExaminationsList = (await laboratoryExaminationService.GetLaboratoryExaminationsAsync(appointment)).ToList();
+            physicalExaminationsList = (await physicalExaminationService.GetPhysicalExaminationsAsync(appointment)).ToList();
+        }
     }
 
-    //TO DO
-    //Zapisanie danych do bazy
     private void ChangeExistingAppointment()
     {
-
-        Debug.WriteLine($"Data - doctor last name: {appointment.Description}, patient last name: {appointment.Diagnosis}, date: {appointment.RegisteredTo}, date2: {appointment.Patient.FirstName}.");
-
+        if(appointment != null)
+        {
+            appointmentService.Update(appointment);
+            toastService.ShowSuccess("Laboratory examination updated successfully!");
+        }
+        else
+        {
+             toastService.ShowError("Error while updating!");
+        }
     }
 
     public void NavigateToPatientExaminationHistory(string PatientId)

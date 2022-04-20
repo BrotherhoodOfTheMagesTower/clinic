@@ -1,5 +1,6 @@
 ﻿using Clinic.Data;
 using Clinic.Data.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Clinic.Services
 {
@@ -14,6 +15,7 @@ namespace Clinic.Services
 
         public void Add(GlossaryDictionary glossaryDictionary)
         {
+            if (glossaryDictionary == null) return;
             _context.GlossaryDictionaries.Add(glossaryDictionary);
             _context.SaveChanges();
         }
@@ -23,11 +25,25 @@ namespace Clinic.Services
 
         public void Update(GlossaryDictionary glossaryDictionary)
         {
+            if (glossaryDictionary == null) return;
             _context.GlossaryDictionaries.Update(glossaryDictionary);
             _context.SaveChanges();
         }
 
         public List<GlossaryDictionary> GetAllDictionaries()
            => _context.GlossaryDictionaries.ToList();
+
+        public async Task<List<GlossaryDictionary>> GetAllDictionariesAsync()
+          => await _context.GlossaryDictionaries
+            .Include(l => l.LaboratoryExaminations)
+            .Include(p => p.PhysicalExaminations)
+            .ToListAsync();
+
+        public async Task<List<GlossaryDictionary>> GetAllDictionariesAsync(GlossaryType glossaryType)
+         => await _context.GlossaryDictionaries
+           .Include(l => l.LaboratoryExaminations)
+           .Include(p => p.PhysicalExaminations)
+           .Where(g => g.Type == glossaryType)
+           .ToListAsync();
     }
 }
