@@ -48,5 +48,8 @@ namespace Clinic.Services
 
         public List<Registrar> GetAllRegistrars()
            => _context.Registrars.ToList();
+
+        public Registrar? GetRegistrarByEmail(string email)
+            => _context.Registrars.Where(x => x.User.Email == email).FirstOrDefault();
     }
 }

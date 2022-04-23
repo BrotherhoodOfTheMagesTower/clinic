@@ -2,10 +2,13 @@
 @using Clinic.Data.Enums
 @using Clinic.Data.Models
 @using Clinic.Data
+@using Clinic.Services
 
 @inject NavigationManager NavigationManager;
+@inject PatientService patientService;
+@inject IToastService toastService
 
-@if (EditPatientId.Equals("-1"))
+@if (editPatientId.Equals("-1"))
 {
     <PageTitle>Add Patient</PageTitle>
 }else
@@ -15,7 +18,7 @@
 
 <AuthorizeView Roles = "Registrar" Context="patientAdding">
     <Authorized>
-            @if (EditPatientId.Equals("-1"))
+            @if (editPatientId.Equals("-1"))
             {
                 <h2 class="mb-3 fw-bold">Add new patient</h2>  <br />
             }else
@@ -23,25 +26,27 @@
                 <h2 class="mb-3 fw-bold">Edit existing patient</h2>  <br />
             }
 
-            <EditForm EditContext="newPatient" OnValidSubmit="addPatient" class="w-50 bg-gray px-4 py-3 rounded">
+            <EditForm EditContext="newPatient" OnValidSubmit="AddPatientToDatabase" class="w-50 bg-gray px-4 py-3 rounded">
 
             <h3 class="mb-3 fw-bold">Enter the patient's:</h3>
-            <label class="d-block mb-1 ml-1">name</label> 
+            <label class="d-block mb-1 ml-1"/>name 
             <InputText @bind-Value="@patient.FirstName" class="form-control w-75"/>
+            <ValidationMessage For="() => patient.FirstName" />
 
-            <label class="d-block mb-1 ml-1">last name </label>
+            <label class="d-block mb-1 ml-1"/>last name 
             <InputText @bind-Value="@patient.LastName" class="form-control w-75"/>
+            <ValidationMessage For="() => patient.LastName" />
 
-            <label class="d-block mb-1 ml-1">pesel </label>
+            <label class="d-block mb-1 ml-1"/>pesel 
             <InputText @bind-Value="@patient.Pesel" class="form-control w-75"/> 
 
-            <label class="d-block mb-1 ml-1">birth date </label>
+            <label class="d-block mb-1 ml-1"/>birth date 
             <InputDate @bind-Value="@patient.BirthDate" class="form-control w-75"/>
 
-            <label class="d-block mb-1 ml-1">phone number </label>
+            <label class="d-block mb-1 ml-1"/>phone number 
             <InputText @bind-Value="@patient.PhoneNumber" class="form-control w-75"/>
 
-            <label class="d-block mb-1 ml-1"> gender</label>
+            <label class="d-block mb-1 ml-1"/> gender
             <InputRadioGroup @bind-Value="@patient.Gender">
                @foreach (var g in (Gender[])Enum.GetValues(typeof(Gender)))
                 {
@@ -78,33 +83,36 @@
 
 @code{
     [Parameter]
-    public string EditPatientId { get; set; }
-
+    public string editPatientId { get; set; } = String.Empty;
+    private bool wasPatientAddedToDatabase { get; set; }
     private Patient patient = new();
-    EditContext newPatient;
+    EditContext? newPatient;
 
-    //TO DO
-    //Przypisanie wartości do pacjenta
     protected override async Task OnInitializedAsync()
     {
+        if (!editPatientId.Equals("-1"))
+            patient = patientService.GetById(Guid.Parse(editPatientId));
         newPatient = new EditContext(patient);
-        base.OnInitialized();
-        if (!EditPatientId.Equals("-1"))
+    }
+
+    private async Task AddPatientToDatabase()
+    {
+        if (editPatientId.Equals("-1"))
         {
-            //Poniższy kod testowo (do usunięcia potem)
-            Address address = new Address() { Id = new Guid(), City = "Racibórz", PostalCode = "47-400" };
-            patient = new Patient() { Id = Guid.Parse(EditPatientId), FirstName = "Adam", LastName = "Nowak", Gender = Gender.MALE, BirthDate = new DateTime(), Pesel = "12345678901", PhoneNumber = "123456789", Address = address };
+            wasPatientAddedToDatabase = patientService.Add(patient);
+            if(wasPatientAddedToDatabase)
+                toastService.ShowSuccess($"Patient {patient.FirstName} {patient.LastName} was added to the database.", "Well done!");
+            else
+                toastService.ShowError("Sorry!  A patient with this pesel number has already added..", "Oops!");
+        }
+        else
+        {
+            patientService.Update(patient);
+            toastService.ShowSuccess($"Patient {patient.FirstName} {patient.LastName} was update.", "Well done!");
         }
     }
 
-    //TO DO
-    //Zapisanie danych do bazy
-    private void addPatient()
-    {
-
-    }
-
-     private void NavigateToAddAddress(string Id)
+    private void NavigateToAddAddress(string Id)
     {
         NavigationManager.NavigateTo($"AddAddress/{Id}");
     }

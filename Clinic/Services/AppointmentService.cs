@@ -14,10 +14,16 @@ namespace Clinic.Services
             _context = context;
         }
 
-        public void Add(Appointment appointment)
+        public bool Add(Appointment appointment)
         {
+            var obj = GetAppointmentByDoctorAndTime(appointment.RegisteredTo, appointment.Doctor.Id);
+                if (obj != null)
+                    return false;
+            var guid = Guid.NewGuid();
+            appointment.Id = guid;
             _context.Appointments.Add(appointment);
             _context.SaveChanges();
+            return true;
         }
 
         public Appointment? GetById(Guid id)
@@ -39,7 +45,13 @@ namespace Clinic.Services
         }
 
         public List<Appointment> GetAllAppointmets()
-            => _context.Appointments.ToList();
+        {
+            return _context.Appointments
+                .Include(p => p.Patient)
+                .Include(p => p.Doctor)
+                .ToList();
+
+        }
 
         public List<Appointment> GetDoctorAppointments(Doctor doctor)
             => _context.Appointments.Where(a => a.Doctor.Id == doctor.Id).ToList();
@@ -58,5 +70,33 @@ namespace Clinic.Services
            => await _context.Appointments
             .Include(d => d.Doctor)
             .Where(p => p.Patient == patient).ToListAsync();
+
+        public List<Appointment> GetAppointmentsByPatternAsync(string pattern)
+        {
+            List<Appointment>? appointmentList = null;
+            string[] words = pattern.Split(' ');
+            foreach (var word in words)
+            {
+                List<Appointment> tmp = _context.Appointments
+                    .Include(a => a.Patient)
+                    .Include(a => a.Doctor)
+                    .Where((a => a.Patient.FirstName.Contains(word) || a.Patient.LastName.Contains(word)  || a.Doctor.FirstName.Contains(word) || a.Doctor.LastName.Contains(word))).ToList();
+                if (appointmentList == null)
+                    appointmentList = tmp;
+                else
+                    appointmentList.AddRange(tmp);
+            }
+
+            return appointmentList;
+        }
+
+        public Appointment? GetAppointmentByDoctorAndTime(DateTime dateTime, string doctorId)
+        {
+            Appointment? appointment = _context.Appointments
+                .Include(a => a.Doctor)
+                .Where(a => a.RegisteredTo == dateTime && a.Doctor.Id == doctorId)
+                .FirstOrDefault();
+            return appointment;
+        }
     }
 }

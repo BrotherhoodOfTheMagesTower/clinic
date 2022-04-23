@@ -23,6 +23,7 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<RegistrarService>();
 builder.Services.AddScoped<PatientService>();
 builder.Services.AddScoped<AppointmentService>();
+builder.Services.AddScoped<AddressService>();   
 builder.Services.AddScoped<LabManagerService>();
 builder.Services.AddScoped<LabTechnicianService>();
 builder.Services.AddScoped<DoctorService>();

@@ -2,8 +2,10 @@
 @using Clinic.Data.Enums
 @using Clinic.Data.Models
 @using Clinic.Data
+@using Clinic.Services
 
 @inject NavigationManager NavigationManager;
+@inject PatientService patientService;
 
 <PageTitle>Patients</PageTitle>
 
@@ -16,9 +18,9 @@
             <button type="submit" class="btn btn-primary"  @onclick="(() => NavigateToAddPatient())">Add patient</button>
         </div><br />
            
-            @if (PatientsList != null)
+            @if (patientsList != null)
             {
-                <TableTemplate Items="PatientsList">
+                <TableTemplate Items="patientsList">
 				    <TableHeader>
 				        <th> First Name </th>
 				        <th> Last Name </th>
@@ -52,15 +54,12 @@
 
 @code{
     public string searchPatient;
+    private List<Patient>? patientsList;
 
-    //TO DO
-    private List<Patient> PatientsList = new List<Patient>()
+    protected override async Task OnInitializedAsync()
     {
-        new Patient() {Id=Guid.NewGuid(), FirstName="Adam", LastName="Nowak", Gender=Gender.MALE},
-        new Patient() {Id=Guid.NewGuid(), FirstName="Marcin", LastName="Kowalski", Gender=Gender.MALE},
-        new Patient() {Id=Guid.NewGuid(), FirstName="Daniel", LastName="Anczyk", Gender=Gender.MALE},
-        new Patient() {Id=Guid.NewGuid(), FirstName="Dawid", LastName="Nowakowski", Gender=Gender.MALE}
-    };
+        patientsList = patientService.GetAllPatients();
+    }
 
     public void NavigateToEditPatient(string Id)
     {
@@ -73,12 +72,11 @@
         NavigationManager.NavigateTo($"AddPatient/{Id}");
     }
 
-    //TO DO
-    //Wyszukiwanie listy pacjentów spełniających warunki wyszukiwania z zmiennej searchPatient
     public void SearchPatient()
-    {
-
-    }
-
+    { 
+        if(searchPatient == string.Empty)
+            patientsList = patientService.GetAllPatients();
+        else
+            patientsList = patientService.SearchPatientByPattern(searchPatient);
     }
 }
