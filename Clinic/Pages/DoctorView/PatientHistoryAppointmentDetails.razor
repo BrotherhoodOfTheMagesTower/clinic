@@ -17,80 +17,88 @@
 <AuthorizeView Roles="Doctor" Context="appointmentEditing">
     <Authorized>
 
-        @if(appointment != null)
+        @if (!validId)
         {
-            <EditForm EditContext="appointmentToEdit" OnValidSubmit="ChangeExistingAppointment" class="w-50 bg-gray px-4 py-3 rounded">
-
-                <h1 class="mb-3 fw-bold">Appointment's details</h1><br />
-                <h2 class="mb-3 fw-bold">Patient: @appointment.Patient.FirstName @appointment.Patient.LastName</h2>
-
-                <h3 class="mb-3 fw-bold">Appointment:</h3>
-
-                <label class="d-block mb-1 ml-1" >Date:</label>
-                <label class="form-control w-75">@appointment.RegisteredTo.Day/@appointment.RegisteredTo.Month/@appointment.RegisteredTo.Year</label><br />
-
-                <label class="d-block mb-1 ml-1" >Diagnosis: </label>
-                <label class="form-control w-75">@appointment.Diagnosis </label>
-
-                <label class="d-block mb-1 ml-1" >Description:</label>
-                <label class="form-control w-75">@appointment.Description </label>
-
-                <label class="d-block mb-1 ml-1" > Status:</label>
-                <label class="form-control w-75">@appointment.Status </label>
-
-                <label class="d-block mb-1 ml-1" > Doctor:</label>
-                <label class="form-control w-75">@appointment.Doctor.FirstName @appointment.Doctor.LastName</label>
-            </EditForm>
+            <p role="alert">Sorry, there's nothing at this address.</p>
         }
 
-       <h3 class="mb-3 fw-bold">Laboratory examinations:</h3>
-        @if (laboratoryExaminationsList != null && laboratoryExaminationsList.Count > 0)
-        {
-            <TableTemplate Items="laboratoryExaminationsList">
-                <TableHeader>
-                    <th> Name </th>
-                    <th> Order Date </th>
-                    <th> Status </th>
-                    <th> Action </th>
-                </TableHeader>
-                <RowTemplate Context="examination">
-                    <td> @examination.GlossaryDictionary?.Name </td>
-                    <td> @examination.OrderedAt </td>
-                    <td> @examination.Status.ToString().ToLower() </td>
-                    <th>
-                        <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToShowLaboratoryExaminationDetails(examination.Id.ToString()))">Edit</a>
-                    </th>
-                </RowTemplate>
-            </TableTemplate>
-        }
         else
         {
-            <h3 class="mb-3 fw-bold">There are no laboratory examinations in the base</h3> <br />
-        }
-   
-        <h3 class="mb-3 fw-bold">Physical examinations:</h3>
-        @if (physicalExaminationsList != null && physicalExaminationsList.Count > 0 )
-        {
-            <TableTemplate Items="physicalExaminationsList">
-                <TableHeader>
-                    <th> Name </th>
-                    <th> Result </th>
-                    <th> Action </th>
-                </TableHeader>
-                <RowTemplate Context="examination">
-                    <td> @examination.GlossaryDictionary?.Name </td>
-                    <td> @examination.Result </td>
-                    <th>
-                        <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToShowPhysicalExaminationDetails(examination.Id.ToString()))">Edit</a>
-                    </th>
-                </RowTemplate>
-            </TableTemplate>
-        }
-        else
-        {
-            <h3 class="mb-3 fw-bold">There are no physical examinations in the base</h3> <br />
-        }
 
+            @if (appointment != null)
+            {
+                <EditForm EditContext="appointmentToEdit" OnValidSubmit="ChangeExistingAppointment" class="w-50 bg-gray px-4 py-3 rounded">
+
+                    <h1 class="mb-3 fw-bold">Appointment's details</h1><br />
+                    <h2 class="mb-3 fw-bold">Patient: @appointment.Patient.FirstName @appointment.Patient.LastName</h2>
+
+                    <h3 class="mb-3 fw-bold">Appointment:</h3>
+
+                    <label class="d-block mb-1 ml-1">Date:</label>
+                    <label class="form-control w-75">@appointment.RegisteredTo.Day/@appointment.RegisteredTo.Month/@appointment.RegisteredTo.Year</label><br />
+
+                    <label class="d-block mb-1 ml-1">Diagnosis: </label>
+                    <label class="form-control w-75">@appointment.Diagnosis </label>
+
+                    <label class="d-block mb-1 ml-1">Description:</label>
+                    <label class="form-control w-75">@appointment.Description </label>
+
+                    <label class="d-block mb-1 ml-1"> Status:</label>
+                    <label class="form-control w-75">@appointment.Status </label>
+
+                    <label class="d-block mb-1 ml-1"> Doctor:</label>
+                    <label class="form-control w-75">@appointment.Doctor.FirstName @appointment.Doctor.LastName</label>
+                </EditForm>
+            }
+
+            <h3 class="mb-3 fw-bold">Laboratory examinations:</h3>
+            @if (laboratoryExaminationsList != null && laboratoryExaminationsList.Count > 0)
+            {
+                <TableTemplate Items="laboratoryExaminationsList">
+                    <TableHeader>
+                        <th> Name </th>
+                        <th> Order Date </th>
+                        <th> Status </th>
+                        <th> Action </th>
+                    </TableHeader>
+                    <RowTemplate Context="examination">
+                        <td> @examination.GlossaryDictionary?.Name </td>
+                        <td> @examination.OrderedAt </td>
+                        <td> @examination.Status.ToString().ToLower() </td>
+                        <th>
+                            <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToShowLaboratoryExaminationDetails(examination.Id.ToString()))">Edit</a>
+                        </th>
+                    </RowTemplate>
+                </TableTemplate>
+            }
+            else
+            {
+                <h3 class="mb-3 fw-bold">There are no laboratory examinations in the base</h3> <br />
+            }
+
+            <h3 class="mb-3 fw-bold">Physical examinations:</h3>
+            @if (physicalExaminationsList != null && physicalExaminationsList.Count > 0)
+            {
+                <TableTemplate Items="physicalExaminationsList">
+                    <TableHeader>
+                        <th> Name </th>
+                        <th> Result </th>
+                        <th> Action </th>
+                    </TableHeader>
+                    <RowTemplate Context="examination">
+                        <td> @examination.GlossaryDictionary?.Name </td>
+                        <td> @examination.Result </td>
+                        <th>
+                            <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToShowPhysicalExaminationDetails(examination.Id.ToString()))">Edit</a>
+                        </th>
+                    </RowTemplate>
+                </TableTemplate>
+            }
+            else
+            {
+                <h3 class="mb-3 fw-bold">There are no physical examinations in the base</h3> <br />
+            }
+        }
     </Authorized>
     <NotAuthorized>
         <h1>Access denied!</h1>
@@ -98,7 +106,7 @@
 </AuthorizeView>
 
 @code {
-    //id wizyty, ktore zostalo przekazane z poprzedniego widoku, trzeba na jego podstawie zwrocic z bazy danych wizyte do edytowania
+    //Appointment Id
     [Parameter]
     public string Id { get; set; } = String.Empty;
 
@@ -107,21 +115,30 @@
     private List<PhysicalExamination>? physicalExaminationsList;
     private List<LaboratoryExamination>? laboratoryExaminationsList;
 
+    private bool validId = true;
+    private Guid parsedId;
+
+
     protected override async Task OnInitializedAsync()
     {
-        appointment = await appointmentService.GetByIdAsync(Guid.Parse(Id));
-        if(appointment != null)
+        validId = Guid.TryParse(Id, out parsedId);
+        if (validId == false)
+        {
+            return;
+        }
+        appointment = await appointmentService.GetByIdAsync(parsedId);
+        if (appointment != null)
         {
             appointmentToEdit = new EditContext(appointment);
             physicalExaminationsList = (await physicalExaminationService.GetAllExaminationsForGivenPatientAsync(appointment.Patient)).ToList();
             laboratoryExaminationsList = (await laboratoryExaminationService.GetAllLabExaminationsForGivenPatientAsync(appointment.Patient)).ToList();
-            
+
         }
     }
 
     private void ChangeExistingAppointment()
     {
-        if(appointment != null)
+        if (appointment != null)
         {
             appointmentService.Update(appointment);
         }

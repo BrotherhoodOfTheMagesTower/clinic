@@ -63,11 +63,11 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Doctor? loggedDoc =  doctorService.GetDoctorByEmail(httpContextAccessor!.HttpContext!.User!.Identity!.Name);
-        if(loggedDoc != null)
-            {
-                appointmentsList = (await appointmentService.GetDoctorAppointmentsAsync(loggedDoc)).ToList();
-            }
+        Doctor? loggedDoc = doctorService.GetDoctorByEmail(httpContextAccessor!.HttpContext!.User!.Identity!.Name);
+        if (loggedDoc != null)
+        {
+            appointmentsList = (await appointmentService.GetDoctorAppointmentsAsync(loggedDoc)).ToList();
+        }
     }
 
     public void NavigateToEditAppointment(string Id)
