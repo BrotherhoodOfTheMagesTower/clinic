@@ -16,6 +16,7 @@ namespace Clinic.Services
 
         public bool Add(Appointment appointment)
         {
+            if (appointment == null) return false;
             var obj = GetAppointmentByDoctorAndTime(appointment.RegisteredTo, appointment.Doctor.Id);
                 if (obj != null)
                     return false;
@@ -40,6 +41,7 @@ namespace Clinic.Services
 
         public void Update(Appointment appointment)
         {
+            if (appointment == null) return;
             _context.Appointments.Update(appointment);
             _context.SaveChanges();
         }

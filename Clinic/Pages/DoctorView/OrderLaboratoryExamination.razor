@@ -67,9 +67,10 @@
     //Zapisanie danych do bazy
     private void OrderExamination()
     {
-        examination.Appointment = appointmentService.GetById(new Guid(Id));
+        examination.Appointment = appointmentService.GetById(Guid.Parse(Id));
         examination.Status = ExaminationStatus.APPROVED;
         examination.OrderedAt = DateTime.Now;
+
         //przypisanie do examination obiektu GlossaryDictionary na podstawie kodu wybranego w select
         if (allGlossaryDictionares != null)
         {
@@ -82,8 +83,6 @@
             laboratoryExaminationService.Add(examination);
             if (laboratoryExaminationService.GetById(examination.Id) != null)
                 toastService.ShowSuccess("Laboratory examination added successfully!");
-
-            //Debug.WriteLine($"Code: {examination.GlossaryDictionary.Code}, notes: {examination.DoctorsNotes}");
         }
     }
 }

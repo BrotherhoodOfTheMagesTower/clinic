@@ -66,7 +66,7 @@
 
     private void AddExamination()
     {
-        examination.Appointment = appointmentService.GetById(new Guid(Id));
+        examination.Appointment = appointmentService.GetById(Guid.Parse(Id));
         if(allGlossaryDictionares != null)
         {
             foreach (var dictionary in allGlossaryDictionares)
