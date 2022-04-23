@@ -12,47 +12,62 @@
 
 <AuthorizeView Roles="Doctor" Context="examinationEditing">
     <Authorized>
-        @if(examination != null)
+        @if (!validId)
         {
-            <EditForm EditContext="newExamination" OnValidSubmit="ChangeExistingExamination" class="w-50 bg-gray px-4 py-3 rounded">
+            <p role="alert">Sorry, there's nothing at this address.</p>
+        }
 
-                <h1 class="mb-3 fw-bold">Edit laboratory examinations</h1><br />
-                <h3 class="mb-3 fw-bold">Examination:</h3>
+        else
+        {
 
-                <label class="d-block mb-1 ml-1">id </label>
-                <label class="form-control w-75" >@EditExaminationId </label><br />
+            @if (examination != null)
+            {
+                <EditForm EditContext="newExamination" OnValidSubmit="ChangeExistingExamination" class="w-50 bg-gray px-4 py-3 rounded">
 
-                <label class="d-block mb-1 ml-1">Name: </label>
-                <label class="form-control w-75" > @examination.GlossaryDictionary.Name </label><br />
+                    <h1 class="mb-3 fw-bold">Edit laboratory examinations</h1><br />
+                    <h3 class="mb-3 fw-bold">Examination:</h3>
 
-                <label class="d-block mb-1 ml-1"> Status:</label>
-                <label class="form-control w-75"> @status </label> <br />
-          
+                    <label class="d-block mb-1 ml-1">id </label>
+                    <label class="form-control w-75">@EditExaminationId </label><br />
 
-                <label class="d-block mb-1 ml-1">Doctor notes: </label>
-                <InputTextArea @bind-Value="@examination.DoctorsNotes" class="form-control w-75" /> <br />
+                    <label class="d-block mb-1 ml-1">Name: </label>
+                    <label class="form-control w-75"> @examination.GlossaryDictionary.Name </label><br />
 
-                @if (examination.Status == ExaminationStatus.APPROVED)
+                    <label class="d-block mb-1 ml-1"> Status:</label>
+                    <label class="form-control w-75"> @status </label> <br />
 
-                {
-                    <label class="d-block mb-1 ml-1">Result: </label>
-                    <label class="form-control w-75" > @examination.Result</label><br />
 
-                    <label class="d-block mb-1 ml-1">Lab Technician: </label>
-                    <label class="form-control w-75" >@examination.LabTechnician?.FirstName @examination.LabTechnician?.LastName </label><br />
+                    <label class="d-block mb-1 ml-1">Doctor notes: </label>
+                    <InputTextArea @bind-Value="@examination.DoctorsNotes" class="form-control w-75" /> <br />
 
-                    <label class="d-block mb-1 ml-1">Execution date: </label>
-                    <label class="form-control w-75" >@examination.ExecutedOrCancelledAt </label><br />
-                }
-                else
-                {
-                     <p>There are no results yet!</p> 
-                }
+                    @if (examination.Status == ExaminationStatus.APPROVED)
 
-                <div>
-                    <button type="submit" class="btn btn-primary">Save</button>
-                </div>
-            </EditForm>
+                    {
+                        <label class="d-block mb-1 ml-1">Result: </label>
+                        <label class="form-control w-75"> @examination.Result</label>
+
+                        <br />
+
+                        <label class="d-block mb-1 ml-1">Lab Technician: </label>
+                        <label class="form-control w-75">@examination.LabTechnician?.FirstName @examination.LabTechnician?.LastName </label>
+
+                        <br />
+
+                        <label class="d-block mb-1 ml-1">Execution date: </label>
+                        <label class="form-control w-75">@examination.ExecutedOrCancelledAt </label>
+
+                        <br />
+                    }
+                    else
+                    {
+                        <p>There are no results yet!</p>
+                    }
+
+                    <div>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </EditForm>
+            }
         }
     </Authorized>
     <NotAuthorized>
@@ -64,15 +79,21 @@
     [Parameter]
     public string EditExaminationId { get; set; } = String.Empty;
 
-    //Kod badania
     public string? status;
     private LaboratoryExamination? examination;
     private EditContext? newExamination;
+    private bool validId = true;
+    private Guid parsedId;
 
     protected override async Task OnInitializedAsync()
     {
-        examination = await laboratoryExaminationService.GetByIdAsync(Guid.Parse(EditExaminationId));
-        if(examination != null)
+        validId = Guid.TryParse(EditExaminationId, out parsedId);
+        if (validId == false)
+        {
+            return;
+        }
+        examination = await laboratoryExaminationService.GetByIdAsync(parsedId);
+        if (examination != null)
         {
             newExamination = new EditContext(examination);
             status = examination.Status.ToString().ToLower();
