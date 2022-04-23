@@ -2,8 +2,10 @@
 @using Clinic.Data.Enums
 @using Clinic.Data.Models
 @using Clinic.Data
+@using Clinic.Services
 
 @inject NavigationManager NavigationManager;
+@inject AppointmentService appointmentService;
 
 <PageTitle>Appointments</PageTitle>
 
@@ -16,9 +18,9 @@
             <button type="submit" class="btn btn-primary"  @onclick="(() => NavigateToAddAppointment())">Add appointment</button>
         </div><br />
            
-            @if (AppointmentsList != null)
+            @if (appointmentsList != null)
             {
-                <TableTemplate Items="AppointmentsList">
+                <TableTemplate Items="appointmentsList">
 				    <TableHeader>
 				        <th> Patient's first name </th>
 				        <th> Last name </th>
@@ -52,14 +54,12 @@
 
 @code{
     public string searchAppointment;
+    private List<Appointment>? appointmentsList;
 
-
-    //TO DO
-    private List<Appointment> AppointmentsList = new List<Appointment>()
+    protected override async Task OnInitializedAsync()
     {
-        new Appointment() {Id=new Guid(),RegisteredTo=new DateTime(),Status=AppointmentStatus.BOOKED,Patient=new Patient { FirstName = "Kasia", LastName = "Jakaś" },Doctor= new Doctor { FirstName = "Adam", LastName = "Jakiś" } },
-        new Appointment() {Id=new Guid(),RegisteredTo=new DateTime(),Status=AppointmentStatus.BOOKED,Patient=new Patient { FirstName = "Tosia", LastName = "Jakaś" },Doctor= new Doctor { FirstName = "Adam", LastName = "Jakiś" } }
-    };
+        appointmentsList = appointmentService.GetAllAppointmets();
+    }
 
     public void NavigateToEditAppointment(string Id)
     {
@@ -72,11 +72,11 @@
         NavigationManager.NavigateTo($"AddAppointment/{Id}");
     }
 
-    //TO DO
-    //Wyszukiwanie listy pacjentów spełniających warunki wyszukiwania z zmiennej searchPatient
     public void SearchAppointment()
     {
-
+        if (searchAppointment == string.Empty)
+            appointmentsList = appointmentService.GetAllAppointmets();
+        else
+            appointmentsList = appointmentService.GetAppointmentsByPatternAsync(searchAppointment);
     }
-
-    }
+}
