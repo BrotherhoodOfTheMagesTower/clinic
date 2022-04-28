@@ -17,38 +17,47 @@
 
 <AuthorizeView Roles="Lab Manager">
     <Authorized>
-        <h3 class="mb-3 fw-bold"><b>Examinations for approval</b></h3> <br />
-
-        @if (examinationsList != null)
+        @if (!validId)
         {
-            <TableTemplate Items="examinationsList">
-                <TableHeader>
-                    <th> Examination's Id </th>
-                    <th> Code </th>
-                    <th> Name </th>
-                    <th> Status </th>
-                    <th> Result </th>
-                    <th> Actions </th>
-                </TableHeader>
-                <RowTemplate Context="examination">
-                    <td> @examination.Id </td>
-                    <td> @examination.GlossaryDictionary.Code.ToString().ToLower() </td>
-                    <td> @examination.GlossaryDictionary.Name </td>
-                    <td> @examination.Status.ToString().ToLower() </td>
-                    <td> @examination.Result </td>
-                    <th>
-                        @*TODO Add Cancel option*@
-                        <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => approveExamination(examination.Id.ToString()))">Approve | </a>
-                        <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToEditExamination(examination.Id.ToString()))">Add note</a>
-                    </th>
-                </RowTemplate>
-            </TableTemplate>
+            <NotFound />
         }
         else
         {
-            <h3 class="mb-3 fw-bold">There are no examinations to be approved</h3> <br />
+            <h3 class="mb-3 fw-bold"><b>Examinations for approval</b></h3> <br />
+
+            @if (examinationsList != null)
+            {
+                <TableTemplate Items="examinationsList">
+                    <TableHeader>
+                        <th> Examination's Id </th>
+                        <th> Code </th>
+                        <th> Name </th>
+                        <th> Status </th>
+                        <th> Result </th>
+                        <th> Actions </th>
+                    </TableHeader>
+                    <RowTemplate Context="examination">
+                        <td> @examination.Id </td>
+                        <td> @examination.GlossaryDictionary.Code.ToString().ToLower() </td>
+                        <td> @examination.GlossaryDictionary.Name </td>
+                        <td> @examination.Status.ToString().ToLower() </td>
+                        <td> @examination.Result </td>
+                        <th>
+                            @*TODO Add Cancel option*@
+                            <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => approveExamination(examination.Id.ToString()))">Approve | </a>
+                            <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToEditExamination(examination.Id.ToString()))">Add note</a>
+                        </th>
+                    </RowTemplate>
+                </TableTemplate>
+            }
+            else
+            {
+                <h3 class="mb-3 fw-bold">There are no examinations to be approved</h3> <br />
+            }
+            <br />
+
+            <br />
         }
-        <br /><br />
     </Authorized>
     <NotAuthorized>
         <h1>Access denied!</h1>
@@ -58,6 +67,8 @@
 @code {
 
     private List<LaboratoryExamination>? examinationsList;
+    private bool validId = true;
+    private Guid parsedId;
 
     protected override async Task OnInitializedAsync()
     {
@@ -66,7 +77,10 @@
 
     public async Task approveExamination(string Id)
     {
-        LaboratoryExamination? examination = await laboratoryExaminationService.GetByIdAsync(Guid.Parse(Id));
+        validId = Guid.TryParse(Id, out parsedId);
+        if (!validId) return;
+
+        LaboratoryExamination? examination = await laboratoryExaminationService.GetByIdAsync(parsedId);
         if (examination != null)
         {
             examination.Status = ExaminationStatus.APPROVED;
