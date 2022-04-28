@@ -1,23 +1,25 @@
 ﻿@page "/CheckRole"
 <PageTitle>Check your role</PageTitle>
 
- <AuthorizeView Roles = "Administrator">
-     <p>You have the Administrator role</p>
- </AuthorizeView> 
- <AuthorizeView Roles = "Doctor">
-     <p>You have the Doctor role</p>
- </AuthorizeView>
- <AuthorizeView Roles = "Registrar">
-     <p>You have the Registrar role</p>
- </AuthorizeView>
- <AuthorizeView Roles = "Lab Technician">
-     <p>You have the Lab Technician role</p>
- </AuthorizeView> 
- <AuthorizeView Roles = "Lab Manager">
-     <p>You have the Lab Manager role</p>
- </AuthorizeView>
- <AuthorizeView>
-     <NotAuthorized>
-        <h1>Access denied!</h1>
-     </NotAuthorized>
- </AuthorizeView>
+<section>
+    <AuthorizeView Roles="Administrator">
+        <p>You have the Administrator role</p>
+    </AuthorizeView>
+    <AuthorizeView Roles="Doctor">
+        <p>You have the Doctor role</p>
+    </AuthorizeView>
+    <AuthorizeView Roles="Registrar">
+        <p>You have the Registrar role</p>
+    </AuthorizeView>
+    <AuthorizeView Roles="Lab Technician">
+        <p>You have the Lab Technician role</p>
+    </AuthorizeView>
+    <AuthorizeView Roles="Lab Manager">
+        <p>You have the Lab Manager role</p>
+    </AuthorizeView>
+    <AuthorizeView>
+        <NotAuthorized>
+            <h1>Access denied!</h1>
+        </NotAuthorized>
+    </AuthorizeView>
+</section>

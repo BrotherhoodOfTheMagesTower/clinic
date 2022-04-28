@@ -15,86 +15,93 @@
 
 <AuthorizeView Roles="Administrator" Context="EditUserDetails">
     <Authorized>
-        <form method="post">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="text-center" style="margin-top:8px">Edit user <b>@User.UserName</b></h2>
+        <section>
+
+            <form method="post">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="text-center" style="margin-top:8px">Edit user <b>@User.UserName</b></h2>
+                    </div>
                 </div>
-            </div>
-            <div class="card-body">
-                @if (User != null)
-                {
-                    // E-Mail & UserName change
-                    <EditForm EditContext="emailContext">
-                        <DataAnnotationsValidator />
-                        <div class="form-group mx-sm-3 mb-2">
-                            <label for="email">Email and user name</label>
-                            <div class="col-sm-6 col-md-4">
-                                <input class="form-control" id="email" disabled value="@initialEmail" />
-                            </div>
-                        </div>
-                        <div class="form-group mx-sm-3 mb-2">
-                            <label style="margin-top:15px" for="new-email">New Email and user name</label>
-                            <div class="col-sm-6 col-md-4">
-                                <InputText class="form-control" id="new-email" @bind-Value="User.Email" />
-                                <ValidationMessage For="() => User.Email" />
-                            </div>
-                        </div>
-                        <div style="margin-left: 10px " class="col-sm-6 col-md-4 text-center">
-                            <button style="margin-top:5px" disabled="@(!emailContext.Validate() || !emailContext.IsModified())" id="change-email-button" type="submit" @onclick="async () => await ChangeEmailAndUserName()" class="w-40 btn btn-primary">Change email and user name</button>
-                        </div>
-                    </EditForm>
-
-                    // First & Last Name
-                    <EditForm EditContext="namesContext">
-                        <DataAnnotationsValidator />
-                        <div class="form-group mx-sm-3 mb-2">
-                            <div class="form-group">
-                                <label for="first-name">First name</label>
+                <div class="card-body">
+                    @if (User != null)
+                    {
+                        // E-Mail & UserName change
+                        <EditForm EditContext="emailContext">
+                            <DataAnnotationsValidator />
+                            <div class="form-group mx-sm-3 mb-2">
+                                <label for="email">Email and user name</label>
                                 <div class="col-sm-6 col-md-4">
-                                    <InputText class="form-control" id="first-name" @bind-Value="Doctor.FirstName" />
-                                    <ValidationMessage For="() => Doctor.FirstName" />
+                                    <input class="form-control" id="email" disabled value="@initialEmail" />
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label for="second-name">Last name</label>
+                            <div class="form-group mx-sm-3 mb-2">
+                                <label style="margin-top:15px" for="new-email">New Email and user name</label>
                                 <div class="col-sm-6 col-md-4">
-                                    <InputText class="form-control" id="last-name" @bind-Value="Doctor.LastName" />
-                                    <ValidationMessage For="() => Doctor.LastName" />
+                                    <InputText class="form-control" id="new-email" @bind-Value="User.Email" />
+                                    <ValidationMessage For="() => User.Email" />
                                 </div>
                             </div>
-                        </div>
-                        <div style="margin-left: 10px " class="col-sm-6 col-md-4 text-center">
-                            <button style="margin-top:5px" disabled="@(!namesContext.Validate() || !namesContext.IsModified())" id="change-names-button" type="submit" @onclick="async () => await ChangeFirstAndLastName()" class="w-40 btn btn-primary">Change first and last name</button>
-                        </div>
-                    </EditForm>
-
-                    // Password
-                    <EditForm EditContext="passContext">
-                        <DataAnnotationsValidator />
-                        <div class="form-group mx-sm-3 mb-2">
-                            <label style="margin-top:25px" for="psswd">Password</label>
-                            <div class="col-sm-6 col-md-4">
-                                <InputText placeholder="New Password" class="form-control" id="psswd" @bind-Value="pass.Password" />
-                                <ValidationMessage For="() => pass.Password" />
+                            <div style="margin-left: 10px " class="col-sm-6 col-md-4 text-center">
+                                <button style="margin-top:5px" disabled="@(!emailContext.Validate() || !emailContext.IsModified())" id="change-email-button" type="submit" @onclick="async () => await ChangeEmailAndUserName()" class="w-40 btn btn-primary">Change email and user name</button>
                             </div>
-                        </div>
-                        <div style="margin-left: 10px " class="col-sm-6 col-md-4 text-center">
-                            <button style="margin-top:5px" disabled="@(!passContext.Validate() || !passContext.IsModified())" id="change-psswd" type="submit" @onclick="async () => await ChangePassword()" class="btn btn-danger">Change password</button>
-                        </div>
-                    </EditForm>
-                }
-                else
-                {
-                    <h5 class="card-title">No users in database</h5>
-                }
-            </div>
+                        </EditForm>
 
-        </form>
+                        // First & Last Name
+                        <EditForm EditContext="namesContext">
+                            <DataAnnotationsValidator />
+                            <div class="form-group mx-sm-3 mb-2">
+                                <div class="form-group">
+                                    <label for="first-name">First name</label>
+                                    <div class="col-sm-6 col-md-4">
+                                        <InputText class="form-control" id="first-name" @bind-Value="Doctor.FirstName" />
+                                        <ValidationMessage For="() => Doctor.FirstName" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="second-name">Last name</label>
+                                    <div class="col-sm-6 col-md-4">
+                                        <InputText class="form-control" id="last-name" @bind-Value="Doctor.LastName" />
+                                        <ValidationMessage For="() => Doctor.LastName" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="margin-left: 10px " class="col-sm-6 col-md-4 text-center">
+                                <button style="margin-top:5px" disabled="@(!namesContext.Validate() || !namesContext.IsModified())" id="change-names-button" type="submit" @onclick="async () => await ChangeFirstAndLastName()" class="w-40 btn btn-primary">Change first and last name</button>
+                            </div>
+                        </EditForm>
+
+                        // Password
+                        <EditForm EditContext="passContext">
+                            <DataAnnotationsValidator />
+                            <div class="form-group mx-sm-3 mb-2">
+                                <label style="margin-top:25px" for="psswd">Password</label>
+                                <div class="col-sm-6 col-md-4">
+                                    <InputText placeholder="New Password" class="form-control" id="psswd" @bind-Value="pass.Password" />
+                                    <ValidationMessage For="() => pass.Password" />
+                                </div>
+                            </div>
+                            <div style="margin-left: 10px " class="col-sm-6 col-md-4 text-center">
+                                <button style="margin-top:5px" disabled="@(!passContext.Validate() || !passContext.IsModified())" id="change-psswd" type="submit" @onclick="async () => await ChangePassword()" class="btn btn-danger">Change password</button>
+                            </div>
+                        </EditForm>
+                    }
+                    else
+                    {
+                        <h5 class="card-title">No users in database</h5>
+                    }
+                </div>
+
+            </form>
+        </section>
+
     </Authorized>
     <NotAuthorized>
-        <h1>Access denied!</h1>
+        <section>
+            <h1>Access denied!</h1>
+        </section>
     </NotAuthorized>
+
 </AuthorizeView>
 
 @code {

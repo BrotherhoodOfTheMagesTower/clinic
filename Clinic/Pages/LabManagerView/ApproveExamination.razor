@@ -2,67 +2,105 @@
 @using Clinic.Data.Enums
 @using Clinic.Data.Models
 @using Clinic.Data
+@using Clinic.Services
+@using System.Security.Claims
 
 @inject NavigationManager NavigationManager;
+@inject LaboratoryExaminationService laboratoryExaminationService;
+@inject LabManagerService labManagerService;
+@inject IToastService toastService;
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor httpContextAccessor
+
+
 
 <PageTitle>Approve examinations</PageTitle>
 
 <AuthorizeView Roles="Lab Manager">
     <Authorized>
-        <h3 class="mb-3 fw-bold"><b>Examinations for approval</b></h3> <br />
-           
-            @if (ExaminationsList != null)
-            {
-                <TableTemplate Items="ExaminationsList">
-				    <TableHeader>
-                        <th> Examination's Id </th>
-				        <th> Code </th>
-				        <th> Name </th>
-				        <th> Status </th>
-                        <th> Result </th>
-				        <th> Actions </th>
-				    </TableHeader>
-				    <RowTemplate Context="examination">
-                        <td> @examination.Id </td>
-                        <td> @examination.GlossaryDictionary.Code.ToString().ToLower() </td>
-				        <td> @examination.GlossaryDictionary.Name </td>
-				        <td> @examination.Status.ToString().ToLower() </td>
-                        <td> @examination.Result </td>
-				        <th>
-                            <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => approveExamination(examination.Id.ToString()))">Approve | </a>
-                            <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToEditExamination(examination.Id.ToString()))">Add note</a>
-                        </th>
-				    </RowTemplate>
-				</TableTemplate>
-			}else{
-                   <h3 class="mb-3 fw-bold">There are no examinations to be approved</h3> <br />
-            }
-            <br /><br />
+        @if (!validId)
+        {
+            <NotFound />
+        }
+        else
+        {
+            <section>
+                <h3 class="mb-3 fw-bold"><b>Examinations for approval</b></h3> <br />
+
+                @if (examinationsList != null)
+                {
+                    <TableTemplate Items="examinationsList">
+                        <TableHeader>
+                            <th> Examination's Id </th>
+                            <th> Code </th>
+                            <th> Name </th>
+                            <th> Status </th>
+                            <th> Result </th>
+                            <th> Actions </th>
+                        </TableHeader>
+                        <RowTemplate Context="examination">
+                            <td> @examination.Id </td>
+                            <td> @examination.GlossaryDictionary.Code.ToString().ToLower() </td>
+                            <td> @examination.GlossaryDictionary.Name </td>
+                            <td> @examination.Status.ToString().ToLower() </td>
+                            <td> @examination.Result </td>
+                            <th>
+                                @*TODO Add Cancel option*@
+                                <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => approveExamination(examination.Id.ToString()))">Approve | </a>
+                                <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToEditExamination(examination.Id.ToString()))">Add note</a>
+                            </th>
+                        </RowTemplate>
+                    </TableTemplate>
+                }
+                else
+                {
+                    <h3 class="mb-3 fw-bold">There are no examinations to be approved</h3> <br />
+                }
+                <br />
+
+                <br />
+            </section>
+        }
     </Authorized>
     <NotAuthorized>
+        <section>
         <h1>Access denied!</h1>
+        </section>
     </NotAuthorized>
 </AuthorizeView>
 
 @code {
-    
-    //TO DO
-    //Lista badań gotowych
-    private List<LaboratoryExamination> ExaminationsList = new List<LaboratoryExamination>()
-    {
-        new LaboratoryExamination() {Id=Guid.NewGuid(), DoctorsNotes="coś tam 1", OrderedAt=new DateTime(), GlossaryDictionary=new GlossaryDictionary() {Code=GlossaryCode.LAB_BLOOD, Name="jakaś tam 1", Type=GlossaryType.LABORATORY}},
-        new LaboratoryExamination() {Id=Guid.NewGuid(), DoctorsNotes="coś tam 2", OrderedAt=new DateTime(), GlossaryDictionary=new GlossaryDictionary() {Code=GlossaryCode.LAB_COVID, Name="jakaś tam 2", Type=GlossaryType.LABORATORY}},
-        new LaboratoryExamination() {Id=Guid.NewGuid(), DoctorsNotes="coś tam 3", OrderedAt=new DateTime(), GlossaryDictionary=new GlossaryDictionary() {Code=GlossaryCode.LAB_URINE, Name="jakaś tam 3", Type=GlossaryType.LABORATORY}},
-        new LaboratoryExamination() {Id=Guid.NewGuid(), DoctorsNotes="coś tam 4", OrderedAt=new DateTime(), GlossaryDictionary=new GlossaryDictionary() {Code=GlossaryCode.LAB_BLOOD, Name="jakaś tam 4", Type=GlossaryType.LABORATORY}}
-    };
 
-    //Zatwierdzanie badania
-    public void approveExamination(string Id)
+    private List<LaboratoryExamination>? examinationsList;
+    private bool validId = true;
+    private Guid parsedId;
+
+    protected override async Task OnInitializedAsync()
     {
-        
+        examinationsList = await laboratoryExaminationService.GetAllLabExaminationsForApprovmentAsync();
     }
 
-     public void NavigateToEditExamination(string Id)
+    public async Task approveExamination(string Id)
+    {
+        validId = Guid.TryParse(Id, out parsedId);
+        if (!validId) return;
+
+        LaboratoryExamination? examination = await laboratoryExaminationService.GetByIdAsync(parsedId);
+        if (examination != null)
+        {
+            examination.Status = ExaminationStatus.APPROVED;
+            examination.ApprovedOrCancelledAt = DateTime.Now;
+            string currentUserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            examination.LabManager = labManagerService.GetById(currentUserId);
+            laboratoryExaminationService.Update(examination);
+            toastService.ShowSuccess("Examination has been successfully approved!");
+        }
+        else
+        {
+            toastService.ShowError("Failed to update examination!");
+        }
+    }
+
+    public void NavigateToEditExamination(string Id)
     {
         NavigationManager.NavigateTo($"EditLabExamination/{Id}");
     }

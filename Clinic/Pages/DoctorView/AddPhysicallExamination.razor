@@ -6,7 +6,6 @@
 @using System.ComponentModel.DataAnnotations
 @using System.Diagnostics
 @using Clinic.Services
-<h3>EditAppointment</h3>
 
 @inject NavigationManager NavigationManager;
 @inject IToastService toastService
@@ -18,56 +17,77 @@
 
 <AuthorizeView Roles="Doctor" Context="examinationEditing">
     <Authorized>
-        <EditForm EditContext="examinationToAdd" OnValidSubmit="AddExamination" class="w-50 bg-gray px-4 py-3 rounded">
+        @if (!validId)
+        {
+            <NotFound />
+        }
 
-            <h1 class="mb-3 fw-bold">Add physical examination</h1><br />
-            <h3 class="mb-3 fw-bold">Examination:</h3>
+        else
+        {
+            <section>
+                <EditForm EditContext="examinationToAdd" OnValidSubmit="AddExamination" class="w-50 bg-gray px-4 py-3 rounded">
 
-            <label class="d-block mb-1 ml-1"> Name: </label>
-            @if(allGlossaryDictionares != null)
-            {
-                <InputSelect class="mb-3 fw-bold" @bind-Value="@glossaryCode">
-                    @foreach (var c in allGlossaryDictionares)
+                    <h1 class="mb-3 fw-bold">Add physical examination</h1><br />
+                    <h3 class="mb-3 fw-bold">Examination:</h3>
+
+                    <label class="d-block mb-1 ml-1"> Name: </label>
+                    @if (allGlossaryDictionares != null)
                     {
+                        <InputSelect class="mb-3 fw-bold" @bind-Value="@glossaryCode">
+                            @foreach (var c in allGlossaryDictionares)
+                            {
                         <option Value=@c.Code>@c.Name</option>
-                    }
+                            }
                 </InputSelect>
-            }
-            <label class="d-block mb-1 ml-1">Result:</label>
-            <InputTextArea @bind-Value="@examination.Result" class="form-control w-75" />
+                    }
+                    <label class="d-block mb-1 ml-1">Result:</label>
+                    <InputTextArea @bind-Value="@examination.Result" class="form-control w-75" />
 
-            <br />
-            <div>
-                <button type="submit" class="btn btn-primary">Order</button>
-            </div>
-        </EditForm>
+                    <br />
+                    <div>
+                        <button type="submit" class="btn btn-primary">Order</button>
+                    </div>
+                </EditForm>
+            </section>
+        }
     </Authorized>
     <NotAuthorized>
-        <h1>Access denied!</h1>
+        <section>
+            <h1>Access denied!</h1>
+        </section>
     </NotAuthorized>
 </AuthorizeView>
 
 @code {
-    //id wizyty, ktore zostalo przekazane z poprzedniego widoku, trzeba na jego podstawie zwrocic z bazy danych wizyte do edytowania
+    //appointment id
     [Parameter]
     public string Id { get; set; } = String.Empty;
 
     private string glossaryCode = String.Empty;
-    private List<GlossaryDictionary>? allGlossaryDictionares; 
+    private List<GlossaryDictionary>? allGlossaryDictionares;
     private PhysicalExamination examination = new();
     private EditContext? examinationToAdd;
+    private bool validId = true;
+    private Guid parsedId;
 
     protected override async Task OnInitializedAsync()
     {
         examinationToAdd = new EditContext(examination);
         allGlossaryDictionares = (await glossaryService.GetAllDictionariesAsync(GlossaryType.PHYSICAL)).ToList();
         glossaryCode = allGlossaryDictionares.First().Code.ToString() ?? "";
+        validId = Guid.TryParse(Id, out parsedId);
     }
 
     private void AddExamination()
     {
-        examination.Appointment = appointmentService.GetById(new Guid(Id));
-        if(allGlossaryDictionares != null)
+        if (validId == false)
+        {
+            return;
+        }
+
+        examination.Appointment = appointmentService.GetById(parsedId);
+
+        if (allGlossaryDictionares != null)
         {
             foreach (var dictionary in allGlossaryDictionares)
             {
@@ -75,7 +95,7 @@
                     examination.GlossaryDictionary = dictionary;
             }
 
-            if(examination.Result!=null)
+            if (examination.Result != null)
             {
                 physicalExaminationService.Add(examination);
                 if (physicalExaminationService.GetById(examination.Id) != null)
@@ -83,7 +103,7 @@
             }
             else
             {
-                 toastService.ShowError("Failed to add Physical examination!");
+                toastService.ShowError("Failed to add Physical examination!");
             }
 
         }

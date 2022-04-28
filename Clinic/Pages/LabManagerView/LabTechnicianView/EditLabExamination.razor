@@ -2,89 +2,127 @@
 @using Clinic.Data.Enums
 @using Clinic.Data.Models
 @using Clinic.Data
+@using Clinic.Services
+@using System.Security.Claims
+
 
 @inject NavigationManager NavigationManager;
+@inject LaboratoryExaminationService laboratoryExaminationService;
+@inject IToastService toastService;
+@inject LabTechnicianService labTechnicianService;
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor httpContextAccessor
+
 
 <PageTitle>Edit laboratory examinations</PageTitle>
 
 <AuthorizeView Roles="Lab Technician, Lab Manager" Context="examinationEditing">
     <Authorized>
-        <h3 class="mb-3 fw-bold"><b>Edit laboratory examinations</b></h3> <br />
-        <EditForm EditContext="newExamination" OnValidSubmit="changeExistingExamination" class="w-50 bg-gray px-4 py-3 rounded">
-
-            <h3 class="mb-3 fw-bold">Enter the examination's data:</h3>
-
-            <label class="d-block mb-1 ml-1">id </label> 
-            <InputText @bind-Value="EditExaminationId" readonly="readonly" class="form-control w-75"/>
-            
-            <label class="d-block mb-1 ml-1">code </label> 
-            <InputText @bind-Value="code" readonly="readonly" class="form-control w-75"/>
-            
-            <label class="d-block mb-1 ml-1">name </label> 
-            <InputText @bind-Value="@examination.GlossaryDictionary.Name" readonly="readonly" class="form-control w-75"/>
-
-            <label class="d-block mb-1 ml-1"> status</label> 
-            <InputRadioGroup @bind-Value="@examination.Status">
-               @foreach (var g in (ExaminationStatus[])Enum.GetValues(typeof(ExaminationStatus)))
+        @if (!validId)
+        {
+            <NotFound />
+        }
+        else
+        {
+            <section>
+                @if (examination != null)
                 {
-                   if (g == examination.Status)
-                    {
-                        <div><InputRadio Value="g" checked/>@g.ToString().ToLower()</div>
-                    }
-                    else if (g != ExaminationStatus.APPROVED)
-                    {
-                        <div><InputRadio Value="g" />@g.ToString().ToLower()</div> 
-                    }
+                    <h3 class="mb-3 fw-bold"><b>Edit laboratory examinations</b></h3> <br />
+                    <EditForm EditContext="newExamination" OnValidSubmit="changeExistingExamination" class="w-50 bg-gray px-4 py-3 rounded">
+
+                        <h3 class="mb-3 fw-bold">Enter the examination's data:</h3>
+
+                        <label class="d-block mb-1 ml-1">id </label>
+                        <InputText @bind-Value="EditExaminationId" readonly="readonly" class="form-control w-75" />
+
+                        <label class="d-block mb-1 ml-1">code </label>
+                        <InputText @bind-Value="code" readonly="readonly" class="form-control w-75" />
+
+                        <label class="d-block mb-1 ml-1">name </label>
+                        <InputText @bind-Value="@examination.GlossaryDictionary.Name" readonly="readonly" class="form-control w-75" />
+
+                        <label class="d-block mb-1 ml-1"> status</label>
+                        <InputRadioGroup @bind-Value="@examination.Status">
+                            @foreach (var g in (ExaminationStatus[])Enum.GetValues(typeof(ExaminationStatus)))
+                            {
+                                if (g == examination.Status)
+                                {
+                            <div><InputRadio Value="g" checked />@g.ToString().ToLower()</div>
+                                }
+                                else if (g != ExaminationStatus.APPROVED)
+                                {
+                            <div><InputRadio Value="g" />@g.ToString().ToLower()</div>
+                                }
+                            }
+                </InputRadioGroup>
+
+                <label class="d-block mb-1 ml-1">result</label>
+                <InputText @bind-Value="@examination.Result" class="form-control w-75" />
+
+                <AuthorizeView Roles="Lab Manager" Context="noteAdding">
+                    <Authorized>
+                        <label class="d-block mb-1 ml-1">note </label>
+                        <InputTextArea @bind-Value="@examination.ManagerNotes" class="form-control w-75" />
+                    </Authorized>
+                </AuthorizeView>
+
+                <br />
+                <div>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </EditForm>
                 }
-            </InputRadioGroup>
-
-            <label class="d-block mb-1 ml-1">result</label>  
-            <InputText @bind-Value="@examination.Result" class="form-control w-75"/> 
-
-            <AuthorizeView Roles="Lab Manager" Context="noteAdding">
-                <Authorized>
-                    <label class="d-block mb-1 ml-1">note </label> 
-                    <InputTextArea @bind-Value="@examination.ManagerNotes" class="form-control w-75"/>
-                </Authorized>
-            </AuthorizeView>
-
-            <br/>
-            <div>
-            <button type="submit" class="btn btn-primary">Save</button>
-            </div>
-        </EditForm> 
-        <button type="submit" class="btn btn-primary" @onclick="() => NavigateToLabExaminations()">Back</button>
+                <button type="submit" class="btn btn-primary" @onclick="() => NavigateToLabExaminations()">Back</button>
+            </section>
+        }
     </Authorized>
     <NotAuthorized>
+        <section>
         <h1>Access denied!</h1>
+        </section>
     </NotAuthorized>
 </AuthorizeView>
 
 @code {
     [Parameter]
-    public string EditExaminationId { get; set; }
+    public string EditExaminationId { get; set; } = String.Empty;
 
     //Kod badania
-    public string code;
+    public string? code;
+    private LaboratoryExamination? examination;
+    private EditContext? newExamination;
+    private bool validId = true;
+    private Guid parsedId;
 
-    //TO DO
-    //Przypisanie wartości do badania
     protected override async Task OnInitializedAsync()
     {
-        newExamination = new EditContext(examination);
-        base.OnInitialized();
-        //Poniższy kod testowo (do usunięcia potem)
-        examination = new LaboratoryExamination() {Id=Guid.Parse(EditExaminationId), DoctorsNotes="coś tam 1", OrderedAt=new DateTime(), Status=ExaminationStatus.COMMISIONED,GlossaryDictionary=new GlossaryDictionary() {Code=GlossaryCode.LAB_BLOOD, Name="jakaś tam 1", Type=GlossaryType.LABORATORY}};
-        code = examination.GlossaryDictionary.Code.ToString().ToLower();
+        validId = Guid.TryParse(EditExaminationId, out parsedId);
+        if (validId)
+        {
+            examination = await laboratoryExaminationService.GetByIdAsync(parsedId);
+            if (examination != null)
+            {
+                newExamination = new EditContext(examination);
+                code = examination.GlossaryDictionary.Code.ToString().ToLower();
+            }
+        }
     }
-    private LaboratoryExamination examination = new();
-    EditContext newExamination;
 
-    //TO DO
-    //Zapisanie danych do bazy
     private void changeExistingExamination()
     {
+        if (examination != null)
+        {
+            string currentUserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            examination.LabTechnician = labTechnicianService.GetById(currentUserId);
 
+            // TODO Distinguish statuses and set date only when changed to executed or canceled
+            examination.ExecutedOrCancelledAt = DateTime.Now;
+            laboratoryExaminationService.Update(examination);
+            toastService.ShowSuccess("Examination has been successfully saved!");
+        }
+        else
+        {
+            toastService.ShowError("Failed to update examination!");
+        }
     }
 
 

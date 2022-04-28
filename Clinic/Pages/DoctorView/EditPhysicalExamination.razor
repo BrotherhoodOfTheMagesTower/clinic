@@ -2,30 +2,46 @@
 @using Clinic.Data.Enums
 @using Clinic.Data.Models
 @using Clinic.Data
+@using Clinic.Services
 
 @inject NavigationManager NavigationManager;
+@inject IToastService toastService;
+@inject PhysicalExaminationService physicalExaminationService;
 
 <PageTitle>Edit physical examinations</PageTitle>
 
 <AuthorizeView Roles="Doctor" Context="examinationEditing">
     <Authorized>
-        <EditForm EditContext="newExamination" OnValidSubmit="changeExistingExamination" class="w-50 bg-gray px-4 py-3 rounded">
+        @if (!validId)
+        {
+            <NotFound />
+        }
 
-            <h1 class="mb-3 fw-bold">Edit physical examinations</h1><br />
-            <h3 class="mb-3 fw-bold">Examination:</h3>
+        else
+        {
+            <section>
+                @if (examination != null)
+                {
+                    <EditForm EditContext="newExamination" OnValidSubmit="changeExistingExamination" class="w-50 bg-gray px-4 py-3 rounded">
 
-            <label class="d-block mb-1 ml-1">id </label>
-            <label class="form-control w-75" >@ExaminationId </label><br />
+                        <h1 class="mb-3 fw-bold">Edit physical examinations</h1><br />
+                        <h3 class="mb-3 fw-bold">Examination:</h3>
 
-            <label class="d-block mb-1 ml-1">Name: </label>
-            <label class="form-control w-75" > @examination.GlossaryDictionary.Name </label><br />
+                        <label class="d-block mb-1 ml-1">id </label>
+                        <label class="form-control w-75">@ExaminationId </label><br />
 
-            <label class="d-block mb-1 ml-1">Result: </label>
-            <InputText @bind-Value=@examination.Result class="form-control w-75" ></InputText><br />
-            <div>
-                <button type="submit" class="btn btn-primary">Save</button>
-            </div>
-        </EditForm>
+                        <label class="d-block mb-1 ml-1">Name: </label>
+                        <label class="form-control w-75"> @examination.GlossaryDictionary.Name </label><br />
+
+                        <label class="d-block mb-1 ml-1">Result: </label>
+                        <InputText @bind-Value=@examination.Result class="form-control w-75"></InputText><br />
+                        <div>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
+                    </EditForm>
+                }
+            </section>
+        }
     </Authorized>
     <NotAuthorized>
         <h1>Access denied!</h1>
@@ -34,31 +50,36 @@
 
 @code {
     [Parameter]
-    public string ExaminationId { get; set; }
+    public string ExaminationId { get; set; } = String.Empty;
 
-    protected override void OnInitialized()
-    {
-        newExamination = new EditContext(examination);
-        base.OnInitialized();
-    }
-    private PhysicalExamination examination = new();
-    EditContext newExamination;
+    private PhysicalExamination? examination;
+    private EditContext? newExamination;
+    private bool validId = true;
+    private Guid parsedId;
 
-    //TO DO
-    //Przypisanie wartości do badania
     protected override async Task OnInitializedAsync()
     {
-        //Poniższy kod testowo (do usunięcia potem)
-        examination = new PhysicalExamination() { Id = Guid.Parse(ExaminationId), Result="wynik jest taki:", GlossaryDictionary = new GlossaryDictionary { Code = GlossaryCode.PHY_EAR, Name = "Ear examination", Type = GlossaryType.PHYSICAL } };
-        
-        
+        validId = Guid.TryParse(ExaminationId, out parsedId);
+        if (validId == false)
+        {
+            return;
+        }
+        examination = await physicalExaminationService.GetByIdAsync(parsedId);
+
+        if (examination != null)
+        {
+            newExamination = new EditContext(examination);
+        }
+
     }
 
-    //TO DO
-    //Zapisanie danych do bazy
     private void changeExistingExamination()
     {
-
+        if (examination != null)
+        {
+            physicalExaminationService.Update(examination);
+            toastService.ShowSuccess("Physical examination was successfully updated!");
+        }
     }
 
  }

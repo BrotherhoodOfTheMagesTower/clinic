@@ -17,63 +17,80 @@
 
 <AuthorizeView Roles="Doctor" Context="examinationOrderByDoctor">
     <Authorized>
-         
-        <EditForm EditContext="examinationToOrder" OnValidSubmit="OrderExamination" class="w-50 bg-gray px-4 py-3 rounded">
-            <h1 class="mb-3 fw-bold">Order laboratory examination</h1><br />
-            <h3 class="mb-3 fw-bold">Examination:</h3>
 
-            <label class="d-block mb-1 ml-1"> Name: </label>
-            @if (allGlossaryDictionares != null)
-            {
-                <InputSelect class="mb-3 fw-bold"  @bind-Value="@glossaryCode">
-                    @foreach (var c in allGlossaryDictionares)
+        @if (!validId)
+        {
+            <NotFound />
+        }
+
+        else
+        {
+            <section>
+                <EditForm EditContext="examinationToOrder" OnValidSubmit="OrderExamination" class="w-50 bg-gray px-4 py-3 rounded">
+                    <h1 class="mb-3 fw-bold">Order laboratory examination</h1><br />
+                    <h3 class="mb-3 fw-bold">Examination:</h3>
+                    <label class="d-block mb-1 ml-1"> Name: </label>
+                    @if (allGlossaryDictionares != null)
                     {
+                        <InputSelect class="mb-3 fw-bold" @bind-Value="@glossaryCode">
+                            @foreach (var c in allGlossaryDictionares)
+                            {
                         <option Value=@c.Code>@c.Name</option>
-                    }
+                            }
                 </InputSelect>
-            }
-            <label class="d-block mb-1 ml-1">Doctor's notes:</label>
-            <InputTextArea @bind-Value="@examination.DoctorsNotes" class="form-control w-75" />
+                    }
+                    <label class="d-block mb-1 ml-1">Doctor's notes:</label>
+                    <InputTextArea @bind-Value="@examination.DoctorsNotes" class="form-control w-75" /> <br />
+                    <div>
+                        <button type="submit" class="btn btn-primary">Order</button>
+                    </div>
+                </EditForm>
+            </section>
+        }
 
-
-            <br />
-            <div>
-                <button type="submit" class="btn btn-primary">Order</button>
-            </div>
-        </EditForm>
     </Authorized>
     <NotAuthorized>
+        <section>
         <h1>Access denied!</h1>
+        </section>
     </NotAuthorized>
 </AuthorizeView>
 
 @code {
-    //id wizyty, ktore zostalo przekazane z poprzedniego widoku, trzeba na jego podstawie zwrocic z bazy danych wizyte do edytowania
+    //appointment Id
     [Parameter]
     public string Id { get; set; } = String.Empty;
 
     private string glossaryCode = String.Empty;
-    private List<GlossaryDictionary>? allGlossaryDictionares; 
+    private List<GlossaryDictionary>? allGlossaryDictionares;
     private LaboratoryExamination examination = new();
     private EditContext? examinationToOrder;
+    private bool validId = true;
+    private Guid parsedId;
 
     protected override async Task OnInitializedAsync()
     {
         examinationToOrder = new EditContext(examination);
         allGlossaryDictionares = (await glossaryService.GetAllDictionariesAsync(GlossaryType.LABORATORY)).ToList();
         glossaryCode = allGlossaryDictionares.First().Code.ToString() ?? "";
+        validId = Guid.TryParse(Id, out parsedId);
     }
 
-    //Zapisanie danych do bazy
     private void OrderExamination()
     {
-        examination.Appointment = appointmentService.GetById(new Guid(Id));
+        if (validId == false)
+        {
+            return;
+        }
+
+        examination.Appointment = appointmentService.GetById(parsedId);
+
         examination.Status = ExaminationStatus.APPROVED;
         examination.OrderedAt = DateTime.Now;
-        //przypisanie do examination obiektu GlossaryDictionary na podstawie kodu wybranego w select
+
         if (allGlossaryDictionares != null)
         {
-            foreach (var dictionary in allGlossaryDictionares ) 
+            foreach (var dictionary in allGlossaryDictionares)
             {
                 if (dictionary.Code.ToString().Equals(glossaryCode))
                     examination.GlossaryDictionary = dictionary;
@@ -82,8 +99,6 @@
             laboratoryExaminationService.Add(examination);
             if (laboratoryExaminationService.GetById(examination.Id) != null)
                 toastService.ShowSuccess("Laboratory examination added successfully!");
-
-            //Debug.WriteLine($"Code: {examination.GlossaryDictionary.Code}, notes: {examination.DoctorsNotes}");
         }
     }
-}
+    }
