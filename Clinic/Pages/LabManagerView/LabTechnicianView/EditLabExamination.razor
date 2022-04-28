@@ -23,58 +23,62 @@
         }
         else
         {
-            @if (examination != null)
-            {
-                <h3 class="mb-3 fw-bold"><b>Edit laboratory examinations</b></h3> <br />
-                <EditForm EditContext="newExamination" OnValidSubmit="changeExistingExamination" class="w-50 bg-gray px-4 py-3 rounded">
+            <section>
+                @if (examination != null)
+                {
+                    <h3 class="mb-3 fw-bold"><b>Edit laboratory examinations</b></h3> <br />
+                    <EditForm EditContext="newExamination" OnValidSubmit="changeExistingExamination" class="w-50 bg-gray px-4 py-3 rounded">
 
-                    <h3 class="mb-3 fw-bold">Enter the examination's data:</h3>
+                        <h3 class="mb-3 fw-bold">Enter the examination's data:</h3>
 
-                    <label class="d-block mb-1 ml-1">id </label>
-                    <InputText @bind-Value="EditExaminationId" readonly="readonly" class="form-control w-75" />
+                        <label class="d-block mb-1 ml-1">id </label>
+                        <InputText @bind-Value="EditExaminationId" readonly="readonly" class="form-control w-75" />
 
-                    <label class="d-block mb-1 ml-1">code </label>
-                    <InputText @bind-Value="code" readonly="readonly" class="form-control w-75" />
+                        <label class="d-block mb-1 ml-1">code </label>
+                        <InputText @bind-Value="code" readonly="readonly" class="form-control w-75" />
 
-                    <label class="d-block mb-1 ml-1">name </label>
-                    <InputText @bind-Value="@examination.GlossaryDictionary.Name" readonly="readonly" class="form-control w-75" />
+                        <label class="d-block mb-1 ml-1">name </label>
+                        <InputText @bind-Value="@examination.GlossaryDictionary.Name" readonly="readonly" class="form-control w-75" />
 
-                    <label class="d-block mb-1 ml-1"> status</label>
-                    <InputRadioGroup @bind-Value="@examination.Status">
-                        @foreach (var g in (ExaminationStatus[])Enum.GetValues(typeof(ExaminationStatus)))
-                        {
-                            if (g == examination.Status)
+                        <label class="d-block mb-1 ml-1"> status</label>
+                        <InputRadioGroup @bind-Value="@examination.Status">
+                            @foreach (var g in (ExaminationStatus[])Enum.GetValues(typeof(ExaminationStatus)))
                             {
-                        <div><InputRadio Value="g" checked />@g.ToString().ToLower()</div>
+                                if (g == examination.Status)
+                                {
+                            <div><InputRadio Value="g" checked />@g.ToString().ToLower()</div>
+                                }
+                                else if (g != ExaminationStatus.APPROVED)
+                                {
+                            <div><InputRadio Value="g" />@g.ToString().ToLower()</div>
+                                }
                             }
-                            else if (g != ExaminationStatus.APPROVED)
-                            {
-                        <div><InputRadio Value="g" />@g.ToString().ToLower()</div>
-                            }
-                        }
-            </InputRadioGroup>
+                </InputRadioGroup>
 
-            <label class="d-block mb-1 ml-1">result</label>
-            <InputText @bind-Value="@examination.Result" class="form-control w-75" />
+                <label class="d-block mb-1 ml-1">result</label>
+                <InputText @bind-Value="@examination.Result" class="form-control w-75" />
 
-            <AuthorizeView Roles="Lab Manager" Context="noteAdding">
-                <Authorized>
-                    <label class="d-block mb-1 ml-1">note </label>
-                    <InputTextArea @bind-Value="@examination.ManagerNotes" class="form-control w-75" />
-                </Authorized>
-            </AuthorizeView>
+                <AuthorizeView Roles="Lab Manager" Context="noteAdding">
+                    <Authorized>
+                        <label class="d-block mb-1 ml-1">note </label>
+                        <InputTextArea @bind-Value="@examination.ManagerNotes" class="form-control w-75" />
+                    </Authorized>
+                </AuthorizeView>
 
-            <br />
-            <div>
-                <button type="submit" class="btn btn-primary">Save</button>
-            </div>
-        </EditForm>
-            }
-            <button type="submit" class="btn btn-primary" @onclick="() => NavigateToLabExaminations()">Back</button>
+                <br />
+                <div>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </EditForm>
+                }
+                <button type="submit" class="btn btn-primary" @onclick="() => NavigateToLabExaminations()">Back</button>
+            </section>
         }
     </Authorized>
     <NotAuthorized>
+        <section>
         <h1>Access denied!</h1>
+        </section>
     </NotAuthorized>
 </AuthorizeView>
 

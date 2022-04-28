@@ -14,32 +14,33 @@
     <Authorized>
         @if (!validId)
         {
-               <NotFound/>
+            <NotFound />
         }
 
         else
         {
+            <section>
+                @if (examination != null)
+                {
+                    <EditForm EditContext="newExamination" OnValidSubmit="changeExistingExamination" class="w-50 bg-gray px-4 py-3 rounded">
 
-            @if (examination != null)
-            {
-                <EditForm EditContext="newExamination" OnValidSubmit="changeExistingExamination" class="w-50 bg-gray px-4 py-3 rounded">
+                        <h1 class="mb-3 fw-bold">Edit physical examinations</h1><br />
+                        <h3 class="mb-3 fw-bold">Examination:</h3>
 
-                    <h1 class="mb-3 fw-bold">Edit physical examinations</h1><br />
-                    <h3 class="mb-3 fw-bold">Examination:</h3>
+                        <label class="d-block mb-1 ml-1">id </label>
+                        <label class="form-control w-75">@ExaminationId </label><br />
 
-                    <label class="d-block mb-1 ml-1">id </label>
-                    <label class="form-control w-75">@ExaminationId </label><br />
+                        <label class="d-block mb-1 ml-1">Name: </label>
+                        <label class="form-control w-75"> @examination.GlossaryDictionary.Name </label><br />
 
-                    <label class="d-block mb-1 ml-1">Name: </label>
-                    <label class="form-control w-75"> @examination.GlossaryDictionary.Name </label><br />
-
-                    <label class="d-block mb-1 ml-1">Result: </label>
-                    <InputText @bind-Value=@examination.Result class="form-control w-75"></InputText><br />
-                    <div>
-                        <button type="submit" class="btn btn-primary">Save</button>
-                    </div>
-                </EditForm>
-            }
+                        <label class="d-block mb-1 ml-1">Result: </label>
+                        <InputText @bind-Value=@examination.Result class="form-control w-75"></InputText><br />
+                        <div>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
+                    </EditForm>
+                }
+            </section>
         }
     </Authorized>
     <NotAuthorized>

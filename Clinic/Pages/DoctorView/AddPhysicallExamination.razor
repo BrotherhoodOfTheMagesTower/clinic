@@ -19,38 +19,42 @@
     <Authorized>
         @if (!validId)
         {
-            <NotFound/>
-        }   
+            <NotFound />
+        }
 
         else
         {
-            <EditForm EditContext="examinationToAdd" OnValidSubmit="AddExamination" class="w-50 bg-gray px-4 py-3 rounded">
+            <section>
+                <EditForm EditContext="examinationToAdd" OnValidSubmit="AddExamination" class="w-50 bg-gray px-4 py-3 rounded">
 
-                <h1 class="mb-3 fw-bold">Add physical examination</h1><br />
-                <h3 class="mb-3 fw-bold">Examination:</h3>
+                    <h1 class="mb-3 fw-bold">Add physical examination</h1><br />
+                    <h3 class="mb-3 fw-bold">Examination:</h3>
 
-                <label class="d-block mb-1 ml-1"> Name: </label>
-                @if (allGlossaryDictionares != null)
-                {
-                    <InputSelect class="mb-3 fw-bold" @bind-Value="@glossaryCode">
-                        @foreach (var c in allGlossaryDictionares)
-                        {
-                    <option Value=@c.Code>@c.Name</option>
-                        }
-            </InputSelect>
-                }
-                <label class="d-block mb-1 ml-1">Result:</label>
-                <InputTextArea @bind-Value="@examination.Result" class="form-control w-75" />
+                    <label class="d-block mb-1 ml-1"> Name: </label>
+                    @if (allGlossaryDictionares != null)
+                    {
+                        <InputSelect class="mb-3 fw-bold" @bind-Value="@glossaryCode">
+                            @foreach (var c in allGlossaryDictionares)
+                            {
+                        <option Value=@c.Code>@c.Name</option>
+                            }
+                </InputSelect>
+                    }
+                    <label class="d-block mb-1 ml-1">Result:</label>
+                    <InputTextArea @bind-Value="@examination.Result" class="form-control w-75" />
 
-                <br />
-                <div>
-                    <button type="submit" class="btn btn-primary">Order</button>
-                </div>
-            </EditForm>
+                    <br />
+                    <div>
+                        <button type="submit" class="btn btn-primary">Order</button>
+                    </div>
+                </EditForm>
+            </section>
         }
     </Authorized>
     <NotAuthorized>
-        <h1>Access denied!</h1>
+        <section>
+            <h1>Access denied!</h1>
+        </section>
     </NotAuthorized>
 </AuthorizeView>
 

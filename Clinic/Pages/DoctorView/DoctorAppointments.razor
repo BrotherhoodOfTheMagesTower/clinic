@@ -14,47 +14,51 @@
 
 <AuthorizeView Roles="Doctor">
     <Authorized>
-        @*<h3 class="mb-3 fw-bold"><b>Patients @searchPatient</b></h3> <br />
-            <div>
-            <input type="text" @bind="searchPatient" class="form-control w-75"/>
-            <button type="submit" class="btn btn-primary" @onclick="SearchPatient">Search</button>
-            <button type="submit" class="btn btn-primary"  @onclick="(() => NavigateToAddPatient())">Add patient</button>
-            </div><br />*@
+        <section>
+            @*<h3 class="mb-3 fw-bold"><b>Patients @searchPatient</b></h3> <br />
+                <div>
+                <input type="text" @bind="searchPatient" class="form-control w-75"/>
+                <button type="submit" class="btn btn-primary" @onclick="SearchPatient">Search</button>
+                <button type="submit" class="btn btn-primary"  @onclick="(() => NavigateToAddPatient())">Add patient</button>
+                </div><br />*@
 
-        <h1 class="mb-3 fw-bold">Appointments</h1><br />
-        @if (appointmentsList != null)
-        {
-            <TableTemplate Items="appointmentsList">
-                <TableHeader>
-                    <th> Id </th>
-                    <th> Last Name </th>
-                    <th> First Name </th>
-                    <th> Status </th>
-                    <th> Registrar </th>
-                    <th> Date </th>
-                    <th> Action </th>
-                </TableHeader>
-                <RowTemplate Context="appointment">
-                    <td> @appointment.Id </td>
-                    <td> @appointment.Patient.LastName </td>
-                    <td> @appointment.Patient.FirstName </td>
-                    <td> @appointment.Status.ToString().ToLower() </td>
-                    <td> @appointment.Registrar.FirstName @appointment.Registrar.LastName </td>
-                    <td> @appointment.RegisteredTo </td>
-                    <th>
-                        <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToEditAppointment(appointment.Id.ToString()))">Edit</a>
-                    </th>
-                </RowTemplate>
-            </TableTemplate>
-        }
-        else
-        {
-            <h3 class="mb-3 fw-bold">There are no appointments in database</h3> <br />
-        }
-        <br /><br />
+            <h1 class="mb-3 fw-bold">Appointments</h1><br />
+            @if (appointmentsList != null)
+            {
+                <TableTemplate Items="appointmentsList">
+                    <TableHeader>
+                        <th> Id </th>
+                        <th> Last Name </th>
+                        <th> First Name </th>
+                        <th> Status </th>
+                        <th> Registrar </th>
+                        <th> Date </th>
+                        <th> Action </th>
+                    </TableHeader>
+                    <RowTemplate Context="appointment">
+                        <td> @appointment.Id </td>
+                        <td> @appointment.Patient.LastName </td>
+                        <td> @appointment.Patient.FirstName </td>
+                        <td> @appointment.Status.ToString().ToLower() </td>
+                        <td> @appointment.Registrar.FirstName @appointment.Registrar.LastName </td>
+                        <td> @appointment.RegisteredTo </td>
+                        <th>
+                            <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToEditAppointment(appointment.Id.ToString()))">Edit</a>
+                        </th>
+                    </RowTemplate>
+                </TableTemplate>
+            }
+            else
+            {
+                <h3 class="mb-3 fw-bold">There are no appointments in database</h3> <br />
+            }
+            <br /><br />
+        </section>
     </Authorized>
     <NotAuthorized>
-        <h1>Access denied!</h1>
+        <section>
+            <h1>Access denied!</h1>
+        </section>
     </NotAuthorized>
 </AuthorizeView>
 
