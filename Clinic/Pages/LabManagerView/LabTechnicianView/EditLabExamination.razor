@@ -17,35 +17,41 @@
 
 <AuthorizeView Roles="Lab Technician, Lab Manager" Context="examinationEditing">
     <Authorized>
-        @if (examination != null)
+        @if (!validId)
         {
-            <h3 class="mb-3 fw-bold"><b>Edit laboratory examinations</b></h3> <br />
-            <EditForm EditContext="newExamination" OnValidSubmit="changeExistingExamination" class="w-50 bg-gray px-4 py-3 rounded">
+            <NotFound />
+        }
+        else
+        {
+            @if (examination != null)
+            {
+                <h3 class="mb-3 fw-bold"><b>Edit laboratory examinations</b></h3> <br />
+                <EditForm EditContext="newExamination" OnValidSubmit="changeExistingExamination" class="w-50 bg-gray px-4 py-3 rounded">
 
-                <h3 class="mb-3 fw-bold">Enter the examination's data:</h3>
+                    <h3 class="mb-3 fw-bold">Enter the examination's data:</h3>
 
-                <label class="d-block mb-1 ml-1">id </label>
-                <InputText @bind-Value="EditExaminationId" readonly="readonly" class="form-control w-75" />
+                    <label class="d-block mb-1 ml-1">id </label>
+                    <InputText @bind-Value="EditExaminationId" readonly="readonly" class="form-control w-75" />
 
-                <label class="d-block mb-1 ml-1">code </label>
-                <InputText @bind-Value="code" readonly="readonly" class="form-control w-75" />
+                    <label class="d-block mb-1 ml-1">code </label>
+                    <InputText @bind-Value="code" readonly="readonly" class="form-control w-75" />
 
-                <label class="d-block mb-1 ml-1">name </label>
-                <InputText @bind-Value="@examination.GlossaryDictionary.Name" readonly="readonly" class="form-control w-75" />
+                    <label class="d-block mb-1 ml-1">name </label>
+                    <InputText @bind-Value="@examination.GlossaryDictionary.Name" readonly="readonly" class="form-control w-75" />
 
-                <label class="d-block mb-1 ml-1"> status</label>
-                <InputRadioGroup @bind-Value="@examination.Status">
-                    @foreach (var g in (ExaminationStatus[])Enum.GetValues(typeof(ExaminationStatus)))
-                    {
-                        if (g == examination.Status)
+                    <label class="d-block mb-1 ml-1"> status</label>
+                    <InputRadioGroup @bind-Value="@examination.Status">
+                        @foreach (var g in (ExaminationStatus[])Enum.GetValues(typeof(ExaminationStatus)))
                         {
+                            if (g == examination.Status)
+                            {
                         <div><InputRadio Value="g" checked />@g.ToString().ToLower()</div>
-                        }
-                        else if (g != ExaminationStatus.APPROVED)
-                        {
+                            }
+                            else if (g != ExaminationStatus.APPROVED)
+                            {
                         <div><InputRadio Value="g" />@g.ToString().ToLower()</div>
+                            }
                         }
-                    }
             </InputRadioGroup>
 
             <label class="d-block mb-1 ml-1">result</label>
@@ -63,8 +69,9 @@
                 <button type="submit" class="btn btn-primary">Save</button>
             </div>
         </EditForm>
+            }
+            <button type="submit" class="btn btn-primary" @onclick="() => NavigateToLabExaminations()">Back</button>
         }
-        <button type="submit" class="btn btn-primary" @onclick="() => NavigateToLabExaminations()">Back</button>
     </Authorized>
     <NotAuthorized>
         <h1>Access denied!</h1>
@@ -79,14 +86,20 @@
     public string? code;
     private LaboratoryExamination? examination;
     private EditContext? newExamination;
+    private bool validId = true;
+    private Guid parsedId;
 
     protected override async Task OnInitializedAsync()
     {
-        examination = await laboratoryExaminationService.GetByIdAsync(Guid.Parse(EditExaminationId));
-        if (examination != null)
+        validId = Guid.TryParse(EditExaminationId, out parsedId);
+        if (validId)
         {
-            newExamination = new EditContext(examination);
-            code = examination.GlossaryDictionary.Code.ToString().ToLower();
+            examination = await laboratoryExaminationService.GetByIdAsync(parsedId);
+            if (examination != null)
+            {
+                newExamination = new EditContext(examination);
+                code = examination.GlossaryDictionary.Code.ToString().ToLower();
+            }
         }
     }
 
