@@ -11,45 +11,49 @@
 
 <AuthorizeView Roles="Lab Technician, Lab Manager">
     <Authorized>
-        <h3 class="mb-3 fw-bold"><b>Laboratory examinations</b></h3> <br />
-        <div>
-            <input type="text" @bind="searchExaminations" class="form-control w-75" />
-            <button type="submit" class="btn btn-primary" @onclick="SearchExaminations">Search</button>
-        </div><br />
+        <section>
+            <h3 class="mb-3 fw-bold"><b>Laboratory examinations</b></h3> <br />
+            <div>
+                <input type="text" @bind="searchExaminations" class="form-control w-75" />
+                <button type="submit" class="btn btn-primary" @onclick="SearchExaminations">Search</button>
+            </div><br />
 
-        @if (examinationsList != null)
-        {
-            <TableTemplate Items="examinationsList">
-                <TableHeader>
-                    <th> Examination's id </th>
-                    <th> Code </th>
-                    <th> Name </th>
-                    <th> Order Date </th>
-                    <th> Status </th>
-                    <th> Doctor's note </th>
-                    <th> Action </th>
-                </TableHeader>
-                <RowTemplate Context="examination">
-                    <td> @examination.Id </td>
-                    <td> @examination.GlossaryDictionary.Code.ToString().ToLower() </td>
-                    <td> @examination.GlossaryDictionary.Name </td>
-                    <td> @examination.OrderedAt </td>
-                    <td> @examination.Status.ToString().ToLower() </td>
-                    <td> @examination.DoctorsNotes </td>
-                    <th>
-                        <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToEditExamination(examination.Id.ToString()))">Edit</a>
-                    </th>
-                </RowTemplate>
-            </TableTemplate>
-        }
-        else
-        {
-            <h3 class="mb-3 fw-bold">There are no examinations in the base</h3> <br />
-        }
-        <br /><br />
+            @if (examinationsList != null)
+            {
+                <TableTemplate Items="examinationsList">
+                    <TableHeader>
+                        <th> Examination's id </th>
+                        <th> Code </th>
+                        <th> Name </th>
+                        <th> Order Date </th>
+                        <th> Status </th>
+                        <th> Doctor's note </th>
+                        <th> Action </th>
+                    </TableHeader>
+                    <RowTemplate Context="examination">
+                        <td> @examination.Id </td>
+                        <td> @examination.GlossaryDictionary.Code.ToString().ToLower() </td>
+                        <td> @examination.GlossaryDictionary.Name </td>
+                        <td> @examination.OrderedAt </td>
+                        <td> @examination.Status.ToString().ToLower() </td>
+                        <td> @examination.DoctorsNotes </td>
+                        <th>
+                            <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToEditExamination(examination.Id.ToString()))">Edit</a>
+                        </th>
+                    </RowTemplate>
+                </TableTemplate>
+            }
+            else
+            {
+                <h3 class="mb-3 fw-bold">There are no examinations in the base</h3> <br />
+            }
+            <br /><br />
+        </section>
     </Authorized>
     <NotAuthorized>
+        <section>
         <h1>Access denied!</h1>
+        </section>
     </NotAuthorized>
 </AuthorizeView>
 

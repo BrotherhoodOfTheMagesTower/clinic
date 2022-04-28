@@ -7,7 +7,9 @@
 
 <AuthorizeView Roles="Administrator">
     <Authorized>
-            <div class="card-header" style="margin-bottom: 40px" >
+        <section>
+
+            <div class="card-header" style="margin-bottom: 40px">
                 <h2 class="text-center" style="margin-top:8px"><b>Edit or enable/disable user accounts</b></h2>
             </div>
             @if (users != null)
@@ -29,20 +31,21 @@
                             <td class="text-center">@user.Item2</td>
                             <td class="text-center">@user.Item3</td>
                             <td class="text-center">@user.Item1.Email</td>
-                            @if(@user.Item1.PhoneNumber is not null)
+                            @if (@user.Item1.PhoneNumber is not null)
                             {
-                                <td class="text-center">@user.Item1.PhoneNumber</td>
-                            } else
+                        <td class="text-center">@user.Item1.PhoneNumber</td>
+                            }
+                            else
                             {
-                                <td class="text-center">-</td>
+                        <td class="text-center">-</td>
                             }
 
-                            <td class="text-center">@user.Item4</td>
-                            <td class="text-center">@user.Item5</td>
-                            <td role="button" class="align-self-auto nav-link" @onclick="() => NavigateToEditUser(user.Item1.Id)">Edit</td>
-                            <td role="button" class="align-self-auto link-danger" @onclick="() => NavigateToEnableOrDisableUser(user.Item1.Id)">Enable/Disable</td>
-                        </RowTemplate>
-                    </TableTemplate>
+                    <td class="text-center">@user.Item4</td>
+                    <td class="text-center">@user.Item5</td>
+                    <td role="button" class="align-self-auto nav-link" @onclick="() => NavigateToEditUser(user.Item1.Id)">Edit</td>
+                    <td role="button" class="align-self-auto link-danger" @onclick="() => NavigateToEnableOrDisableUser(user.Item1.Id)">Enable/Disable</td>
+                </RowTemplate>
+            </TableTemplate>
                 }
                 else
                 {
@@ -53,9 +56,13 @@
             {
                 <h5 class="card-title">No users in database</h5>
             }
+        </section>
+
     </Authorized>
     <NotAuthorized>
-        <h1>Access denied!</h1>
+        <section>
+            <h1>Access denied!</h1>
+        </section>
     </NotAuthorized>
 </AuthorizeView>
 

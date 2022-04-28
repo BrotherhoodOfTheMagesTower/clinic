@@ -18,57 +18,60 @@
     <Authorized>
         @if (!validId)
         {
-               <NotFound/>
+            <NotFound />
         }
 
         else
         {
+            <section>
+                @*<h3 class="mb-3 fw-bold"><b>Patients @searchPatient</b></h3> <br />
+                    <div>
+                    <input type="text" @bind="searchPatient" class="form-control w-75"/>
+                    <button type="submit" class="btn btn-primary" @onclick="SearchPatient">Search</button>
+                    <button type="submit" class="btn btn-primary"  @onclick="(() => NavigateToAddPatient())">Add patient</button>
+                    </div><br />*@
 
-            @*<h3 class="mb-3 fw-bold"><b>Patients @searchPatient</b></h3> <br />
-                <div>
-                <input type="text" @bind="searchPatient" class="form-control w-75"/>
-                <button type="submit" class="btn btn-primary" @onclick="SearchPatient">Search</button>
-                <button type="submit" class="btn btn-primary"  @onclick="(() => NavigateToAddPatient())">Add patient</button>
-                </div><br />*@
+                @if (appointmentsList != null && patient != null)
+                {
+                    <h1 class="mb-3 fw-bold">Patient: @patient.FirstName @patient.LastName</h1>
 
-            @if (appointmentsList != null && patient != null)
-            {
-                <h1 class="mb-3 fw-bold">Patient: @patient.FirstName @patient.LastName</h1>
+                    <br />
+                    <h2 class="mb-3 fw-bold">Appointments history</h2>
+
+                    <br />
+
+                    <TableTemplate Items="appointmentsList">
+                        <TableHeader>
+                            <th> Status </th>
+                            <th> Date </th>
+                            <th> Doctor </th>
+                            <th> Action </th>
+
+                        </TableHeader>
+                        <RowTemplate Context="appointment">
+                            <td> @appointment.Status.ToString().ToLower() </td>
+                            <td> @appointment.RegisteredTo </td>
+                            <td> @appointment.Doctor.FirstName @appointment.Doctor.LastName</td>
+                            <th>
+                                <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToAppointmentDetails(appointment.Id.ToString()))">Show details</a>
+                            </th>
+                        </RowTemplate>
+                    </TableTemplate>
+                }
+                else
+                {
+                    <h3 class="mb-3 fw-bold">There are no appointments in database</h3> <br />
+                }
+                <br />
 
                 <br />
-                <h2 class="mb-3 fw-bold">Appointments history</h2>
-
-                <br />
-
-                <TableTemplate Items="appointmentsList">
-                    <TableHeader>
-                        <th> Status </th>
-                        <th> Date </th>
-                        <th> Doctor </th>
-                        <th> Action </th>
-
-                    </TableHeader>
-                    <RowTemplate Context="appointment">
-                        <td> @appointment.Status.ToString().ToLower() </td>
-                        <td> @appointment.RegisteredTo </td>
-                        <td> @appointment.Doctor.FirstName @appointment.Doctor.LastName</td>
-                        <th>
-                            <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToAppointmentDetails(appointment.Id.ToString()))">Show details</a>
-                        </th>
-                    </RowTemplate>
-                </TableTemplate>
-            }
-            else
-            {
-                <h3 class="mb-3 fw-bold">There are no appointments in database</h3> <br />
-            }
-            <br />
-
-            <br />
+            </section>
         }
     </Authorized>
     <NotAuthorized>
-        <h1>Access denied!</h1>
+        <section>
+            <h1>Access denied!</h1>
+        </section>
     </NotAuthorized>
 </AuthorizeView>
 
