@@ -1,7 +1,14 @@
 @import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    text-rendering: optimizeLegibility;
 }
 
 h1:focus {
