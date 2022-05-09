@@ -9,7 +9,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+#if DEBUG
+var connectionString = builder.Configuration.GetConnectionString("LocalApplicationDbContextConnection");
+#else
 var connectionString = builder.Configuration.GetConnectionString("ApplicationDbContextConnection");
+#endif
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
      options.UseSqlServer(connectionString));
 builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
@@ -23,7 +28,7 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<RegistrarService>();
 builder.Services.AddScoped<PatientService>();
 builder.Services.AddScoped<AppointmentService>();
-builder.Services.AddScoped<AddressService>();   
+builder.Services.AddScoped<AddressService>();
 builder.Services.AddScoped<LabManagerService>();
 builder.Services.AddScoped<LabTechnicianService>();
 builder.Services.AddScoped<DoctorService>();
