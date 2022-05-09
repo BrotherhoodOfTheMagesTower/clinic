@@ -13,11 +13,6 @@
     <Authorized>
         <section>
             <h3 class="mb-3 fw-bold"><b>Laboratory examinations</b></h3> <br />
-            <div>
-                <input type="text" @bind="searchExaminations" class="form-control w-75" />
-                <button type="submit" class="btn btn-primary" @onclick="SearchExaminations">Search</button>
-            </div><br />
-
             @if (examinationsList != null)
             {
                 <TableTemplate Items="examinationsList">
@@ -52,14 +47,12 @@
     </Authorized>
     <NotAuthorized>
         <section>
-        <h1>Access denied!</h1>
+            <h1>Access denied!</h1>
         </section>
     </NotAuthorized>
 </AuthorizeView>
 
 @code {
-    //Pole wyszukiwania
-    public string searchExaminations;
 
     private List<LaboratoryExamination>? examinationsList;
 
@@ -68,22 +61,9 @@
         examinationsList = await laboratoryExaminationService.GetAllLabExaminationsAsync();
     }
 
-    protected override void OnInitialized()
-    {
-
-    }
-
     public void NavigateToEditExamination(string Id)
     {
         NavigationManager.NavigateTo($"EditLabExamination/{Id}");
-    }
-
-    //TO DO
-    //Wyszukiwanie listy badań spelniajacej warunki wyszukiwania
-    //Do zastanowienia sie czy jest wogole potrzebne wyszukiwani i jak tak to po czym xddd
-    public void SearchExaminations()
-    {
-
     }
 
  }
