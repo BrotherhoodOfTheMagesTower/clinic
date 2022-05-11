@@ -35,7 +35,7 @@ To use the app perform following steps:
 
 - ##### From website
 
-  - Go to website https://clinicsystemapp.azurewebsites.net
+  - Go to website https://bestclinic.azurewebsites.net/
 
 - Login to a particular account
 
@@ -95,5 +95,5 @@ Development in progress
 
 ### Links
 
-- website: https://clinicsystemapp.azurewebsites.net
+- website: https://bestclinic.azurewebsites.net/
 - dockerhub repository: https://hub.docker.com/repository/docker/marekkawalski/clinic
