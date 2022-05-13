@@ -85,7 +85,7 @@
 
         examination.Appointment = appointmentService.GetById(parsedId);
 
-        examination.Status = ExaminationStatus.APPROVED;
+        examination.Status = ExaminationStatus.COMMISIONED;
         examination.OrderedAt = DateTime.Now;
 
         if (allGlossaryDictionares != null)
