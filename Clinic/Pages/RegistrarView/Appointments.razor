@@ -11,6 +11,7 @@
 
 <AuthorizeView Roles = "Registrar">
     <Authorized>
+        <section>
         <h3 class="mb-3 fw-bold"><b>Appointments </b></h3> <br />
         <div>
             <input type="text" @bind="searchAppointment" class="form-control w-75"/>
@@ -46,9 +47,12 @@
                    <h3 class="mb-3 fw-bold">There are no appointments in the base</h3> <br />
             }
             <br /><br />
+        </section>
     </Authorized>
     <NotAuthorized>
+        <section>
         <h1>Access denied!</h1>
+        </section>
     </NotAuthorized>
 </AuthorizeView>
 

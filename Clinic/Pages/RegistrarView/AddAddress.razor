@@ -9,6 +9,7 @@
 @inject AddressService addressService;
 @inject IToastService toastService
 
+
 @if (!hasAddress)
 {
     <PageTitle>Add Patient's Address</PageTitle>
@@ -20,6 +21,7 @@ else
 
 <AuthorizeView Roles="Registrar" Context="addressAdding">
     <Authorized>
+        <section>
 
         @if (!hasAddress)
         {
@@ -55,10 +57,13 @@ else
             </div>
         </EditForm>
         <button type="submit" class="btn btn-primary" @onclick="() => NavigateToPatients()">Back</button>
-
+        </section>
+        
     </Authorized>
     <NotAuthorized>
+        <section>
         <h1>Access denied!</h1>
+        </section>
     </NotAuthorized>
 </AuthorizeView>
 
