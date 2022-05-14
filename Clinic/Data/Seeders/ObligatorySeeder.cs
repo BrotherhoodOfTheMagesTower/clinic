@@ -29,6 +29,9 @@ namespace Clinic.Data.Seeders
             {
                 var administrator = new Administrator
                 {
+                    FirstName = "adminFirstName",
+                    LastName = "adminLastName",
+
                     User = new ApplicationUser
                     {
                         Email = "admin@admin.com",
@@ -45,12 +48,12 @@ namespace Clinic.Data.Seeders
                 context!.SaveChanges();
 
                 UserManager<ApplicationUser> _userManager = serviceProvider.GetService<UserManager<ApplicationUser>>()!;
-                if(!await _userManager.IsInRoleAsync(administrator.User, Roles.Administrator))
+                if (!await _userManager.IsInRoleAsync(administrator.User, Roles.Administrator))
                     await _userManager!.AddToRoleAsync(administrator.User, Roles.Administrator);
             }
 
             //Seed default Glossary
-            if(!context!.GlossaryDictionaries.Any())
+            if (!context!.GlossaryDictionaries.Any())
             {
                 var blood = new GlossaryDictionary { Code = GlossaryCode.LAB_BLOOD, Name = "Blood examination", Type = GlossaryType.LABORATORY };
                 var covid = new GlossaryDictionary { Code = GlossaryCode.LAB_COVID, Name = "Covid examination", Type = GlossaryType.LABORATORY };
