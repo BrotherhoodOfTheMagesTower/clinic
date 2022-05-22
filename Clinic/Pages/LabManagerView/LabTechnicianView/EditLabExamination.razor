@@ -31,36 +31,36 @@
 
                         <h3 class="mb-3 fw-bold">Enter the examination's data:</h3>
 
-                        <label class="d-block mb-1 ml-1">id </label>
+                        <label class="d-block mb-1 ml-1">Id </label>
                         <InputText @bind-Value="EditExaminationId" readonly="readonly" class="form-control w-75" />
 
-                        <label class="d-block mb-1 ml-1">code </label>
+                        <label class="d-block mb-1 ml-1">Code </label>
                         <InputText @bind-Value="code" readonly="readonly" class="form-control w-75" />
 
-                        <label class="d-block mb-1 ml-1">name </label>
-                        <InputText @bind-Value="@examination.GlossaryDictionary.Name" readonly="readonly" class="form-control w-75" />
+                        <label class="d-block mb-1 ml-1">Name </label>
+                        <InputText @bind-Value="@examination.GlossaryDictionary.Name" class="form-control w-75" readonly="readonly" />
 
-                        <label class="d-block mb-1 ml-1"> status</label>
-                        <InputRadioGroup @bind-Value="@examination.Status">
+                        <label class="d-block mb-1 ml-1"> Status</label>
+                        <InputRadioGroup @bind-Value="@examination.Status" >
                             @foreach (var g in (ExaminationStatus[])Enum.GetValues(typeof(ExaminationStatus)))
                             {
                                 if (g == examination.Status)
                                 {
-                            <div><InputRadio Value="g" checked />@g.ToString().ToLower()</div>
+                            <div><InputRadio Value="g" checked disabled=@statusReadonly />@g.ToString().ToLower() </div>
                                 }
                                 else if (g != ExaminationStatus.APPROVED)
                                 {
-                            <div><InputRadio Value="g" />@g.ToString().ToLower()</div>
+                            <div><InputRadio Value="g" disabled=@statusReadonly />@g.ToString().ToLower()</div>
                                 }
                             }
                 </InputRadioGroup>
 
-                <label class="d-block mb-1 ml-1">result</label>
-                <InputText @bind-Value="@examination.Result" class="form-control w-75" />
+                <label class="d-block mb-1 ml-1">Result</label>
+                <InputText @bind-Value="@examination.Result" class="form-control w-75" readonly=@statusReadonly />
 
                 <AuthorizeView Roles="Lab Manager" Context="noteAdding">
                     <Authorized>
-                        <label class="d-block mb-1 ml-1">note </label>
+                        <label class="d-block mb-1 ml-1">Manager's note </label>
                         <InputTextArea @bind-Value="@examination.ManagerNotes" class="form-control w-75" />
                     </Authorized>
                 </AuthorizeView>
@@ -77,7 +77,7 @@
     </Authorized>
     <NotAuthorized>
         <section>
-        <h1>Access denied!</h1>
+            <h1>Access denied!</h1>
         </section>
     </NotAuthorized>
 </AuthorizeView>
@@ -93,6 +93,8 @@
     private bool validId = true;
     private Guid parsedId;
 
+    public bool statusReadonly = true;
+
     protected override async Task OnInitializedAsync()
     {
         validId = Guid.TryParse(EditExaminationId, out parsedId);
@@ -103,8 +105,11 @@
             {
                 newExamination = new EditContext(examination);
                 code = examination.GlossaryDictionary.Code.ToString().ToLower();
+                if (examination.Status.Equals(ExaminationStatus.COMMISIONED))
+                    statusReadonly = false;
             }
         }
+         toastService.ShowSuccess(statusReadonly.ToString());
     }
 
     private void changeExistingExamination()
