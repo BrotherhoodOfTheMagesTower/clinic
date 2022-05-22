@@ -40,6 +40,10 @@
                         <label class="d-block mb-1 ml-1">Name </label>
                         <InputText @bind-Value="@examination.GlossaryDictionary.Name" class="form-control w-75" readonly="readonly" />
 
+                         <label class="d-block mb-1 ml-1">Doctor's note</label>
+                        <InputText @bind-Value="@examination.DoctorsNotes" class="form-control w-75" readonly="readonly" />
+
+
                         <label class="d-block mb-1 ml-1"> Status</label>
                         <InputRadioGroup @bind-Value="@examination.Status" >
                             @foreach (var g in (ExaminationStatus[])Enum.GetValues(typeof(ExaminationStatus)))
@@ -67,7 +71,7 @@
 
                 <br />
                 <div>
-                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="submit" disabled=@statusReadonly class="btn btn-primary">Save</button>
                 </div>
             </EditForm>
                 }
@@ -109,7 +113,6 @@
                     statusReadonly = false;
             }
         }
-         toastService.ShowSuccess(statusReadonly.ToString());
     }
 
     private void changeExistingExamination()
@@ -119,10 +122,12 @@
             string currentUserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             examination.LabTechnician = labTechnicianService.GetById(currentUserId);
 
-            // TODO Distinguish statuses and set date only when changed to executed or canceled
             examination.ExecutedOrCancelledAt = DateTime.Now;
             laboratoryExaminationService.Update(examination);
             toastService.ShowSuccess("Examination has been successfully saved!");
+            if (!examination.Status.Equals(ExaminationStatus.COMMISIONED))
+                statusReadonly = true;
+
         }
         else
         {
