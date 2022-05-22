@@ -1,0 +1,115 @@
+﻿@page "/CancelLabExamination/{CancelExaminationId}"
+@using Clinic.Data.Enums
+@using Clinic.Data.Models
+@using Clinic.Data
+@using Clinic.Services
+@using System.Security.Claims
+
+
+@inject NavigationManager NavigationManager;
+@inject LaboratoryExaminationService laboratoryExaminationService;
+@inject IToastService toastService;
+@inject LabManagerService labManagerService;
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor httpContextAccessor
+
+
+<PageTitle>Cancel laboratory examination</PageTitle>
+
+<AuthorizeView Roles="Lab Manager" Context="examinationCanceling">
+    <Authorized>
+        @if (!validId)
+        {
+            <NotFound />
+        }
+        else
+        {
+            <section>
+                @if (examination != null)
+                {
+                    <h3 class="mb-3 fw-bold"><b>Cancel laboratory examination</b></h3> <br />
+                    <EditForm EditContext="newExamination" OnValidSubmit="cancelExistingExamination" class="w-50 bg-gray px-4 py-3 rounded">
+
+                        <h3 class="mb-3 fw-bold">Enter the note:</h3>
+
+                        <label class="d-block mb-1 ml-1">Id </label>
+                        <InputText @bind-Value="CancelExaminationId" readonly="readonly" class="form-control w-75" />
+
+                        <label class="d-block mb-1 ml-1">Code </label>
+                        <InputText @bind-Value="code" readonly="readonly" class="form-control w-75" />
+
+                        <label class="d-block mb-1 ml-1">Name </label>
+                        <InputText @bind-Value="@examination.GlossaryDictionary.Name" class="form-control w-75" readonly="readonly"></InputText>
+
+                        <label class="d-block mb-1 ml-1">Result</label>
+                        <InputText @bind-Value="@examination.Result" class="form-control w-75" readonly="readonly"></InputText>
+
+                        <label class="d-block mb-1 ml-1">Manager's note </label>
+                        <InputTextArea @bind-Value="@examination.ManagerNotes" class="form-control w-75" />
+
+                        <br />
+                        <div>
+                            <button type="submit" class="btn btn-primary">Cancel examination</button>
+                        </div>
+                    </EditForm>
+                }
+                <button type="submit" class="btn btn-primary" @onclick="() => NavigateToApproveExaminations()">Back</button>
+            </section>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <section>
+            <h1>Access denied!</h1>
+        </section>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    [Parameter]
+    public string CancelExaminationId { get; set; } = String.Empty;
+
+    //Kod badania
+    public string? code;
+    private LaboratoryExamination? examination;
+    private EditContext? newExamination;
+    private bool validId = true;
+    private Guid parsedId;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        validId = Guid.TryParse(CancelExaminationId, out parsedId);
+        if (validId)
+        {
+            examination = await laboratoryExaminationService.GetByIdAsync(parsedId);
+            if (examination != null)
+            {
+                newExamination = new EditContext(examination);
+                code = examination.GlossaryDictionary.Code.ToString().ToLower();
+            }
+        }
+    }
+
+    private void cancelExistingExamination()
+    {
+        if (examination != null)
+        {
+            string currentUserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            examination.LabManager = labManagerService.GetById(currentUserId);
+            examination.Status = ExaminationStatus.CANCELLED;
+            examination.ApprovedOrCancelledAt = DateTime.Now;
+            laboratoryExaminationService.Update(examination);
+            toastService.ShowSuccess("Examination has been successfully saved!");
+        }
+        else
+        {
+            toastService.ShowError("Failed to update examination!");
+        }
+    }
+
+
+    private void NavigateToApproveExaminations()
+    {
+        NavigationManager.NavigateTo($"ApproveExamination");
+    }
+
+ }
