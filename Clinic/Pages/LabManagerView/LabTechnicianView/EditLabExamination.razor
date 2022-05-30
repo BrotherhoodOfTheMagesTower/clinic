@@ -52,7 +52,7 @@
                                 {
                             <div><InputRadio Value="g" checked disabled=@statusReadonly />@g.ToString().ToLower() </div>
                                 }
-                                else if (g != ExaminationStatus.APPROVED)
+                                else if (g != ExaminationStatus.APPROVED && g != ExaminationStatus.CANCELLED_MANAGER)
                                 {
                             <div><InputRadio Value="g" disabled=@statusReadonly />@g.ToString().ToLower()</div>
                                 }

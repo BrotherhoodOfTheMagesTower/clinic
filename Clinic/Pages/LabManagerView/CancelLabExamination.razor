@@ -95,7 +95,7 @@
         {
             string currentUserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             examination.LabManager = labManagerService.GetById(currentUserId);
-            examination.Status = ExaminationStatus.CANCELLED;
+            examination.Status = ExaminationStatus.CANCELLED_MANAGER;
             examination.ApprovedOrCancelledAt = DateTime.Now;
             laboratoryExaminationService.Update(examination);
             toastService.ShowSuccess("Examination has been successfully saved!");
