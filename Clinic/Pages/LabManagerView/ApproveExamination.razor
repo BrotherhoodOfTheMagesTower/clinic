@@ -44,9 +44,8 @@
                             <td> @examination.Status.ToString().ToLower() </td>
                             <td> @examination.Result </td>
                             <th>
-                                @*TODO Add Cancel option*@
                                 <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => approveExamination(examination.Id.ToString()))">Approve | </a>
-                                <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToEditExamination(examination.Id.ToString()))">Add note</a>
+                                <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToCancelExamination(examination.Id.ToString()))">Cancel</a>
                             </th>
                         </RowTemplate>
                     </TableTemplate>
@@ -100,9 +99,9 @@
         }
     }
 
-    public void NavigateToEditExamination(string Id)
+    public void NavigateToCancelExamination(string Id)
     {
-        NavigationManager.NavigateTo($"EditLabExamination/{Id}");
+        NavigationManager.NavigateTo($"CancelLabExamination/{Id}");
     }
 
  }

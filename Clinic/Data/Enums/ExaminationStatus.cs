@@ -2,9 +2,10 @@
 {
     public enum ExaminationStatus
     {
-        APPROVED, //zatwierdzone
-        COMMISIONED, //zlecone
-        CANCELLED, //anulowane
-        EXECUTED, //wykonane
+        APPROVED, 
+        COMMISIONED, 
+        CANCELLED_TECH, 
+        CANCELLED_MANAGER,
+        EXECUTED, 
     }
 }
