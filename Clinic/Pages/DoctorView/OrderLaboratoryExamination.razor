@@ -98,7 +98,10 @@
 
             laboratoryExaminationService.Add(examination);
             if (laboratoryExaminationService.GetById(examination.Id) != null)
-                toastService.ShowSuccess("Laboratory examination added successfully!");
+               {
+                   toastService.ShowSuccess("Laboratory examination ordered successfully!");
+          
+               }
         }
     }
     }

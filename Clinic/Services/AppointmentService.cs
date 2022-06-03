@@ -65,6 +65,14 @@ namespace Clinic.Services
                 .Where(a => a.Doctor.Id == doctor.Id)
                 .ToListAsync();
 
+        public async Task<List<Appointment>> GetDoctorAppointmentsByStatusAsync(Doctor doctor, AppointmentStatus status)
+            => await _context.Appointments
+                .Include(p => p.Patient)
+                .Include(p => p.Registrar)
+                .Where(a => a.Doctor.Id == doctor.Id)
+                .Where(s => s.Status == status)
+                .ToListAsync();
+
         public List<Appointment> GetPatientAppointments(Patient patient)
             => _context.Appointments.Where(a => a.Patient.Id == patient.Id).ToList();
 

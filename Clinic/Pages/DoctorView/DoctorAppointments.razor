@@ -23,36 +23,123 @@
                 </div><br />*@
 
             <h1 class="mb-3 fw-bold">Appointments</h1><br />
-            @if (appointmentsList != null)
+
+            <label><b>Filter appointments by status:</b></label><br />
+            <input type="checkbox" @bind="bookedVisible">
+            <label for="addition">Booked</label><br />
+            <input type="checkbox" @bind="finishedVisible">
+            <label for="addition">Finished</label><br />
+            <input type="checkbox" @bind="cancelledVisible">
+            <label for="addition">Cancelled</label><br /><br />
+
+
+
+            @if (bookedAppointmentsList != null && bookedVisible == true)
             {
-                <TableTemplate Items="appointmentsList">
-                    <TableHeader>
-                        <th> Id </th>
-                        <th> Last Name </th>
-                        <th> First Name </th>
-                        <th> Status </th>
-                        <th> Registrar </th>
-                        <th> Date </th>
-                        <th> Action </th>
-                    </TableHeader>
-                    <RowTemplate Context="appointment">
-                        <td> @appointment.Id </td>
-                        <td> @appointment.Patient.LastName </td>
-                        <td> @appointment.Patient.FirstName </td>
-                        <td> @appointment.Status.ToString().ToLower() </td>
-                        <td> @appointment.Registrar.FirstName @appointment.Registrar.LastName </td>
-                        <td> @appointment.RegisteredTo </td>
-                        <th>
-                            <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToEditAppointment(appointment.Id.ToString()))">Edit</a>
-                        </th>
-                    </RowTemplate>
-                </TableTemplate>
+                <h2 class="mb-3 fw-bold">Booked appointments</h2>
+
+                <br />
+                @if (bookedAppointmentsList.Count > 0)
+                {
+                    <TableTemplate Items="bookedAppointmentsList">
+                        <TableHeader>
+                            <th> Last Name </th>
+                            <th> First Name </th>
+                            <th> Status </th>
+                            <th> Registrar </th>
+                            <th> Date </th>
+                            <th> Action </th>
+                        </TableHeader>
+                        <RowTemplate Context="appointment">
+                            <td> @appointment.Patient.LastName </td>
+                            <td> @appointment.Patient.FirstName </td>
+                            <td> @appointment.Status.ToString().ToLower() </td>
+                            <td> @appointment.Registrar.FirstName @appointment.Registrar.LastName </td>
+                            <td> @appointment.RegisteredTo </td>
+                            <th>
+                                <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToEditAppointment(appointment.Id.ToString()))">Edit</a>
+                            </th>
+                        </RowTemplate>
+                    </TableTemplate>
+                }
+                else
+                {
+                    <h3 class="mb-3 fw-bold">There are no booked appointments in database</h3> <br />
+                }
             }
-            else
+
+            <br /><br />
+
+
+            @if (finishedAppointmentsList != null && finishedVisible == true)
             {
-                <h3 class="mb-3 fw-bold">There are no appointments in database</h3> <br />
+                <h2 class="mb-3 fw-bold">Finished appointments</h2>
+
+                <br />
+                @if (finishedAppointmentsList.Count > 0)
+                {
+                    <TableTemplate Items="finishedAppointmentsList">
+                        <TableHeader>
+                            <th> Last Name </th>
+                            <th> First Name </th>
+                            <th> Status </th>
+                            <th> Registrar </th>
+                            <th> Date </th>
+                            <th> Action </th>
+                        </TableHeader>
+                        <RowTemplate Context="appointment">
+                            <td> @appointment.Patient.LastName </td>
+                            <td> @appointment.Patient.FirstName </td>
+                            <td> @appointment.Status.ToString().ToLower() </td>
+                            <td> @appointment.Registrar.FirstName @appointment.Registrar.LastName </td>
+                            <td> @appointment.RegisteredTo </td>
+                            <th>
+                                <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToShowAppointmentDetails(appointment.Id.ToString()))">Show details</a>
+                            </th>
+                        </RowTemplate>
+                    </TableTemplate>
+                }
+                else
+                {
+                    <h3 class="mb-3 fw-bold">There are no finished appointments in database</h3> <br />
+                }
             }
             <br /><br />
+
+            @if (cancelledAppointmentsList != null && cancelledVisible == true)
+            {
+                <h2 class="mb-3 fw-bold">Cancelled appointments</h2>
+
+                <br />
+                @if (cancelledAppointmentsList.Count > 0)
+                {
+                    <TableTemplate Items="cancelledAppointmentsList">
+                        <TableHeader>
+                            <th> Last Name </th>
+                            <th> First Name </th>
+                            <th> Status </th>
+                            <th> Registrar </th>
+                            <th> Date </th>
+                            <th> Action </th>
+                        </TableHeader>
+                        <RowTemplate Context="appointment">
+                            <td> @appointment.Patient.LastName </td>
+                            <td> @appointment.Patient.FirstName </td>
+                            <td> @appointment.Status.ToString().ToLower() </td>
+                            <td> @appointment.Registrar.FirstName @appointment.Registrar.LastName </td>
+                            <td> @appointment.RegisteredTo </td>
+                            <th>
+                                <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToShowAppointmentDetails(appointment.Id.ToString()))">Show details</a>
+                            </th>
+                        </RowTemplate>
+                    </TableTemplate>
+                }
+                else
+                {
+                    <h3 class="mb-3 fw-bold">There are no cancelled appointments in database</h3> <br />
+                }
+            }
+
         </section>
     </Authorized>
     <NotAuthorized>
@@ -63,14 +150,21 @@
 </AuthorizeView>
 
 @code {
-    private List<Appointment>? appointmentsList;
+    private List<Appointment>? finishedAppointmentsList;
+    private List<Appointment>? bookedAppointmentsList;
+    private List<Appointment>? cancelledAppointmentsList;
+    private bool bookedVisible = true;
+    private bool cancelledVisible = false;
+    private bool finishedVisible = false;
 
     protected override async Task OnInitializedAsync()
     {
         Doctor? loggedDoc = doctorService.GetDoctorByEmail(httpContextAccessor!.HttpContext!.User!.Identity!.Name);
         if (loggedDoc != null)
         {
-            appointmentsList = (await appointmentService.GetDoctorAppointmentsAsync(loggedDoc)).ToList();
+            finishedAppointmentsList = (await appointmentService.GetDoctorAppointmentsByStatusAsync(loggedDoc, AppointmentStatus.FINISHED)).ToList();
+            bookedAppointmentsList = (await appointmentService.GetDoctorAppointmentsByStatusAsync(loggedDoc, AppointmentStatus.BOOKED)).ToList();
+            cancelledAppointmentsList = (await appointmentService.GetDoctorAppointmentsByStatusAsync(loggedDoc, AppointmentStatus.CANCELLED)).ToList();
         }
     }
 
@@ -79,7 +173,10 @@
         NavigationManager.NavigateTo($"EditAppointment/{Id}");
     }
 
-
+    public void NavigateToShowAppointmentDetails(string Id)
+    {
+        NavigationManager.NavigateTo($"ShowAppointmentDetails/{Id}");
+    }
     //TO DO
     //Wyszukiwanie listy pacjentów spełniających warunki wyszukiwania z zmiennej searchPatient
     public void SearchPatient()

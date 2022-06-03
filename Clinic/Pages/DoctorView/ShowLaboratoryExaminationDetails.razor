@@ -1,4 +1,4 @@
-﻿@page "/EditLaboratoryExamination/{EditExaminationId}"
+﻿@page "/ShowLaboratoryExaminationDetails/{EditExaminationId}"
 @using Clinic.Data.Enums
 @using Clinic.Data.Models
 @using Clinic.Data
@@ -8,37 +8,38 @@
 @inject IToastService toastService;
 @inject LaboratoryExaminationService laboratoryExaminationService;
 
-<PageTitle>Edit laboratory examinations</PageTitle>
+<PageTitle>Laboratory examination details</PageTitle>
 
 <AuthorizeView Roles="Doctor" Context="examinationEditing">
     <Authorized>
         @if (!validId)
         {
-             <NotFound/>
+            <NotFound />
         }
 
         else
         {
             <section>
-            @if (examination != null)
-            {
-                <EditForm EditContext="newExamination" OnValidSubmit="ChangeExistingExamination" class="w-50 bg-gray px-4 py-3 rounded">
+                @if (examination != null)
+                {
 
-                    <h1 class="mb-3 fw-bold">Edit laboratory examinations</h1><br />
+                    <h1 class="mb-3 fw-bold">Laboratory examination details</h1>
+
+                    <br />
                     <h3 class="mb-3 fw-bold">Examination:</h3>
 
-                    <label class="d-block mb-1 ml-1">id </label>
-                    <label class="form-control w-75">@EditExaminationId </label><br />
 
                     <label class="d-block mb-1 ml-1">Name: </label>
-                    <label class="form-control w-75"> @examination.GlossaryDictionary.Name </label><br />
+                    <label class="form-control w-75"> @examination.GlossaryDictionary.Name </label>
+
+                    <br />
 
                     <label class="d-block mb-1 ml-1"> Status:</label>
                     <label class="form-control w-75"> @status </label> <br />
 
 
                     <label class="d-block mb-1 ml-1">Doctor notes: </label>
-                    <InputTextArea @bind-Value="@examination.DoctorsNotes" class="form-control w-75" /> <br />
+                    <label class="form-control w-75"> @examination.DoctorsNotes </label> <br />
 
                     @if (examination.Status == ExaminationStatus.APPROVED)
 
@@ -63,17 +64,13 @@
                         <p>There are no results yet!</p>
                     }
 
-                    <div>
-                        <button type="submit" class="btn btn-primary">Save</button>
-                    </div>
-                </EditForm>
-            }
-        </section>
+                }
+            </section>
         }
     </Authorized>
     <NotAuthorized>
         <section>
-        <h1>Access denied!</h1>
+            <h1>Access denied!</h1>
         </section>
     </NotAuthorized>
 </AuthorizeView>
@@ -84,7 +81,6 @@
 
     public string? status;
     private LaboratoryExamination? examination;
-    private EditContext? newExamination;
     private bool validId = true;
     private Guid parsedId;
 
@@ -98,23 +94,8 @@
         examination = await laboratoryExaminationService.GetByIdAsync(parsedId);
         if (examination != null)
         {
-            newExamination = new EditContext(examination);
             status = examination.Status.ToString().ToLower();
         }
-    }
-
-    private void ChangeExistingExamination()
-    {
-        if (examination != null)
-        {
-            laboratoryExaminationService.Update(examination);
-            toastService.ShowSuccess("Examination has been successfully updated!");
-        }
-    }
-
-    private void NavigateToLabExaminations()
-    {
-        NavigationManager.NavigateTo($"LabExaminations");
     }
 
  }

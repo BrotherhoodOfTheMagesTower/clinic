@@ -1,4 +1,4 @@
-﻿@page "/PatientHistoryAppointmentDetails/{Id}"
+﻿@page "/ShowAppointmentDetails/{Id}"
 @using Clinic.Data
 @using Clinic.Data.Enums
 @using Clinic.Data.Models
@@ -27,29 +27,39 @@
             <section>
                 @if (appointment != null)
                 {
-                    <EditForm EditContext="appointmentToEdit" OnValidSubmit="ChangeExistingAppointment" class="w-50 bg-gray px-4 py-3 rounded">
+                    <h1 class="mb-3 fw-bold">Appointment's details</h1>
 
-                        <h1 class="mb-3 fw-bold">Appointment's details</h1><br />
-                        <h2 class="mb-3 fw-bold">Patient: @appointment.Patient.FirstName @appointment.Patient.LastName</h2>
+                    <br />
+                    <h2 class="mb-3 fw-bold">Patient: @appointment.Patient.FirstName @appointment.Patient.LastName</h2>
 
-                        <h3 class="mb-3 fw-bold">Appointment:</h3>
+                    <h3 class="mb-3 fw-bold">Appointment:</h3>
 
-                        <label class="d-block mb-1 ml-1">Date:</label>
-                        <label class="form-control w-75">@appointment.RegisteredTo.Day/@appointment.RegisteredTo.Month/@appointment.RegisteredTo.Year</label><br />
+                    <label class="d-block mb-1 ml-1">Date:</label>
+                    <label class="form-control w-75">@appointment.RegisteredTo.Day/@appointment.RegisteredTo.Month/@appointment.RegisteredTo.Year</label>
 
-                        <label class="d-block mb-1 ml-1">Diagnosis: </label>
-                        <label class="form-control w-75">@appointment.Diagnosis </label>
+                    <br />
 
-                        <label class="d-block mb-1 ml-1">Description:</label>
-                        <label class="form-control w-75">@appointment.Description </label>
+                    <label class="d-block mb-1 ml-1">Diagnosis: </label>
+                    <label class="form-control w-75">@appointment.Diagnosis </label>
 
-                        <label class="d-block mb-1 ml-1"> Status:</label>
-                        <label class="form-control w-75">@appointment.Status </label>
+                    <br />
 
-                        <label class="d-block mb-1 ml-1"> Doctor:</label>
-                        <label class="form-control w-75">@appointment.Doctor.FirstName @appointment.Doctor.LastName</label>
-                    </EditForm>
-                }
+                    <label class="d-block mb-1 ml-1">Description:</label>
+                    <label class="form-control w-75">@appointment.Description </label>
+
+                    <br />
+
+                    <label class="d-block mb-1 ml-1"> Status:</label>
+                    <label class="form-control w-75">@appointment.Status.ToString().ToLower() </label>
+
+                    <br />
+
+                    <label class="d-block mb-1 ml-1"> Doctor:</label>
+                    <label class="form-control w-75">@appointment.Doctor.FirstName @appointment.Doctor.LastName</label>
+
+                    <br />
+
+                } <br><br>
 
                 <h3 class="mb-3 fw-bold">Laboratory examinations:</h3>
                 @if (laboratoryExaminationsList != null && laboratoryExaminationsList.Count > 0)
@@ -66,7 +76,7 @@
                             <td> @examination.OrderedAt </td>
                             <td> @examination.Status.ToString().ToLower() </td>
                             <th>
-                                <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToShowLaboratoryExaminationDetails(examination.Id.ToString()))">Edit</a>
+                                <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToShowLaboratoryExaminationDetails(examination.Id.ToString()))">Show details</a>
                             </th>
                         </RowTemplate>
                     </TableTemplate>
@@ -89,7 +99,7 @@
                             <td> @examination.GlossaryDictionary?.Name </td>
                             <td> @examination.Result </td>
                             <th>
-                                <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToShowPhysicalExaminationDetails(examination.Id.ToString()))">Edit</a>
+                                <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToShowPhysicalExaminationDetails(examination.Id.ToString()))">Show details</a>
                             </th>
                         </RowTemplate>
                     </TableTemplate>
@@ -103,7 +113,7 @@
     </Authorized>
     <NotAuthorized>
         <section>
-        <h1>Access denied!</h1>
+            <h1>Access denied!</h1>
         </section>
     </NotAuthorized>
 </AuthorizeView>
@@ -114,7 +124,6 @@
     public string Id { get; set; } = String.Empty;
 
     private Appointment? appointment;
-    private EditContext? appointmentToEdit;
     private List<PhysicalExamination>? physicalExaminationsList;
     private List<LaboratoryExamination>? laboratoryExaminationsList;
 
@@ -132,29 +141,22 @@
         appointment = await appointmentService.GetByIdAsync(parsedId);
         if (appointment != null)
         {
-            appointmentToEdit = new EditContext(appointment);
             physicalExaminationsList = (await physicalExaminationService.GetAllExaminationsForGivenPatientAsync(appointment.Patient)).ToList();
             laboratoryExaminationsList = (await laboratoryExaminationService.GetAllLabExaminationsForGivenPatientAsync(appointment.Patient)).ToList();
 
         }
     }
 
-    private void ChangeExistingAppointment()
-    {
-        if (appointment != null)
-        {
-            appointmentService.Update(appointment);
-        }
-    }
+  
 
     public void NavigateToShowLaboratoryExaminationDetails(string LaboratoryExaminationId)
     {
-        NavigationManager.NavigateTo($"EditLaboratoryExamination/{LaboratoryExaminationId}");
+        NavigationManager.NavigateTo($"ShowLaboratoryExaminationDetails/{LaboratoryExaminationId}");
     }
 
     public void NavigateToShowPhysicalExaminationDetails(string PhysicalExaminationId)
     {
-        NavigationManager.NavigateTo($"EditPhysicalExamination/{PhysicalExaminationId}");
+        NavigationManager.NavigateTo($"ShowPhysicalExaminationDetails/{PhysicalExaminationId}");
     }
 
 }
