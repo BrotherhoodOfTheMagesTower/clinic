@@ -55,6 +55,27 @@ namespace Clinic.Services
 
         }
 
+        public List<Appointment> GetAllAppointmetsWithStatus(AppointmentStatus status)
+        {
+            return _context.Appointments
+                .Include(p => p.Patient)
+                .Include(p => p.Doctor)
+                .Where(s => s.Status == status)
+                .ToList();
+
+        }
+
+        public List<Appointment> GetPatientAppointmetsWithStatus(Patient patient,AppointmentStatus status)
+        {
+            return _context.Appointments
+                .Include(p => p.Patient)
+                .Include(p => p.Doctor)
+                .Where(a => a.Patient.Id == patient.Id)
+                .Where(s => s.Status == status)
+                .ToList();
+
+        }
+
         public List<Appointment> GetDoctorAppointments(Doctor doctor)
             => _context.Appointments.Where(a => a.Doctor.Id == doctor.Id).ToList();
 
@@ -148,6 +169,43 @@ namespace Clinic.Services
             }
             
             return avaiableHours;
+        }
+
+        public List<Appointment> GetTodayAppointments(AppointmentStatus status)
+        {
+            DateTime date = DateTime.Today;
+            List<Appointment> appointments = _context.Appointments
+                .Include(p => p.Patient)
+                .Include(p => p.Doctor)
+                .Where(a => a.RegisteredTo.Date==date.Date)
+                .Where(s => s.Status == status)
+                .ToList();
+            return appointments;
+        }
+
+        public List<Appointment> GetThisWeekAppointments(AppointmentStatus status)
+        {
+            DateTime date = DateTime.Today;
+            DateTime endWeek = date.AddDays(7);
+            List<Appointment> appointments = _context.Appointments
+                .Include(p => p.Patient)
+                .Include(p => p.Doctor)
+                .Where(a => a.RegisteredTo.Date >= date.Date && a.RegisteredTo.Date<=endWeek.Date)
+                .Where(s => s.Status == status)
+                .ToList();
+            return appointments;
+        }
+
+        public List<Appointment> GetThisMonthAppointments(AppointmentStatus status)
+        {
+            DateTime date = DateTime.Today;
+            List<Appointment> appointments = _context.Appointments
+                .Include(p => p.Patient)
+                .Include(p => p.Doctor)
+                .Where(a => a.RegisteredTo.Month == date.Month && a.RegisteredTo.Year == date.Year)
+                .Where(s => s.Status == status)
+                .ToList();
+            return appointments;
         }
     }
 }

@@ -96,7 +96,7 @@
 
         if (patient != null)
         {
-            appointmentsList = (await appointmentService.GetPatientAppointmentsAsync(patient)).ToList();
+            appointmentsList = (await appointmentService.GetPatientAppointmentsAsync(patient)).OrderBy(x => x.RegisteredTo).ToList();
         }
     }
 

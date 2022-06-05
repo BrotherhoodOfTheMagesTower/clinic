@@ -12,7 +12,7 @@
 <AuthorizeView Roles = "Registrar">
     <Authorized>
         <section>
-        <h3 class="mb-3 fw-bold"><b>Patients @searchPatient</b></h3> <br />
+        <h3 class="mb-3 fw-bold"><b>Patients</b></h3> <br />
         <div>
             <input type="text" @bind="searchPatient" class="form-control w-75"/>
             <button type="submit" class="btn btn-primary" @onclick="SearchPatient">Search</button>
@@ -39,7 +39,8 @@
 				        <td> @patient.BirthDate </td>
 				        <td> @patient.PhoneNumber </td>
 				        <th>
-                            <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToEditPatient(patient.Id.ToString()))">Edit</a>
+                            <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToEditPatient(patient.Id.ToString()))">Edit </a>
+                            <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToPatientAppointments(patient.Id.ToString()))">| Show appointments</a>
                         </th>
 				    </RowTemplate>
 				</TableTemplate>
@@ -67,13 +68,17 @@
 
     public void NavigateToEditPatient(string Id)
     {
-        NavigationManager.NavigateTo($"AddPatient/{Id}");
+        NavigationManager.NavigateTo($"EditPatient/{Id}");
+    }
+
+    public void NavigateToPatientAppointments(string Id)
+    {
+        NavigationManager.NavigateTo($"PatientAppointments/{Id}");
     }
 
     private void NavigateToAddPatient()
     {
-        string Id = "-1";
-        NavigationManager.NavigateTo($"AddPatient/{Id}");
+        NavigationManager.NavigateTo($"AddPatient");
     }
 
     public void SearchPatient()

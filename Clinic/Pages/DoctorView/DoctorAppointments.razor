@@ -32,6 +32,20 @@
             <input type="checkbox" @bind="cancelledVisible">
             <label for="addition">Cancelled</label><br /><br />
 
+            <label class="d-block mb-1 ml-1">Filter appointments by date</label>
+			<select @onchange="DisplayFilterList" class="form-control w-75">
+				@foreach (var element in filterList)
+				{
+					@if (element.Equals("All"))
+					{
+						<option value="@element" selected>@element</option>
+					}
+					else
+					{
+						<option value="@element">@element</option>
+					}
+				}
+			</select><br/><br/>
 
 
             @if (bookedAppointmentsList != null && bookedVisible == true)
@@ -157,14 +171,22 @@
     private bool cancelledVisible = false;
     private bool finishedVisible = false;
 
+    public List<string> filterList = new List<string>
+	{
+		"All",
+		"Today",
+		"This week",
+		"This month"
+	};
+
     protected override async Task OnInitializedAsync()
     {
         Doctor? loggedDoc = doctorService.GetDoctorByEmail(httpContextAccessor!.HttpContext!.User!.Identity!.Name);
         if (loggedDoc != null)
         {
-            finishedAppointmentsList = (await appointmentService.GetDoctorAppointmentsByStatusAsync(loggedDoc, AppointmentStatus.FINISHED)).ToList();
-            bookedAppointmentsList = (await appointmentService.GetDoctorAppointmentsByStatusAsync(loggedDoc, AppointmentStatus.BOOKED)).ToList();
-            cancelledAppointmentsList = (await appointmentService.GetDoctorAppointmentsByStatusAsync(loggedDoc, AppointmentStatus.CANCELLED)).ToList();
+            finishedAppointmentsList = (await appointmentService.GetDoctorAppointmentsByStatusAsync(loggedDoc, AppointmentStatus.FINISHED)).OrderBy(x => x.RegisteredTo).ToList();
+            bookedAppointmentsList = (await appointmentService.GetDoctorAppointmentsByStatusAsync(loggedDoc, AppointmentStatus.BOOKED)).OrderBy(x => x.RegisteredTo).ToList();
+            cancelledAppointmentsList = (await appointmentService.GetDoctorAppointmentsByStatusAsync(loggedDoc, AppointmentStatus.CANCELLED)).OrderBy(x => x.RegisteredTo).ToList();
         }
     }
 
@@ -177,12 +199,35 @@
     {
         NavigationManager.NavigateTo($"ShowAppointmentDetails/{Id}");
     }
-    //TO DO
-    //Wyszukiwanie listy pacjentów spełniających warunki wyszukiwania z zmiennej searchPatient
-    public void SearchPatient()
-    {
+    
+    private async Task DisplayFilterList(ChangeEventArgs e)
+	{
+		string filter = e.Value.ToString();
+		if(filter.Equals("Today")) {
+            finishedAppointmentsList=appointmentService.GetTodayAppointments(AppointmentStatus.FINISHED);
+            bookedAppointmentsList=appointmentService.GetTodayAppointments(AppointmentStatus.BOOKED);
+            cancelledAppointmentsList=appointmentService.GetTodayAppointments(AppointmentStatus.CANCELLED);
+        }
+		if(filter.Equals("All")) {
+            finishedAppointmentsList=appointmentService.GetAllAppointmetsWithStatus(AppointmentStatus.FINISHED);
+            bookedAppointmentsList=appointmentService.GetAllAppointmetsWithStatus(AppointmentStatus.BOOKED);
+            cancelledAppointmentsList=appointmentService.GetAllAppointmetsWithStatus(AppointmentStatus.CANCELLED);
+        }
+		if(filter.Equals("This week")) {
+            finishedAppointmentsList=appointmentService.GetThisWeekAppointments(AppointmentStatus.FINISHED);
+            bookedAppointmentsList=appointmentService.GetThisWeekAppointments(AppointmentStatus.BOOKED);
+            cancelledAppointmentsList=appointmentService.GetThisWeekAppointments(AppointmentStatus.CANCELLED);
+        }
+		if(filter.Equals("This month")) {
+            finishedAppointmentsList=appointmentService.GetThisMonthAppointments(AppointmentStatus.FINISHED);
+            bookedAppointmentsList=appointmentService.GetThisMonthAppointments(AppointmentStatus.BOOKED);
+            cancelledAppointmentsList=appointmentService.GetThisMonthAppointments(AppointmentStatus.CANCELLED);
+        }
 
-    }
+		finishedAppointmentsList = finishedAppointmentsList.OrderBy(x => x.RegisteredTo).ToList();
+        bookedAppointmentsList = bookedAppointmentsList.OrderBy(x => x.RegisteredTo).ToList();
+        cancelledAppointmentsList = cancelledAppointmentsList.OrderBy(x => x.RegisteredTo).ToList();
+	}
 
     }
 

@@ -1,4 +1,4 @@
-﻿@page "/AddPatient"
+﻿@page "/EditPatient/{EditPatientId}"
 @using Clinic.Data.Enums
 @using Clinic.Data.Models
 @using Clinic.Data
@@ -8,16 +8,14 @@
 @inject PatientService patientService;
 @inject IToastService toastService
 
- 
-    <PageTitle>Add Patient</PageTitle>
- 
+
+    <PageTitle>Edit Patient</PageTitle>
 
 <AuthorizeView Roles="Registrar" Context="patientAdding">
     <Authorized>
         <section>
-  
-                <h2 class="mb-3 fw-bold">Add new patient</h2>  <br />
-  
+
+                <h2 class="mb-3 fw-bold">Edit existing patient</h2>  <br />
 
             <EditForm EditContext="newPatient" OnValidSubmit="AddPatientToDatabase" class="w-50 bg-gray px-4 py-3 rounded">
 
@@ -59,7 +57,6 @@
                 </div>
             </EditForm>
                 <button type="submit" class="btn btn-primary" @onclick="() => NavigateToAddAddress(patient.Id.ToString())">Address</button>
-        
         </section>
     </Authorized>
     <NotAuthorized>
@@ -78,29 +75,24 @@
 
     protected override async Task OnInitializedAsync()
     {
+            patient = patientService.GetById(Guid.Parse(editPatientId));
+            wasPatientAddedToDatabase = true;
         newPatient = new EditContext(patient);
     }
 
     private async Task AddPatientToDatabase()
     {
-
-        wasPatientAddedToDatabase = patientService.Add(patient);
-        if (wasPatientAddedToDatabase)
-            toastService.ShowSuccess($"Patient {patient.FirstName} {patient.LastName} was added to the database.", "Well done!");
-        else
-            toastService.ShowError("Sorry!  A patient with this pesel number has already added..", "Oops!");
-
+            patientService.Update(patient);
+            toastService.ShowSuccess($"Patient {patient.FirstName} {patient.LastName} was update.", "Well done!");
         //NavigationManager.NavigateTo($"Patients");
     }
 
     private void NavigateToAddAddress(string Id)
     {
-        //if (wasPatientAddedToDatabase)
-        AddPatientToDatabase();
-        NavigationManager.NavigateTo($"AddAddress/{Id}");
-        //else 
-            //toastService.ShowError("Sorry!  A patient hasy to be saved  first.", "Oops!");
-
+        if (wasPatientAddedToDatabase)
+            NavigationManager.NavigateTo($"AddAddress/{Id}");
+        else 
+            toastService.ShowError("Sorry!  A patient hasy to be saved  first.", "Oops!");
     }
 
     private void NavigateToPatients()

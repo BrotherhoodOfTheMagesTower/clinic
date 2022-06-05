@@ -75,7 +75,6 @@
                 </div>
             </EditForm>
                 }
-                <button type="submit" class="btn btn-primary" @onclick="() => NavigateToLabExaminations()">Back</button>
             </section>
         }
     </Authorized>
@@ -133,6 +132,7 @@
         {
             toastService.ShowError("Failed to update examination!");
         }
+        NavigationManager.NavigateTo($"LabExaminations");
     }
 
 

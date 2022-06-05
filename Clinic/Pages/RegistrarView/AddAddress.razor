@@ -1,4 +1,4 @@
-﻿@page "/AddAddress/{EditPatientId}"
+﻿@page "/AddAddress/{PatientId}"
 @using Clinic.Data.Enums
 @using Clinic.Data.Models
 @using Clinic.Data
@@ -10,27 +10,16 @@
 @inject IToastService toastService
 
 
-@if (!hasAddress)
-{
+
     <PageTitle>Add Patient's Address</PageTitle>
-}
-else
-{
-    <PageTitle>Edit Patient's Address</PageTitle>
-}
+
 
 <AuthorizeView Roles="Registrar" Context="addressAdding">
     <Authorized>
         <section>
 
-        @if (!hasAddress)
-        {
             <h2 class="mb-3 fw-bold">Add patient's address</h2>  <br />
-        }
-        else
-        {
-            <h2 class="mb-3 fw-bold">Edit patient's address</h2>  <br />
-        }
+
 
         <EditForm EditContext="newAddress" OnValidSubmit="addAddress" class="w-50 bg-gray px-4 py-3 rounded">
 
@@ -56,7 +45,6 @@ else
                 <button type="submit" class="btn btn-primary">Save</button>
             </div>
         </EditForm>
-        <button type="submit" class="btn btn-primary" @onclick="() => NavigateToPatients()">Back</button>
         </section>
         
     </Authorized>
@@ -69,7 +57,7 @@ else
 
 @code {
     [Parameter]
-    public string EditPatientId { get; set; }
+    public string PatientId { get; set; }
 
     private bool hasAddress;
 
@@ -77,13 +65,9 @@ else
     {
         newAddress = new EditContext(address);
         base.OnInitialized();
-        patient = patientService.GetById(Guid.Parse(EditPatientId));
-        if (patient.Address != null)
-        {
-            var addressId = patientService.GetPatientAddressId(patient.Id);
-            address = addressService.GetById(addressId);
-            hasAddress = true;
-        }
+        patient = patientService.GetById(Guid.Parse(PatientId));
+        if(patient.Address!=null)
+            address = addressService.GetById(patient.Address.Id);
     }
     private Address address = new();
     private Patient patient = new();
@@ -91,20 +75,24 @@ else
 
     private void addAddress()
     {
-        if (hasAddress)
-        {
+            /*if (hasAddress)
+            {
             addressService.Update(address);
             toastService.ShowSuccess($"Address was succesfully updated.", "Well done!");
         }
         else
-        {
+            {
             addressService.Add(address);
             toastService.ShowSuccess($"Address was succesfully added to the database.", "Well done!");
-        }
+        }*/
+        patient.Address = address;
+        patientService.Update(patient);
+        toastService.ShowSuccess($"Address was succesfully updated.", "Well done!");
+        NavigationManager.NavigateTo($"EditPatient/{PatientId}");
     }
 
     private void NavigateToPatients()
     {
-        NavigationManager.NavigateTo($"AddPatient/{EditPatientId}");
+        NavigationManager.NavigateTo($"EditPatient/{PatientId}");
     }
 }

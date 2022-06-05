@@ -1,4 +1,4 @@
-﻿@page "/AddAppointment"
+﻿@page "/RegistrarEditAppointment/{EditAppointmentId}"
 @using Clinic.Data
 @using Clinic.Data.Enums
 @using Clinic.Data.Models
@@ -12,54 +12,47 @@
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor httpContextAccessor
 
 
-<PageTitle>Add Appointment</PageTitle>
+<PageTitle>Edit Appointment</PageTitle>
 
 <AuthorizeView Roles="Registrar" Context="appointmentAdding">
 	<Authorized>
 		<section>
-			<h2 class="mb-3 fw-bold">Add a new appointment </h2>
+
+			<h2 class="mb-3 fw-bold">Edit a appointment </h2>
 
 			<br />
 
+			<EditForm EditContext="editAppointmentt" OnValidSubmit="editAppointment" class="w-50 bg-gray px-4 py-3 rounded">
+				<label class="d-block mb-1 ml-1">Patient:</label>
+				<InputText @bind-Value="patientName" class="form-control w-75" readonly="readonly"></InputText><br />
 
-			<EditForm EditContext="newAppointment" OnValidSubmit="addAppointment" class="w-50 bg-gray px-4 py-3 rounded">
 				<label class="d-block mb-1 ml-1">Doctor:</label>
-				<InputSelect @bind-Value="doctorId"  class="form-control w-75">
-					<option value="" selected disabled hidden>Choose here...</option>
+				<InputSelect @bind-Value="doctorId" class="form-control w-75">
 					@foreach (var Doctor in AllDoctors)
 					{
-						<option value=@Doctor.Id>@Doctor.LastName @Doctor.FirstName</option>
-					}
-				</InputSelect><br />
-
-				<label class="d-block mb-1 ml-1">Patient:</label>
-				<InputSelect @bind-Value="patientId" class="form-control w-75">
-					<option value="Guid.Empty" selected disabled hidden>Choose here...</option>
-					@foreach (var Patient in AllPatients)
-					{
-						<option value=@Patient.Id.ToString()>@Patient.LastName @Patient.FirstName </option>
-					}
-				</InputSelect><br />
-
-
-				<label class="d-block mb-1 ml-1">Date:</label>
-
-				<InputDate @bind-Value="_appointmentDate" class="form-control w-75"> </InputDate><br />
-
-				@if (doctorId!= null && appointmentDate!= null)
-				{
-					<label class="d-block mb-1 ml-1">Free hours:</label>
-					<InputRadioGroup @bind-Value="@appointmentTime">
-						@foreach (var time in @listAppointmentTime)
+						if (Doctor.Id.Equals(appointment.Doctor.Id))
 						{
-						<div><InputRadio Value="time.TimeOfDay" />@time.TimeOfDay</div>
+							<option value=@Doctor.Id selected>@Doctor.LastName @Doctor.FirstName</option>
 						}
+						else
+						{
+							<option value=@Doctor.Id>@Doctor.LastName @Doctor.FirstName</option>
+						}
+					}
+				</InputSelect><br />
+
+
+				<label class="d-block mb-1 ml-1">Wybrana godzina: @appointment.RegisteredTo.TimeOfDay</label>
+
+				<InputDate @bind-Value="@_appointmentDate" class="form-control w-75"> </InputDate><br />
+				<label class="d-block mb-1 ml-1">Free hours:</label>
+				<InputRadioGroup @bind-Value="@appointmentTime">
+					@foreach (var time in @listAppointmentTime)
+					{
+							<div><InputRadio Value="time.TimeOfDay" />@time.TimeOfDay</div>
+					}
 				</InputRadioGroup>
-				}
-				else
-				{
-					<label class="d-block mb-1 ml-1">You have to choose a day and doctor first</label>
-				}
+
 				<br /><br />
 				<div><button type="submit" class="btn btn-primary">Save</button></div>
 			</EditForm>
@@ -81,6 +74,8 @@
 	private List<Doctor>? AllDoctors;
 	private List<Patient>? AllPatients;
 	private List<DateTime>? listAppointmentTime;
+	private string appointmentTime;
+	private string patientName;
 	private DateTime appointmentDate;
 	public DateTime _appointmentDate
 	{
@@ -94,38 +89,36 @@
 			listAppointmentTime= appointmentService.GetAvailableHours(appointmentDate, doctorId);
 		}
 	}
-	private string appointmentTime;
 	private string doctorId;
 	private string patientId;
 
 	Appointment appointment = new();
-	EditContext newAppointment;
+	EditContext editAppointmentt;
 
 	protected override async Task OnInitializedAsync()
 	{
-		newAppointment = new EditContext(appointment);
-		//default data and time
-		appointmentDate = DateTime.Today;
+		editAppointmentt = new EditContext(appointment);
 		base.OnInitialized();
+		appointment = appointmentService.GetById(Guid.Parse(editAppointmentId));
+		patientName = appointment.Patient.FirstName +" "+ appointment.Patient.LastName;
+		doctorId = appointment.Doctor.Id;
+		appointmentDate = appointment.RegisteredTo;
+		appointmentTime = appointment.RegisteredTo.ToString("HH:mm:ss");
 		AllDoctors = doctorService.GetAllDoctors();
 		AllPatients = patientService.GetAllPatients();
 		listAppointmentTime= appointmentService.GetAvailableHours(appointmentDate, doctorId);
 	}
 
-	private void addAppointment()
+	private void editAppointment()
 	{
 		Registrar loggedRegistrar = registrarService.GetRegistrarByEmail(httpContextAccessor.HttpContext.User.Identity.Name);
 		appointment.Registrar = loggedRegistrar;
 		System.DateTime validatedDateTime = appointmentDate.Add(TimeSpan.Parse(appointmentTime));
 		appointment.RegisteredTo = validatedDateTime;
 		assignPatientsAndDoctorsToAppointmentById();
-		wasAppointmentAddedToDatabase = appointmentService.Add(appointment);
-		if (wasAppointmentAddedToDatabase){
-			toastService.ShowSuccess($"Appointment was added to the database.", "Well done!");
-			NavigationManager.NavigateTo($"Appointments");
-		}
-		else
-			toastService.ShowError("Sorry! Doctor {appointment.Doctor.FirstName} {appointment.Doctor.LastName} already has appointment a this time.", "Oops!");
+		appointmentService.Update(appointment);
+		toastService.ShowSuccess($"Appointment was updated.", "Well done!");
+		NavigationManager.NavigateTo($"Appointments");
 	}
 
 	private void assignPatientsAndDoctorsToAppointmentById()
