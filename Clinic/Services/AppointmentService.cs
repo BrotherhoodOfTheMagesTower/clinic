@@ -18,8 +18,8 @@ namespace Clinic.Services
         {
             if (appointment == null) return false;
             var obj = GetAppointmentByDoctorAndTime(appointment.RegisteredTo, appointment.Doctor.Id);
-                if (obj != null)
-                    return false;
+            if (obj != null)
+                return false;
             var guid = Guid.NewGuid();
             appointment.Id = guid;
             _context.Appointments.Add(appointment);
@@ -90,7 +90,7 @@ namespace Clinic.Services
                 List<Appointment> tmp = _context.Appointments
                     .Include(a => a.Patient)
                     .Include(a => a.Doctor)
-                    .Where((a => a.Patient.FirstName.Contains(word) || a.Patient.LastName.Contains(word)  || a.Doctor.FirstName.Contains(word) || a.Doctor.LastName.Contains(word))).ToList();
+                    .Where((a => a.Patient.FirstName.Contains(word) || a.Patient.LastName.Contains(word) || a.Doctor.FirstName.Contains(word) || a.Doctor.LastName.Contains(word))).ToList();
                 if (appointmentList == null)
                     appointmentList = tmp;
                 else
@@ -107,6 +107,47 @@ namespace Clinic.Services
                 .Where(a => a.RegisteredTo == dateTime && a.Doctor.Id == doctorId)
                 .FirstOrDefault();
             return appointment;
+        }
+
+        public List<DateTime> GetAvailableDatesByDoctorAndTime(DateTime dateTime, string doctorId)
+        {
+            List<DateTime> appointments = _context.Appointments
+                .Where(a => a.RegisteredTo.Day == dateTime.Day && a.Doctor.Id == doctorId)
+                .Select(d => d.RegisteredTo)
+                .ToList();
+            return appointments;
+        }
+
+
+        public List<DateTime> GetAvailableHours(DateTime dateTime, string doctorId)
+        {
+            List<DateTime> avaiableHours = new List<DateTime>();
+            DateTime actualHour = dateTime;
+            TimeSpan ts = new TimeSpan(8, 0, 0);
+            actualHour = actualHour.Date + ts;
+            avaiableHours.Add(actualHour);
+            while (actualHour.Hour < 16)
+            {
+                actualHour = actualHour.AddMinutes(15);
+                avaiableHours.Add(actualHour);
+            }
+
+            List<DateTime> doctorAppointments = GetAvailableDatesByDoctorAndTime(dateTime, doctorId);
+
+
+            foreach (DateTime doctorAppointment in doctorAppointments)
+            {
+                foreach (DateTime avaiableHour in avaiableHours)
+                { 
+                    if (doctorAppointment == avaiableHour)
+                    {
+                        avaiableHours.Remove(avaiableHour);
+                        break;
+                    }
+                }
+            }
+            
+            return avaiableHours;
         }
     }
 }
