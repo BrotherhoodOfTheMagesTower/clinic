@@ -13,6 +13,9 @@
     <Authorized>
         <section>
             <h3 class="mb-3 fw-bold"><b>Laboratory examinations</b></h3> <br />
+
+            <input type="checkbox" @onchange="ReloadExaminations" >
+            <label for="addition">Only commisioned</label><br /><br />
             @if (examinationsList != null)
             {
                 <TableTemplate Items="examinationsList">
@@ -59,6 +62,14 @@
     protected override async Task OnInitializedAsync()
     {
         examinationsList = await laboratoryExaminationService.GetAllLabExaminationsAsync();
+        examinationsList = examinationsList.OrderByDescending(x => x.OrderedAt).ToList();
+    }
+
+    private async Task ReloadExaminations(ChangeEventArgs e)
+    {
+        await OnInitializedAsync();
+        if ((bool)e.Value)
+            examinationsList = examinationsList!.Where(x => x.Status == ExaminationStatus.COMMISIONED).ToList();
     }
 
     public void NavigateToEditExamination(string Id)
