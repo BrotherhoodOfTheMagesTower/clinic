@@ -170,6 +170,7 @@
     private bool bookedVisible = true;
     private bool cancelledVisible = false;
     private bool finishedVisible = false;
+    Doctor? loggedDoc;
 
     public List<string> filterList = new List<string>
 	{
@@ -181,7 +182,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Doctor? loggedDoc = doctorService.GetDoctorByEmail(httpContextAccessor!.HttpContext!.User!.Identity!.Name);
+        loggedDoc = doctorService.GetDoctorByEmail(httpContextAccessor!.HttpContext!.User!.Identity!.Name);
         if (loggedDoc != null)
         {
             finishedAppointmentsList = (await appointmentService.GetDoctorAppointmentsByStatusAsync(loggedDoc, AppointmentStatus.FINISHED)).OrderBy(x => x.RegisteredTo).ToList();
@@ -204,24 +205,24 @@
 	{
 		string filter = e.Value.ToString();
 		if(filter.Equals("Today")) {
-            finishedAppointmentsList=appointmentService.GetTodayAppointments(AppointmentStatus.FINISHED);
-            bookedAppointmentsList=appointmentService.GetTodayAppointments(AppointmentStatus.BOOKED);
-            cancelledAppointmentsList=appointmentService.GetTodayAppointments(AppointmentStatus.CANCELLED);
+            finishedAppointmentsList=appointmentService.GetTodayDoctorAppointmentsWithStatus(loggedDoc,AppointmentStatus.FINISHED);
+            bookedAppointmentsList=appointmentService.GetTodayDoctorAppointmentsWithStatus(loggedDoc,AppointmentStatus.BOOKED);
+            cancelledAppointmentsList=appointmentService.GetTodayDoctorAppointmentsWithStatus(loggedDoc,AppointmentStatus.CANCELLED);
         }
 		if(filter.Equals("All")) {
-            finishedAppointmentsList=appointmentService.GetAllAppointmetsWithStatus(AppointmentStatus.FINISHED);
-            bookedAppointmentsList=appointmentService.GetAllAppointmetsWithStatus(AppointmentStatus.BOOKED);
-            cancelledAppointmentsList=appointmentService.GetAllAppointmetsWithStatus(AppointmentStatus.CANCELLED);
+            finishedAppointmentsList=await appointmentService.GetDoctorAppointmentsByStatusAsync(loggedDoc, AppointmentStatus.FINISHED);
+            bookedAppointmentsList=await appointmentService.GetDoctorAppointmentsByStatusAsync(loggedDoc,AppointmentStatus.BOOKED);
+            cancelledAppointmentsList=await appointmentService.GetDoctorAppointmentsByStatusAsync(loggedDoc,AppointmentStatus.CANCELLED);
         }
 		if(filter.Equals("This week")) {
-            finishedAppointmentsList=appointmentService.GetThisWeekAppointments(AppointmentStatus.FINISHED);
-            bookedAppointmentsList=appointmentService.GetThisWeekAppointments(AppointmentStatus.BOOKED);
-            cancelledAppointmentsList=appointmentService.GetThisWeekAppointments(AppointmentStatus.CANCELLED);
+            finishedAppointmentsList=appointmentService.GetThisWeekDoctorAppointmentsWithStatus(loggedDoc,AppointmentStatus.FINISHED);
+            bookedAppointmentsList=appointmentService.GetThisWeekDoctorAppointmentsWithStatus(loggedDoc,AppointmentStatus.BOOKED);
+            cancelledAppointmentsList=appointmentService.GetThisWeekDoctorAppointmentsWithStatus(loggedDoc,AppointmentStatus.CANCELLED);
         }
 		if(filter.Equals("This month")) {
-            finishedAppointmentsList=appointmentService.GetThisMonthAppointments(AppointmentStatus.FINISHED);
-            bookedAppointmentsList=appointmentService.GetThisMonthAppointments(AppointmentStatus.BOOKED);
-            cancelledAppointmentsList=appointmentService.GetThisMonthAppointments(AppointmentStatus.CANCELLED);
+            finishedAppointmentsList=appointmentService.GetThisMonthDoctorAppointmentsWithStatus(loggedDoc,AppointmentStatus.FINISHED);
+            bookedAppointmentsList=appointmentService.GetThisMonthDoctorAppointmentsWithStatus(loggedDoc,AppointmentStatus.BOOKED);
+            cancelledAppointmentsList=appointmentService.GetThisMonthDoctorAppointmentsWithStatus(loggedDoc,AppointmentStatus.CANCELLED);
         }
 
 		finishedAppointmentsList = finishedAppointmentsList.OrderBy(x => x.RegisteredTo).ToList();

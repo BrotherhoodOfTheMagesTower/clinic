@@ -121,10 +121,10 @@
 	private async Task DisplayFilterList(ChangeEventArgs e)
 	{
 		string filter = e.Value.ToString();
-		if(filter.Equals("Today")) appointmentsList=appointmentService.GetTodayAppointments(AppointmentStatus.BOOKED);
+		if(filter.Equals("Today")) appointmentsList=appointmentService.GetTodayAppointmentsWithStatus(AppointmentStatus.BOOKED);
 		if(filter.Equals("All")) appointmentsList=appointmentService.GetAllAppointmetsWithStatus(AppointmentStatus.BOOKED);
-		if(filter.Equals("This week")) appointmentsList=appointmentService.GetThisWeekAppointments(AppointmentStatus.BOOKED);
-		if(filter.Equals("This month")) appointmentsList=appointmentService.GetThisMonthAppointments(AppointmentStatus.BOOKED);
+		if(filter.Equals("This week")) appointmentsList=appointmentService.GetThisWeekAppointmentsWithStatus(AppointmentStatus.BOOKED);
+		if(filter.Equals("This month")) appointmentsList=appointmentService.GetThisMonthAppointmentsWithStatus(AppointmentStatus.BOOKED);
 
 		appointmentsList = appointmentsList.OrderBy(x => x.RegisteredTo).ToList();
 	}
