@@ -1,5 +1,6 @@
 ﻿using Clinic.Data;
 using Clinic.Data.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Clinic.Services
 {
@@ -32,7 +33,9 @@ namespace Clinic.Services
 
         public Patient? GetById(Guid id)
         {
-            return _context.Patients.FirstOrDefault(p => p.Id == id);
+            return _context.Patients
+                .Include(a => a.Address)
+                .FirstOrDefault(p => p.Id == id);
         }
 
         public List<Patient> GetAllPatients()

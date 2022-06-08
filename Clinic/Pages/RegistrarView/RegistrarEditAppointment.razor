@@ -49,7 +49,7 @@
 				<InputRadioGroup @bind-Value="@appointmentTime">
 					@foreach (var time in @listAppointmentTime)
 					{
-							<div><InputRadio Value="time.TimeOfDay" />@time.TimeOfDay</div>
+							<div><InputRadio Value="time" />@time.TimeOfDay</div>
 					}
 				</InputRadioGroup>
 
@@ -113,7 +113,7 @@
 	{
 		Registrar loggedRegistrar = registrarService.GetRegistrarByEmail(httpContextAccessor.HttpContext.User.Identity.Name);
 		appointment.Registrar = loggedRegistrar;
-		System.DateTime validatedDateTime = appointmentDate.Add(TimeSpan.Parse(appointmentTime));
+		System.DateTime validatedDateTime = DateTime.Parse(appointmentTime);
 		appointment.RegisteredTo = validatedDateTime;
 		assignPatientsAndDoctorsToAppointmentById();
 		appointmentService.Update(appointment);

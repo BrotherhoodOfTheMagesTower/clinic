@@ -52,7 +52,7 @@
 				<InputSelect @bind-Value="@appointmentTime" class="form-control w-75">
 					@foreach (var time in @listAppointmentTime)
 					{
-						<option value=@time.TimeOfDay>@time.TimeOfDay </option>
+						<option value=@time>@time.TimeOfDay </option>
 					}
 				</InputSelect><br />
 				}
@@ -116,7 +116,7 @@
 	{
 		Registrar loggedRegistrar = registrarService.GetRegistrarByEmail(httpContextAccessor.HttpContext.User.Identity.Name);
 		appointment.Registrar = loggedRegistrar;
-		System.DateTime validatedDateTime = appointmentDate.Add(TimeSpan.Parse(appointmentTime));
+		System.DateTime validatedDateTime = DateTime.Parse(appointmentTime);
 		appointment.RegisteredTo = validatedDateTime;
 		assignPatientsAndDoctorsToAppointmentById();
 		wasAppointmentAddedToDatabase = appointmentService.Add(appointment);

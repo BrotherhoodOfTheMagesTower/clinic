@@ -112,10 +112,11 @@
 
 	public void SearchAppointment()
 	{
-		if (searchAppointment == string.Empty)
+		if (searchAppointment == null || searchAppointment == "")
 			appointmentsList = appointmentService.GetAllAppointmets();
 		else
 			appointmentsList = appointmentService.GetAppointmentsByPatternAsync(searchAppointment);
+
 	}
 
 	private async Task DisplayFilterList(ChangeEventArgs e)
