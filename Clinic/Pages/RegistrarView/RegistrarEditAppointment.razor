@@ -41,17 +41,15 @@
 					}
 				</InputSelect><br />
 
-
-				<label class="d-block mb-1 ml-1">Wybrana godzina: @appointment.RegisteredTo.TimeOfDay</label>
-
 				<InputDate @bind-Value="@_appointmentDate" class="form-control w-75"> </InputDate><br />
-				<label class="d-block mb-1 ml-1">Free hours:</label>
-				<InputRadioGroup @bind-Value="@appointmentTime">
+				<label class="d-block mb-1 ml-1">Choose hour: @appointment.RegisteredTo.TimeOfDay</label>
+				<label class="d-block mb-1 ml-1">Another free hours in this day:</label>
+				<InputSelect @bind-Value="@appointmentTime" class="form-control w-75">
 					@foreach (var time in @listAppointmentTime)
 					{
-							<div><InputRadio Value="time" />@time.TimeOfDay</div>
+						<option value=@time>@time.TimeOfDay </option>
 					}
-				</InputRadioGroup>
+				</InputSelect><br />
 
 				<br /><br />
 				<div><button type="submit" class="btn btn-primary">Save</button></div>

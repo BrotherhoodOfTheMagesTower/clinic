@@ -113,9 +113,9 @@
 	public void SearchAppointment()
 	{
 		if (searchAppointment == null || searchAppointment == "")
-			appointmentsList = appointmentService.GetAllAppointmets();
+			appointmentsList = appointmentService.GetAllAppointmets().OrderBy(x => x.RegisteredTo).ToList();
 		else
-			appointmentsList = appointmentService.GetAppointmentsByPatternAsync(searchAppointment);
+			appointmentsList = appointmentService.GetAppointmentsByPatternAsync(searchAppointment).OrderBy(x => x.RegisteredTo).ToList();
 
 	}
 
