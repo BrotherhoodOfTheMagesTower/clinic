@@ -75,8 +75,12 @@
             patient = tempPatient;
             if (patient.Address != null)
             {
-                address = addressService.GetById(patient.Address.Id);
-                hasAddress = true;
+                var tempAddress = addressService.GetById(patient.Address.Id);
+                if (tempAddress is not null)
+                {
+                    address = tempAddress;
+                    hasAddress = true;
+                }
             }
         }
         newAddress = new EditContext(address);

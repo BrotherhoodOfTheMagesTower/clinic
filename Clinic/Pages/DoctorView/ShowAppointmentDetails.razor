@@ -143,11 +143,8 @@
         {
             physicalExaminationsList = (await physicalExaminationService.GetAllExaminationsForGivenPatientAsync(appointment.Patient)).ToList();
             laboratoryExaminationsList = (await laboratoryExaminationService.GetAllLabExaminationsForGivenPatientAsync(appointment.Patient)).ToList();
-
         }
     }
-
-  
 
     public void NavigateToShowLaboratoryExaminationDetails(string LaboratoryExaminationId)
     {
