@@ -51,7 +51,7 @@
     </Authorized>
     <NotAuthorized>
         <section>
-        <h1>Access denied!</h1>
+            <h1>Access denied!</h1>
         </section>
     </NotAuthorized>
 </AuthorizeView>
@@ -83,7 +83,11 @@
             return;
         }
 
-        examination.Appointment = appointmentService.GetById(parsedId);
+        var tempAppoitment = appointmentService.GetById(parsedId);
+        if (tempAppoitment is not null)
+        {
+            examination.Appointment = tempAppoitment;
+        }
 
         examination.Status = ExaminationStatus.COMMISIONED;
         examination.OrderedAt = DateTime.Now;
@@ -98,10 +102,10 @@
 
             laboratoryExaminationService.Add(examination);
             if (laboratoryExaminationService.GetById(examination.Id) != null)
-               {
-                   toastService.ShowSuccess("Laboratory examination ordered successfully!");
-                   NavigationManager.NavigateTo($"EditAppointment/{Id}");
-               }
+            {
+                toastService.ShowSuccess("Laboratory examination ordered successfully!");
+                NavigationManager.NavigateTo($"EditAppointment/{Id}");
+            }
         }
     }
     }

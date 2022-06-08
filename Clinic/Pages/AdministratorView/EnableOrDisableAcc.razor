@@ -12,17 +12,17 @@
 <section>
     <div class="card">
         <div class="card-header">
-            <h2 class="text-center" style="margin-top:8px">Enable or disable account for user <b>@User.UserName</b></h2>
+            <h2 class="text-center" style="margin-top:8px">Enable or disable account for user <b>@User?.UserName</b></h2>
         </div>
     </div>
     <div class="card-body">
         @if (IsAccountEnabled)
         {
-            <h3 class="text-center">The account for user @User.UserName is currently <b>enabled</b>.</h3>
+            <h3 class="text-center">The account for user @User?.UserName is currently <b>enabled</b>.</h3>
         }
         else
         {
-            <h3 class="text-center">The account for user @User.UserName is currently <b>disabled</b>.</h3>
+            <h3 class="text-center">The account for user @User?.UserName is currently <b>disabled</b>.</h3>
         }
         <div class="container">
             <div class="col-md-12 text-center">
@@ -39,7 +39,7 @@
 @code {
     private ApplicationUser? User { get; set; }
     [Parameter]
-    public string Id { get; set; }
+    public string Id { get; set; } = String.Empty;
     private bool IsAccountEnabled { get; set; }
 
     protected override async Task OnInitializedAsync()

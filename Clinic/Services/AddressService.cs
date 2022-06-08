@@ -17,7 +17,7 @@ namespace Clinic.Services
             _context.Addresses.Add(address);
             _context.SaveChanges();
         }
-        public Address GetById(Guid id)
+        public Address? GetById(Guid id)
         {
             return _context.Addresses.FirstOrDefault(p => p.Id == id);
         }

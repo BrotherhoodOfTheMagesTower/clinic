@@ -40,12 +40,12 @@
                         <label class="d-block mb-1 ml-1">Name </label>
                         <InputText @bind-Value="@examination.GlossaryDictionary.Name" class="form-control w-75" readonly="readonly" />
 
-                         <label class="d-block mb-1 ml-1">Doctor's note</label>
+                        <label class="d-block mb-1 ml-1">Doctor's note</label>
                         <InputText @bind-Value="@examination.DoctorsNotes" class="form-control w-75" readonly="readonly" />
 
 
                         <label class="d-block mb-1 ml-1"> Status</label>
-                        <InputRadioGroup @bind-Value="@examination.Status" >
+                        <InputRadioGroup @bind-Value="@examination.Status">
                             @foreach (var g in (ExaminationStatus[])Enum.GetValues(typeof(ExaminationStatus)))
                             {
                                 if (g == examination.Status)
@@ -118,8 +118,11 @@
     {
         if (examination != null)
         {
-            string currentUserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            examination.LabTechnician = labTechnicianService.GetById(currentUserId);
+            string? currentUserId = httpContextAccessor?.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (currentUserId is not null)
+            {
+                examination.LabTechnician = labTechnicianService.GetById(currentUserId);
+            }
 
             examination.ExecutedOrCancelledAt = DateTime.Now;
             laboratoryExaminationService.Update(examination);

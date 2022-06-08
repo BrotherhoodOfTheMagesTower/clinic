@@ -10,13 +10,13 @@
 @inject IToastService toastService
 
 
-    <PageTitle>Edit Patient</PageTitle>
+<PageTitle>Edit Patient</PageTitle>
 
 <AuthorizeView Roles="Registrar" Context="patientAdding">
     <Authorized>
         <section>
 
-                <h2 class="mb-3 fw-bold">Edit existing patient</h2>  <br />
+            <h2 class="mb-3 fw-bold">Edit existing patient</h2>  <br />
 
             <EditForm EditContext="newPatient" OnValidSubmit="AddPatientToDatabase" class="w-50 bg-gray px-4 py-3 rounded">
                 <DataAnnotationsValidator />
@@ -58,7 +58,7 @@
                     <button type="submit" class="btn btn-primary">Save</button>
                 </div>
             </EditForm>
-                <button type="submit" class="btn btn-primary" @onclick="() => NavigateToAddAddress(patient.Id.ToString())">Address</button>
+            <button type="submit" class="btn btn-primary" @onclick="() => NavigateToAddAddress(patient.Id.ToString())">Address</button>
         </section>
     </Authorized>
     <NotAuthorized>
@@ -75,25 +75,34 @@
     private Patient patient = new();
     EditContext? newPatient;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-            patient = patientService.GetById(Guid.Parse(editPatientId));
-            wasPatientAddedToDatabase = true;
+        Guid parsedId;
+        var validId = Guid.TryParse(editPatientId, out parsedId);
+        if (validId)
+        {
+            var tempPatient = patientService.GetById(parsedId);
+            if (tempPatient is not null)
+            {
+                patient = tempPatient;
+            }
+        }
+        wasPatientAddedToDatabase = true;
         newPatient = new EditContext(patient);
     }
 
-    private async Task AddPatientToDatabase()
+    private void AddPatientToDatabase()
     {
-            patientService.Update(patient);
-            toastService.ShowSuccess($"Patient {patient.FirstName} {patient.LastName} was update.", "Well done!");
-            NavigationManager.NavigateTo($"Patients");
+        patientService.Update(patient);
+        toastService.ShowSuccess($"Patient {patient.FirstName} {patient.LastName} was update.", "Well done!");
+        NavigationManager.NavigateTo($"Patients");
     }
 
     private void NavigateToAddAddress(string Id)
     {
         if (wasPatientAddedToDatabase)
             NavigationManager.NavigateTo($"AddAddress/{Id}");
-        else 
+        else
             toastService.ShowError("Sorry!  A patient hasy to be saved  first.", "Oops!");
     }
 
@@ -106,5 +115,4 @@
     {
         NavigationManager.NavigateTo($"AddAddress/{Id}");
     }
-
 }

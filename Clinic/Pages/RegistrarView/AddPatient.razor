@@ -79,12 +79,12 @@
     private Patient patient = new();
     EditContext? newPatient;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         newPatient = new EditContext(patient);
     }
 
-    private async Task AddPatientToDatabase()
+    private void AddPatientToDatabase()
     {
         patient.Address = null;
         wasPatientAddedToDatabase = patientService.Add(patient);

@@ -11,125 +11,137 @@
 <PageTitle>Appointments</PageTitle>
 
 <AuthorizeView Roles="Registrar">
-	<Authorized>
-		<section>
-			<h3 class="mb-3 fw-bold"><b>Appointments </b></h3> <br />
-			<div>
-				<input type="text" @bind="searchAppointment" class="form-control w-75" />
-				<button type="submit" class="btn btn-primary" @onclick="SearchAppointment">Search</button>
-				<button type="submit" class="btn btn-primary" @onclick="(() => NavigateToAddAppointment())">Add appointment</button>
-			</div><br />
+    <Authorized>
+        <section>
+            <h3 class="mb-3 fw-bold"><b>Appointments </b></h3> <br />
+            <div>
+                <input type="text" @bind="searchAppointment" class="form-control w-75" />
+                <button type="submit" class="btn btn-primary" @onclick="SearchAppointment">Search</button>
+                <button type="submit" class="btn btn-primary" @onclick="(() => NavigateToAddAppointment())">Add appointment</button>
+            </div><br />
 
-			<label class="d-block mb-1 ml-1">Filter appointments by date</label>
-			<select @onchange="DisplayFilterList" class="form-control w-75">
-				@foreach (var element in filterList)
-				{
-					@if (element.Equals("All"))
-					{
-						<option value="@element" selected>@element</option>
-					}
-					else
-					{
-						<option value="@element">@element</option>
-					}
-				}
-			</select><br/><br/>
+            <label class="d-block mb-1 ml-1">Filter appointments by date</label>
+            <select @onchange="DisplayFilterList" class="form-control w-75">
+                @foreach (var element in filterList)
+                {
+                    @if (element.Equals("All"))
+                    {
+                        <option value="@element" selected>@element</option>
+                    }
+                    else
+                    {
+                        <option value="@element">@element</option>
+                    }
+                }
+            </select><br /><br />
 
-			@if (appointmentsList != null)
-			{
-				<TableTemplate Items="appointmentsList">
-					<TableHeader>
-						<th> Patient's first name </th>
-						<th> Last name </th>
-						<th> Appointment's date </th>
-						<th> Status </th>
-						<th> Doctor's first name </th>
-						<th> Last name </th>
-						<th> Action </th>
-					</TableHeader>
-					<RowTemplate Context="appointment">
-						<td> @appointment.Patient.FirstName </td>
-						<td> @appointment.Patient.LastName </td>
-						<td> @appointment.RegisteredTo</td>
-						<td> @appointment.Status.ToString().ToLower() </td>
-						<td> @appointment.Doctor.FirstName </td>
-						<td> @appointment.Doctor.LastName </td>
-						<th>
-							<a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToEditAppointment(appointment.Id.ToString()))">Edit </a>
-							<a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToCancelAppointment(appointment.Id.ToString()))">| Cancel</a>
-						</th>
-					</RowTemplate>
-				</TableTemplate>
-			}
-			else
-			{
-				<h3 class="mb-3 fw-bold">There are no appointments in the base</h3> <br />
-			}
-			<br /><br />
-		</section>
-	</Authorized>
-	<NotAuthorized>
-		<section>
-			<h1>Access denied!</h1>
-		</section>
-	</NotAuthorized>
+            @if (appointmentsList != null)
+            {
+                <TableTemplate Items="appointmentsList">
+                    <TableHeader>
+                        <th> Patient's first name </th>
+                        <th> Last name </th>
+                        <th> Appointment's date </th>
+                        <th> Status </th>
+                        <th> Doctor's first name </th>
+                        <th> Last name </th>
+                        <th> Action </th>
+                    </TableHeader>
+                    <RowTemplate Context="appointment">
+                        <td> @appointment.Patient.FirstName </td>
+                        <td> @appointment.Patient.LastName </td>
+                        <td> @appointment.RegisteredTo</td>
+                        <td> @appointment.Status.ToString().ToLower() </td>
+                        <td> @appointment.Doctor.FirstName </td>
+                        <td> @appointment.Doctor.LastName </td>
+                        <th>
+                            <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToEditAppointment(appointment.Id.ToString()))">Edit </a>
+                            <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToCancelAppointment(appointment.Id.ToString()))">| Cancel</a>
+                        </th>
+                    </RowTemplate>
+                </TableTemplate>
+            }
+            else
+            {
+                <h3 class="mb-3 fw-bold">There are no appointments in the base</h3> <br />
+            }
+            <br /><br />
+        </section>
+    </Authorized>
+    <NotAuthorized>
+        <section>
+            <h1>Access denied!</h1>
+        </section>
+    </NotAuthorized>
 </AuthorizeView>
 
 @code {
-	public string searchAppointment;
-	private List<Appointment>? appointmentsList;
-	public List<string> filterList = new List<string>
-	{
-		"All",
-		"Today",
-		"This week",
-		"This month"
-	};
+    public string searchAppointment = String.Empty;
+    private List<Appointment>? appointmentsList;
+    public List<string> filterList = new List<string>
+    {
+        "All",
+        "Today",
+        "This week",
+        "This month"
+    };
 
-	protected override async Task OnInitializedAsync()
-	{
-		appointmentsList = appointmentService.GetAllAppointmetsWithStatus(AppointmentStatus.BOOKED);
-		appointmentsList = appointmentsList.OrderBy(x => x.RegisteredTo).ToList();
-	}
+    protected override void OnInitialized()
+    {
+        appointmentsList = appointmentService.GetAllAppointmetsWithStatus(AppointmentStatus.BOOKED);
+        appointmentsList = appointmentsList.OrderBy(x => x.RegisteredTo).ToList();
+    }
 
-	public void NavigateToEditAppointment(string Id)
-	{
-		NavigationManager.NavigateTo($"RegistrarEditAppointment/{Id}");
-	}
+    public void NavigateToEditAppointment(string Id)
+    {
+        NavigationManager.NavigateTo($"RegistrarEditAppointment/{Id}");
+    }
 
-	public void NavigateToCancelAppointment(string Id)
-	{
-		Appointment calAppointment = appointmentService.GetById(Guid.Parse(Id));
-		calAppointment.Status = AppointmentStatus.CANCELLED;
-		appointmentService.Update(calAppointment);
-		toastService.ShowSuccess($"Appointment cancelled.", "Well done!");
-	}
+    public void NavigateToCancelAppointment(string Id)
+    {
+        Guid parsedId;
+        Appointment? calAppointment;
+        var validId = Guid.TryParse(Id, out parsedId);
+        if (validId)
+        {
+            var tempCalAppointment = appointmentService.GetById(parsedId);
+            if (tempCalAppointment is not null)
+            {
+                calAppointment = tempCalAppointment;
+                calAppointment.Status = AppointmentStatus.CANCELLED;
+                appointmentService.Update(calAppointment);
+                toastService.ShowSuccess($"Appointment cancelled.", "Well done!");
+            }
+        }
+    }
 
-	private void NavigateToAddAppointment()
-	{
-		NavigationManager.NavigateTo($"AddAppointment");
-	}
+    private void NavigateToAddAppointment()
+    {
+        NavigationManager.NavigateTo($"AddAppointment");
+    }
 
-	public void SearchAppointment()
-	{
-		if (searchAppointment == null || searchAppointment == "")
-			appointmentsList = appointmentService.GetAllAppointmets().OrderBy(x => x.RegisteredTo).ToList();
-		else
-		{
-			appointmentsList = appointmentService.GetAllAppointmets().OrderBy(x => x.RegisteredTo).ToList();
-			List<Appointment> appointmentsListToSort = appointmentsList;
-			appointmentsList = appointmentService.GetAppointmentsByPatternInAppointmentsList(searchAppointment, appointmentsListToSort);
-		}
-	}
+    public void SearchAppointment()
+    {
+        if (searchAppointment == null || searchAppointment == "")
+            appointmentsList = appointmentService.GetAllAppointmets().OrderBy(x => x.RegisteredTo).ToList();
+        else
+        {
+            appointmentsList = appointmentService.GetAllAppointmets().OrderBy(x => x.RegisteredTo).ToList();
+            List<Appointment> appointmentsListToSort = appointmentsList;
+            appointmentsList = appointmentService.GetAppointmentsByPatternInAppointmentsList(searchAppointment, appointmentsListToSort);
+        }
+    }
 
-	private async Task DisplayFilterList(ChangeEventArgs e)
-	{
-		string filter = e.Value.ToString();
-		if(filter.Equals("Today")) appointmentsList=appointmentService.GetTodayAppointmentsWithStatus(AppointmentStatus.BOOKED);
-		if(filter.Equals("All")) appointmentsList=appointmentService.GetAllAppointmetsWithStatus(AppointmentStatus.BOOKED);
-		if(filter.Equals("This week")) appointmentsList=appointmentService.GetThisWeekAppointmentsWithStatus(AppointmentStatus.BOOKED);
-		if(filter.Equals("This month")) appointmentsList=appointmentService.GetThisMonthAppointmentsWithStatus(AppointmentStatus.BOOKED);
-
-		appointmentsList = appointmentsList.OrderBy(x => x.RegisteredTo).ToList();
-	}
+    private void DisplayFilterList(ChangeEventArgs e)
+    {
+        string? filter = e?.Value?.ToString();
+        if (filter is not null)
+        {
+            if (filter.Equals("Today")) appointmentsList = appointmentService.GetTodayAppointmentsWithStatus(AppointmentStatus.BOOKED);
+            if (filter.Equals("All")) appointmentsList = appointmentService.GetAllAppointmetsWithStatus(AppointmentStatus.BOOKED);
+            if (filter.Equals("This week")) appointmentsList = appointmentService.GetThisWeekAppointmentsWithStatus(AppointmentStatus.BOOKED);
+            if (filter.Equals("This month")) appointmentsList = appointmentService.GetThisMonthAppointmentsWithStatus(AppointmentStatus.BOOKED);
+        }
+        appointmentsList = appointmentsList?.OrderBy(x => x.RegisteredTo).ToList();
+    }
 }

@@ -200,7 +200,10 @@
             return;
         }
         appointment = await appointmentService.GetByIdAsync(parsedId);
-        appointmentToEdit = new EditContext(appointment!);
+        if (appointment is not null)
+        {
+            appointmentToEdit = new EditContext(appointment);
+        }
 
         if (appointment != null)
         {

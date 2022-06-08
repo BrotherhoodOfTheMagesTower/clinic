@@ -62,7 +62,7 @@
     </Authorized>
     <NotAuthorized>
         <section>
-        <h1>Access denied!</h1>
+            <h1>Access denied!</h1>
         </section>
     </NotAuthorized>
 </AuthorizeView>
@@ -88,8 +88,11 @@
         {
             examination.Status = ExaminationStatus.APPROVED;
             examination.ApprovedOrCancelledAt = DateTime.Now;
-            string currentUserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            examination.LabManager = labManagerService.GetById(currentUserId);
+            string? currentUserId = httpContextAccessor?.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (currentUserId is not null)
+            {
+                examination.LabManager = labManagerService.GetById(currentUserId);
+            }
             laboratoryExaminationService.Update(examination);
             examinationsList = await laboratoryExaminationService.GetAllLabExaminationsForApprovmentAsync();
             toastService.ShowSuccess("Examination has been successfully approved!");

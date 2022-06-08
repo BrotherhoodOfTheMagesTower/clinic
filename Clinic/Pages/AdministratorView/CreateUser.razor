@@ -57,13 +57,19 @@
                             <h4 class="modal-header" style="margin-top: 10px">Select role for new user <b></b></h4>
                         </div>
                         <InputRadioGroup @bind-Value="selectedRole">
-                            @foreach (var role in RolesWithSelection)
+                            @if (RolesWithSelection is not null)
                             {
-                                <div class="form-check"><InputRadio Value="role.Role.Name" class="form-check-input" /><span style="padding-left: 5px">@role.Role.Name</span></div>
+                                @foreach (var role in RolesWithSelection)
+                                {
+                                    <div class="form-check"><InputRadio Value="role?.Role?.Name" class="form-check-input" /><span style="padding-left: 5px">@role?.Role?.Name</span></div>
+                                }
                             }
                         </InputRadioGroup>
                     </EditForm>
-                    <button @onclick="async () => await CreateNewUser()" disabled="@(!doctorContext.Validate() || !emailContext.Validate() || !passContext.Validate() || !emailContext.IsModified() || selectedRole.Equals(""))" type="button" style="margin-top: 20px" class="btn btn-lg btn-danger">Add new user to database</button>
+                    @if (doctorContext is not null && emailContext is not null && passContext is not null)
+                    {
+                        <button @onclick="async () => await CreateNewUser()" disabled="@(!doctorContext.Validate() || !emailContext.Validate() || !passContext.Validate() || !emailContext.IsModified() || selectedRole.Equals(""))" type="button" style="margin-top: 20px" class="btn btn-lg btn-danger">Add new user to database</button>
+                    }
                 </div>
             </form>
         </section>
@@ -79,20 +85,20 @@
 @code
 {
     private ApplicationUser User { get; set; } = new();
-    private List<IdentityRole> AllRoles { get; set; }
-    private List<AllRolesView> RolesWithSelection { get; set; }
+    private List<IdentityRole>? AllRoles { get; set; }
+    private List<AllRolesView>? RolesWithSelection { get; set; }
     private string selectedRole { get; set; } = "";
     private bool WasUserAddedToDatabase { get; set; }
 
-    EditContext doctorContext;
-    EditContext emailContext;
-    EditContext passContext;
+    EditContext? doctorContext;
+    EditContext? emailContext;
+    EditContext? passContext;
     Doctor Doctor = new();
     Pass pass = new();
 
     private class AllRolesView
     {
-        public IdentityRole Role { get; set; }
+        public IdentityRole? Role { get; set; }
         public bool IsSelected { get; set; }
     }
 
@@ -103,10 +109,10 @@
         [DataType(DataType.Password)]
         [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$^+=!*()@%&]).{6,}$", ErrorMessage = "Password must have at least one non alphanumeric character, at least one digit ('0'-'9') and at least one uppercase ('A'-'Z').")]
         [Display(Name = "Password")]
-        public string Password { get; set; }
+        public string Password { get; set; } = String.Empty;
     }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         AllRoles = userService.GetAllRoles();
         RolesWithSelection = new List<AllRolesView>();
