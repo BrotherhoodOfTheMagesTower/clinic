@@ -100,7 +100,7 @@
             if (laboratoryExaminationService.GetById(examination.Id) != null)
                {
                    toastService.ShowSuccess("Laboratory examination ordered successfully!");
-          
+                   NavigationManager.NavigateTo($"EditAppointment/{Id}");
                }
         }
     }

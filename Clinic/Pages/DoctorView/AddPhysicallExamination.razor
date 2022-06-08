@@ -100,6 +100,7 @@
                 physicalExaminationService.Add(examination);
                 if (physicalExaminationService.GetById(examination.Id) != null)
                     toastService.ShowSuccess("Physical examination added successfully!");
+                    NavigationManager.NavigateTo($"EditAppointment/{Id}");
             }
             else
             {

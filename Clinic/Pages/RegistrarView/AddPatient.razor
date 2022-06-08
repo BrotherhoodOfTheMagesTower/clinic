@@ -3,6 +3,7 @@
 @using Clinic.Data.Models
 @using Clinic.Data
 @using Clinic.Services
+@using System.ComponentModel.DataAnnotations
 
 @inject NavigationManager NavigationManager;
 @inject PatientService patientService;
@@ -21,6 +22,7 @@
 
             <EditForm EditContext="newPatient" OnValidSubmit="AddPatientToDatabase" class="w-50 bg-gray px-4 py-3 rounded">
 
+                <DataAnnotationsValidator />
                 <h3 class="mb-3 fw-bold">Enter the patient's:</h3>
                 <label class="d-block mb-1 ml-1" />name
                 <InputText @bind-Value="@patient.FirstName" class="form-control w-75" />
@@ -38,6 +40,7 @@
 
                 <label class="d-block mb-1 ml-1" />phone number
                 <InputText @bind-Value="@patient.PhoneNumber" class="form-control w-75" />
+                <ValidationMessage For="() => patient.PhoneNumber" />
 
                 <label class="d-block mb-1 ml-1" /> gender
                 <InputRadioGroup @bind-Value="@patient.Gender">
@@ -83,14 +86,14 @@
 
     private async Task AddPatientToDatabase()
     {
-
+        patient.Address = null;
         wasPatientAddedToDatabase = patientService.Add(patient);
         if (wasPatientAddedToDatabase)
             toastService.ShowSuccess($"Patient {patient.FirstName} {patient.LastName} was added to the database.", "Well done!");
         else
             toastService.ShowError("Sorry!  A patient with this pesel number has already added..", "Oops!");
 
-        //NavigationManager.NavigateTo($"Patients");
+        NavigationManager.NavigateTo($"Patients");
     }
 
     private void NavigateToAddAddress(string Id)

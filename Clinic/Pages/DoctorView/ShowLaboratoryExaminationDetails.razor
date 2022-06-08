@@ -59,6 +59,10 @@
 
                         <br />
                     }
+                    else if (examination.Status == ExaminationStatus.CANCELLED_TECH || examination.Status == ExaminationStatus.CANCELLED_MANAGER)
+                    {
+                        <p>This examination has been canceled!</p>
+                    }
                     else
                     {
                         <p>There are no results yet!</p>

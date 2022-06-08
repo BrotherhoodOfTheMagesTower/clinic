@@ -1,6 +1,10 @@
 ﻿using Clinic.Areas.Identity.Data;
 using Clinic.Data.Enums;
 
+
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace Clinic.Data.Models
 {
     public class LaboratoryExamination

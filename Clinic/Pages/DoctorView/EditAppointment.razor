@@ -217,9 +217,12 @@
                 appointment.Diagnosis = "no diagnosis due to cancellation of the appointment";
             if (appointment.Description == "" || appointment.Description == null)
                 appointment.Description = "no description";
-
-            appointmentService.Update(appointment);
-            toastService.ShowSuccess("Appointment updated successfully!");
+            else
+            {
+                appointmentService.Update(appointment);
+                toastService.ShowSuccess("Appointment updated successfully!");
+                NavigationManager.NavigateTo($"DoctorAppointments");
+            }
         }
         else
         {

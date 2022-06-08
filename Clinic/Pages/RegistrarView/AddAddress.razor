@@ -3,6 +3,7 @@
 @using Clinic.Data.Models
 @using Clinic.Data
 @using Clinic.Services
+@using System.ComponentModel.DataAnnotations
 
 @inject NavigationManager NavigationManager;
 @inject PatientService patientService;
@@ -25,17 +26,22 @@
 
             <h3 class="mb-3 fw-bold">Enter the patient's:</h3>
 
+            <DataAnnotationsValidator />
             <label class="d-block mb-1 ml-1">city</label>
             <InputText @bind-Value="@address.City" class="form-control w-75" />
+            <ValidationMessage For="() => address.City" />
 
             <label class="d-block mb-1 ml-1">street </label>
             <InputText @bind-Value="@address.Street" class="form-control w-75" />
+            <ValidationMessage For="() => address.Street" />
 
             <label class="d-block mb-1 ml-1">postal code</label>
             <InputText @bind-Value="@address.PostalCode" class="form-control w-75" />
+            <ValidationMessage For="() => address.PostalCode" />
 
             <label class="d-block mb-1 ml-1">house number</label>
             <InputText @bind-Value="@address.HouseNumber" class="form-control w-75" />
+            <ValidationMessage For="() => address.HouseNumber" />
 
             <label class="d-block mb-1 ml-1">local number </label>
             <InputText @bind-Value="@address.LocalNumber" class="form-control w-75" />

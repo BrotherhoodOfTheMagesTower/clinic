@@ -49,12 +49,12 @@
 				@if (doctorId!= null && appointmentDate!= null)
 				{
 					<label class="d-block mb-1 ml-1">Free hours:</label>
-					<InputRadioGroup @bind-Value="@appointmentTime">
-						@foreach (var time in @listAppointmentTime)
-						{
-						<div><InputRadio Value="time.TimeOfDay" />@time.TimeOfDay</div>
-						}
-				</InputRadioGroup>
+				<InputSelect @bind-Value="@appointmentTime" class="form-control w-75">
+					@foreach (var time in @listAppointmentTime)
+					{
+						<option value=@time.TimeOfDay>@time.TimeOfDay </option>
+					}
+				</InputSelect><br />
 				}
 				else
 				{
