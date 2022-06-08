@@ -69,14 +69,15 @@
 
     protected override async Task OnInitializedAsync()
     {
-        newAddress = new EditContext(address);
-        base.OnInitialized();
+        
+        
         patient = patientService.GetById(Guid.Parse(PatientId));
         if (patient.Address != null)
         {
             address = addressService.GetById(patient.Address.Id);
             hasAddress = true;
         }
+        newAddress = new EditContext(address);
 
     }
     private Address address = new();
@@ -89,12 +90,14 @@
         {
             addressService.Update(address);
             toastService.ShowSuccess($"Address was succesfully updated.", "Well done!");
+            NavigationManager.NavigateTo($"EditPatient/{PatientId}");
         }
         else
         {
             patient.Address = address;
             addressService.Add(address);
             toastService.ShowSuccess($"Address was succesfully added to the database.", "Well done!");
+            NavigationManager.NavigateTo($"EditPatient/{PatientId}");
         }
         //patient.Address = address;
         //patientService.Update(patient);
