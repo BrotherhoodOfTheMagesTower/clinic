@@ -115,8 +115,11 @@
 		if (searchAppointment == null || searchAppointment == "")
 			appointmentsList = appointmentService.GetAllAppointmets().OrderBy(x => x.RegisteredTo).ToList();
 		else
-			appointmentsList = appointmentService.GetAppointmentsByPatternAsync(searchAppointment).OrderBy(x => x.RegisteredTo).ToList();
-
+		{
+			appointmentsList = appointmentService.GetAllAppointmets().OrderBy(x => x.RegisteredTo).ToList();
+			List<Appointment> appointmentsListToSort = appointmentsList;
+			appointmentsList = appointmentService.GetAppointmentsByPatternInAppointmentsList(searchAppointment, appointmentsListToSort);
+		}
 	}
 
 	private async Task DisplayFilterList(ChangeEventArgs e)

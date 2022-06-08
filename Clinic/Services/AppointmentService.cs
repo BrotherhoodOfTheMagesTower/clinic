@@ -102,7 +102,7 @@ namespace Clinic.Services
             .Include(d => d.Doctor)
             .Where(p => p.Patient == patient).ToListAsync();
 
-        public List<Appointment> GetAppointmentsByPatternAsync(string pattern)
+        public List<Appointment> GetAppointmentsByPattern(string pattern)
         {
             List<Appointment>? appointmentList = null;
             string[] words = pattern.Split(' ');
@@ -116,6 +116,18 @@ namespace Clinic.Services
                     appointmentList = tmp;
                 else
                     appointmentList.AddRange(tmp);
+            }
+
+            return appointmentList;
+        }
+
+        public List<Appointment> GetAppointmentsByPatternInAppointmentsList(string pattern, List<Appointment> appointments)
+        {
+            List<Appointment>? appointmentList = null;
+            string[] words = pattern.Split(' ');
+            foreach (var word in words)
+            {
+                appointmentList = appointments.Where((a => a.Patient.FirstName.Contains(word) || a.Patient.LastName.Contains(word) || a.Doctor.FirstName.Contains(word) || a.Doctor.LastName.Contains(word))).ToList();
             }
 
             return appointmentList;
