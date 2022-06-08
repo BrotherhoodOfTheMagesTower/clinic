@@ -91,6 +91,7 @@
             string currentUserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             examination.LabManager = labManagerService.GetById(currentUserId);
             laboratoryExaminationService.Update(examination);
+            examinationsList = await laboratoryExaminationService.GetAllLabExaminationsForApprovmentAsync();
             toastService.ShowSuccess("Examination has been successfully approved!");
         }
         else
