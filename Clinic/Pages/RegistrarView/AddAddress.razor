@@ -63,26 +63,28 @@
 
 @code {
     [Parameter]
-    public string PatientId { get; set; }
+    public string PatientId { get; set; } = String.Empty;
 
     private bool hasAddress = false;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        
-        
-        patient = patientService.GetById(Guid.Parse(PatientId));
-        if (patient.Address != null)
+        var tempPatient = patientService.GetById(Guid.Parse(PatientId));
+        if (tempPatient is not null)
         {
-            address = addressService.GetById(patient.Address.Id);
-            hasAddress = true;
+            patient = tempPatient;
+            if (patient.Address != null)
+            {
+                address = addressService.GetById(patient.Address.Id);
+                hasAddress = true;
+            }
         }
         newAddress = new EditContext(address);
 
     }
     private Address address = new();
     private Patient patient = new();
-    EditContext newAddress;
+    EditContext? newAddress;
 
     private void Address()
     {

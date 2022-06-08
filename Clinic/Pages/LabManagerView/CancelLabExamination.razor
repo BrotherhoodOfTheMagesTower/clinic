@@ -92,8 +92,11 @@
     {
         if (examination != null)
         {
-            string currentUserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            examination.LabManager = labManagerService.GetById(currentUserId);
+            string? currentUserId = httpContextAccessor?.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (currentUserId is not null)
+            {
+                examination.LabManager = labManagerService.GetById(currentUserId);
+            }
             examination.Status = ExaminationStatus.CANCELLED_MANAGER;
             examination.ApprovedOrCancelledAt = DateTime.Now;
             laboratoryExaminationService.Update(examination);

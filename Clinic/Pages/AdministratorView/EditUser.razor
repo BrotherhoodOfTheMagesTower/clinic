@@ -43,7 +43,10 @@
                                 </div>
                             </div>
                             <div style="margin-left: 10px " class="col-sm-6 col-md-4 text-center">
-                                <button style="margin-top:5px" disabled="@(!emailContext.Validate() || !emailContext.IsModified())" id="change-email-button" type="submit" @onclick="async () => await ChangeEmailAndUserName()" class="w-40 btn btn-primary">Change email and user name</button>
+                                @if (emailContext is not null)
+                                {
+                                    <button style="margin-top:5px" disabled="@(!emailContext.Validate() || !emailContext.IsModified())" id="change-email-button" type="submit" @onclick="async () => await ChangeEmailAndUserName()" class="w-40 btn btn-primary">Change email and user name</button>
+                                }
                             </div>
                         </EditForm>
 
@@ -67,7 +70,10 @@
                                 </div>
                             </div>
                             <div style="margin-left: 10px " class="col-sm-6 col-md-4 text-center">
-                                <button style="margin-top:5px" disabled="@(!namesContext.Validate() || !namesContext.IsModified())" id="change-names-button" type="submit" @onclick="async () => await ChangeFirstAndLastName()" class="w-40 btn btn-primary">Change first and last name</button>
+                                @if (namesContext is not null)
+                                {
+                                    <button style="margin-top:5px" disabled="@(!namesContext.Validate() || !namesContext.IsModified())" id="change-names-button" type="submit" @onclick="async () => await ChangeFirstAndLastName()" class="w-40 btn btn-primary">Change first and last name</button>
+                                }
                             </div>
                         </EditForm>
 
@@ -82,7 +88,10 @@
                                 </div>
                             </div>
                             <div style="margin-left: 10px " class="col-sm-6 col-md-4 text-center">
-                                <button style="margin-top:5px" disabled="@(!passContext.Validate() || !passContext.IsModified())" id="change-psswd" type="submit" @onclick="async () => await ChangePassword()" class="btn btn-danger">Change password</button>
+                                @if (passContext is not null)
+                                {
+                                    <button style="margin-top:5px" disabled="@(!passContext.Validate() || !passContext.IsModified())" id="change-psswd" type="submit" @onclick="async () => await ChangePassword()" class="btn btn-danger">Change password</button>
+                                }
                             </div>
                         </EditForm>
                     }
@@ -106,14 +115,14 @@
 
 @code {
     [Parameter]
-    public string Id { get; set; }
+    public string Id { get; set; } = String.Empty;
     private ApplicationUser User { get; set; } = new();
     private Doctor Doctor { get; set; } = new();
-    private string initialEmail;
+    private string initialEmail = String.Empty;
 
-    EditContext emailContext;
-    EditContext passContext;
-    EditContext namesContext;
+    EditContext? emailContext;
+    EditContext? passContext;
+    EditContext? namesContext;
     Pass pass = new();
 
     private class Pass
@@ -123,17 +132,29 @@
         [DataType(DataType.Password)]
         [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$^+=!*()@%&]).{6,}$", ErrorMessage = "Password must have at least one non alphanumeric character, at least one digit ('0'-'9') and at least one uppercase ('A'-'Z').")]
         [Display(Name = "Password")]
-        public string Password { get; set; }
+        public string Password { get; set; } = String.Empty;
     }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        User = userService.GetUserById(Id);
+        var tempUser = userService.GetUserById(Id);
+        if (tempUser is not null)
+        {
+            User = tempUser;
+        }
+
         emailContext = new EditContext(User);
         passContext = new EditContext(pass);
         var names = userService.GetFirstAndLastNameForSpecificUser(Id);
 
-        Doctor.FirstName = names.Item1; Doctor.LastName = names.Item2;
+        if (names.Item1 is not null)
+        {
+            Doctor.FirstName = names.Item1;
+        }
+        if (names.Item2 is not null)
+        {
+            Doctor.LastName = names.Item2;
+        }
 
         namesContext = new EditContext(Doctor);
         initialEmail = User.Email;

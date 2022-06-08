@@ -85,7 +85,11 @@
             return;
         }
 
-        examination.Appointment = appointmentService.GetById(parsedId);
+        var tempAppoitment = appointmentService.GetById(parsedId);
+        if (tempAppoitment is not null)
+        {
+            examination.Appointment = tempAppoitment;
+        }
 
         if (allGlossaryDictionares != null)
         {
@@ -100,7 +104,7 @@
                 physicalExaminationService.Add(examination);
                 if (physicalExaminationService.GetById(examination.Id) != null)
                     toastService.ShowSuccess("Physical examination added successfully!");
-                    NavigationManager.NavigateTo($"EditAppointment/{Id}");
+                NavigationManager.NavigateTo($"EditAppointment/{Id}");
             }
             else
             {

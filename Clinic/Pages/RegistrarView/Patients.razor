@@ -58,10 +58,10 @@
 </AuthorizeView>
 
 @code{
-    public string searchPatient;
+    public string searchPatient = String.Empty;
     private List<Patient>? patientsList;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         patientsList = patientService.GetAllPatients();
     }
