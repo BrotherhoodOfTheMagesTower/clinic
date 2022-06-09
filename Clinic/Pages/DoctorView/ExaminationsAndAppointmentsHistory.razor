@@ -24,13 +24,6 @@
         else
         {
             <section>
-                @*<h3 class="mb-3 fw-bold"><b>Patients @searchPatient</b></h3> <br />
-                    <div>
-                    <input type="text" @bind="searchPatient" class="form-control w-75"/>
-                    <button type="submit" class="btn btn-primary" @onclick="SearchPatient">Search</button>
-                    <button type="submit" class="btn btn-primary"  @onclick="(() => NavigateToAddPatient())">Add patient</button>
-                    </div><br />*@
-
                 @if (appointmentsList != null && patient != null)
                 {
                     <h1 class="mb-3 fw-bold">Patient: @patient.FirstName @patient.LastName</h1>

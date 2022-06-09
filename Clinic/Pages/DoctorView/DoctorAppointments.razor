@@ -15,12 +15,6 @@
 <AuthorizeView Roles="Doctor">
     <Authorized>
         <section>
-            @*<h3 class="mb-3 fw-bold"><b>Patients @searchPatient</b></h3> <br />
-                <div>
-                <input type="text" @bind="searchPatient" class="form-control w-75"/>
-                <button type="submit" class="btn btn-primary" @onclick="SearchPatient">Search</button>
-                <button type="submit" class="btn btn-primary"  @onclick="(() => NavigateToAddPatient())">Add patient</button>
-                </div><br />*@
 
             <h1 class="mb-3 fw-bold">Appointments</h1><br />
 
@@ -33,19 +27,19 @@
             <label for="addition">Cancelled</label><br /><br />
 
             <label class="d-block mb-1 ml-1">Filter appointments by date</label>
-			<select @onchange="DisplayFilterList" class="form-control w-75">
-				@foreach (var element in filterList)
-				{
-					@if (element.Equals("All"))
-					{
-						<option value="@element" selected>@element</option>
-					}
-					else
-					{
-						<option value="@element">@element</option>
-					}
-				}
-			</select><br/><br/>
+            <select @onchange="DisplayFilterList" class="form-control w-75">
+                @foreach (var element in filterList)
+                {
+                    @if (element.Equals("All"))
+                    {
+                        <option value="@element" selected>@element</option>
+                    }
+                    else
+                    {
+                        <option value="@element">@element</option>
+                    }
+                }
+            </select><br /><br />
 
 
             @if (bookedAppointmentsList != null && bookedVisible == true)
@@ -173,12 +167,12 @@
     Doctor? loggedDoc;
 
     public List<string> filterList = new List<string>
-	{
-		"All",
-		"Today",
-		"This week",
-		"This month"
-	};
+    {
+        "All",
+        "Today",
+        "This week",
+        "This month"
+    };
 
     protected override async Task OnInitializedAsync()
     {
@@ -234,7 +228,7 @@
         finishedAppointmentsList = finishedAppointmentsList?.OrderBy(x => x.RegisteredTo).ToList();
         bookedAppointmentsList = bookedAppointmentsList?.OrderBy(x => x.RegisteredTo).ToList();
         cancelledAppointmentsList = cancelledAppointmentsList?.OrderBy(x => x.RegisteredTo).ToList();
-	}
+    }
 
     }
 
