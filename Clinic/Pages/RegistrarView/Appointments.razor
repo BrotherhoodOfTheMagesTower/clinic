@@ -85,7 +85,7 @@
         "This week",
         "This month"
     };
-    string filter= "All";
+    string filter = "All";
 
     protected override void OnInitialized()
     {
@@ -128,22 +128,25 @@
 
     private void DisplayFilterList(ChangeEventArgs e)
     {
-        filter = e?.Value?.ToString();
+        var tempValue = e?.Value?.ToString();
+        if (tempValue is not null)
+        {
+            filter = tempValue;
+        }
         GetAppointmentList();
-
     }
 
     private void GetAppointmentList()
     {
-       if (filter is not null)
+        if (filter is not null)
         {
             if (filter.Equals("Today")) appointmentsList = appointmentService.GetTodayAppointmentsWithStatus(AppointmentStatus.BOOKED);
             if (filter.Equals("All")) appointmentsList = appointmentService.GetAllAppointmetsWithStatus(AppointmentStatus.BOOKED);
             if (filter.Equals("This week")) appointmentsList = appointmentService.GetThisWeekAppointmentsWithStatus(AppointmentStatus.BOOKED);
             if (filter.Equals("This month")) appointmentsList = appointmentService.GetThisMonthAppointmentsWithStatus(AppointmentStatus.BOOKED);
         }
-        if(searchAppointment != null && searchAppointment != "")
+        if (searchAppointment != null && searchAppointment != "" && appointmentsList is not null)
             appointmentsList = appointmentService.GetAppointmentsByPatternInAppointmentsList(searchAppointment, appointmentsList);
-        appointmentsList = appointmentsList?.OrderBy(x => x.RegisteredTo).ToList(); 
+        appointmentsList = appointmentsList?.OrderBy(x => x.RegisteredTo).ToList();
     }
 }
