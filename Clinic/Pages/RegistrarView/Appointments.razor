@@ -85,6 +85,7 @@
         "This week",
         "This month"
     };
+    string filter= "All";
 
     protected override void OnInitialized()
     {
@@ -122,26 +123,27 @@
 
     public void SearchAppointment()
     {
-        if (searchAppointment == null || searchAppointment == "")
-            appointmentsList = appointmentService.GetAllAppointmets().OrderBy(x => x.RegisteredTo).ToList();
-        else
-        {
-            appointmentsList = appointmentService.GetAllAppointmets().OrderBy(x => x.RegisteredTo).ToList();
-            List<Appointment> appointmentsListToSort = appointmentsList;
-            appointmentsList = appointmentService.GetAppointmentsByPatternInAppointmentsList(searchAppointment, appointmentsListToSort);
-        }
+        GetAppointmentList();
     }
 
     private void DisplayFilterList(ChangeEventArgs e)
     {
-        string? filter = e?.Value?.ToString();
-        if (filter is not null)
+        filter = e?.Value?.ToString();
+        GetAppointmentList();
+
+    }
+
+    private void GetAppointmentList()
+    {
+       if (filter is not null)
         {
             if (filter.Equals("Today")) appointmentsList = appointmentService.GetTodayAppointmentsWithStatus(AppointmentStatus.BOOKED);
             if (filter.Equals("All")) appointmentsList = appointmentService.GetAllAppointmetsWithStatus(AppointmentStatus.BOOKED);
             if (filter.Equals("This week")) appointmentsList = appointmentService.GetThisWeekAppointmentsWithStatus(AppointmentStatus.BOOKED);
             if (filter.Equals("This month")) appointmentsList = appointmentService.GetThisMonthAppointmentsWithStatus(AppointmentStatus.BOOKED);
         }
-        appointmentsList = appointmentsList?.OrderBy(x => x.RegisteredTo).ToList();
+        if(searchAppointment != null && searchAppointment != "")
+            appointmentsList = appointmentService.GetAppointmentsByPatternInAppointmentsList(searchAppointment, appointmentsList);
+        appointmentsList = appointmentsList?.OrderBy(x => x.RegisteredTo).ToList(); 
     }
 }

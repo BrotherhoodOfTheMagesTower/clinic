@@ -13,106 +13,110 @@
 <PageTitle>Edit Patient</PageTitle>
 
 <AuthorizeView Roles="Registrar" Context="patientAdding">
-    <Authorized>
-        <section>
+	<Authorized>
+		<section>
 
-            <h2 class="mb-3 fw-bold">Edit existing patient</h2>  <br />
+			<h2 class="mb-3 fw-bold">Edit existing patient</h2>  <br />
 
-            <EditForm EditContext="newPatient" OnValidSubmit="AddPatientToDatabase" class="w-50 bg-gray px-4 py-3 rounded">
-                <DataAnnotationsValidator />
-                <h3 class="mb-3 fw-bold">Enter the patient's:</h3>
-                <label class="d-block mb-1 ml-1" />name
-                <InputText @bind-Value="@patient.FirstName" class="form-control w-75" />
-                <ValidationMessage For="() => patient.FirstName" />
+			<EditForm EditContext="newPatient" OnValidSubmit="AddPatientToDatabase" class="w-50 bg-gray px-4 py-3 rounded">
+				<DataAnnotationsValidator />
+				<h3 class="mb-3 fw-bold">Enter the patient's:</h3>
+				<label class="d-block mb-1 ml-1" />name
+				<InputText @bind-Value="@patient.FirstName" class="form-control w-75" />
+				<ValidationMessage For="() => patient.FirstName" />
 
-                <label class="d-block mb-1 ml-1" />last name
-                <InputText @bind-Value="@patient.LastName" class="form-control w-75" />
-                <ValidationMessage For="() => patient.LastName" />
+				<label class="d-block mb-1 ml-1" />last name
+				<InputText @bind-Value="@patient.LastName" class="form-control w-75" />
+				<ValidationMessage For="() => patient.LastName" />
 
-                <label class="d-block mb-1 ml-1" />pesel
-                <InputText @bind-Value="@patient.Pesel" class="form-control w-75" />
+				<label class="d-block mb-1 ml-1" />pesel
+				<InputText @bind-Value="@patient.Pesel" class="form-control w-75" />
 
-                <label class="d-block mb-1 ml-1" />birth date
-                <InputDate @bind-Value="@patient.BirthDate" class="form-control w-75" />
+				<label class="d-block mb-1 ml-1" />birth date
+				<InputDate @bind-Value="@patient.BirthDate" class="form-control w-75" />
 
-                <label class="d-block mb-1 ml-1" />phone number
-                <InputText @bind-Value="@patient.PhoneNumber" class="form-control w-75" />
-                <ValidationMessage For="() => patient.PhoneNumber" />
+				<label class="d-block mb-1 ml-1" />phone number
+				<InputText @bind-Value="@patient.PhoneNumber" class="form-control w-75" />
+				<ValidationMessage For="() => patient.PhoneNumber" />
 
-                <label class="d-block mb-1 ml-1" /> gender
-                <InputRadioGroup @bind-Value="@patient.Gender">
-                    @foreach (var g in (Gender[])Enum.GetValues(typeof(Gender)))
-                    {
-                        if (g == patient.Gender)
-                        {
-                            <div><InputRadio Value="g" checked />@g.ToString().ToLower()</div>
-                        }
-                        else
-                        {
-                            <div><InputRadio Value="g" />@g.ToString().ToLower()</div>
-                        }
-                    }
-                </InputRadioGroup>
-                <br />
-                <div>
-                    <button type="submit" class="btn btn-primary">Save</button>
-                </div>
-            </EditForm>
-            <button type="submit" class="btn btn-primary" @onclick="() => NavigateToAddAddress(patient.Id.ToString())">Address</button>
-        </section>
-    </Authorized>
-    <NotAuthorized>
-        <section>
-            <h1>Access denied!</h1>
-        </section>
-    </NotAuthorized>
+				<label class="d-block mb-1 ml-1" /> gender
+				<InputRadioGroup @bind-Value="@patient.Gender">
+					@foreach (var g in (Gender[])Enum.GetValues(typeof(Gender)))
+					{
+						if (g == patient.Gender)
+						{
+							<div><InputRadio Value="g" checked />@g.ToString().ToLower()</div>
+						}
+						else
+						{
+							<div><InputRadio Value="g" />@g.ToString().ToLower()</div>
+						}
+					}
+				</InputRadioGroup>
+				<br />
+				<div>
+					<button type="submit" class="btn btn-primary">Save</button>
+				</div>
+			</EditForm>
+			<button type="submit" class="btn btn-primary" @onclick="() => NavigateToAddAddress(patient.Id.ToString())">Address</button>
+		</section>
+	</Authorized>
+	<NotAuthorized>
+		<section>
+			<h1>Access denied!</h1>
+		</section>
+	</NotAuthorized>
 </AuthorizeView>
 
 @code {
-    [Parameter]
-    public string editPatientId { get; set; } = String.Empty;
-    private bool wasPatientAddedToDatabase { get; set; }
-    private Patient patient = new();
-    EditContext? newPatient;
+	[Parameter]
+	public string editPatientId { get; set; } = String.Empty;
+	private bool wasPatientAddedToDatabase { get; set; }
+	private Patient patient = new();
+	EditContext? newPatient;
 
-    protected override void OnInitialized()
-    {
-        Guid parsedId;
-        var validId = Guid.TryParse(editPatientId, out parsedId);
-        if (validId)
-        {
-            var tempPatient = patientService.GetById(parsedId);
-            if (tempPatient is not null)
-            {
-                patient = tempPatient;
-            }
-        }
-        wasPatientAddedToDatabase = true;
-        newPatient = new EditContext(patient);
-    }
+	protected override void OnInitialized()
+	{
+		Guid parsedId;
+		var validId = Guid.TryParse(editPatientId, out parsedId);
+		if (validId)
+		{
+			var tempPatient = patientService.GetById(parsedId);
+			if (tempPatient is not null)
+			{
+				patient = tempPatient;
+			}
+		}
+		wasPatientAddedToDatabase = true;
+		newPatient = new EditContext(patient);
+	}
 
-    private void AddPatientToDatabase()
-    {
-        patientService.Update(patient);
-        toastService.ShowSuccess($"Patient {patient.FirstName} {patient.LastName} was update.", "Well done!");
-        NavigationManager.NavigateTo($"Patients");
-    }
+	private void AddPatientToDatabase()
+	{
+		if (patient.BirthDate < DateTime.Now)
+		{
+			patientService.Update(patient);
+			toastService.ShowSuccess($"Patient {patient.FirstName} {patient.LastName} was update.", "Well done!");
+			NavigationManager.NavigateTo($"Patients");
+		}
+		else toastService.ShowError("Sorry!  The date of birth is incorrect ", "Oops!");
+	}
 
-    private void NavigateToAddAddress(string Id)
-    {
-        if (wasPatientAddedToDatabase)
-            NavigationManager.NavigateTo($"AddAddress/{Id}");
-        else
-            toastService.ShowError("Sorry!  A patient hasy to be saved  first.", "Oops!");
-    }
+	private void NavigateToAddAddress(string Id)
+	{
+		if (wasPatientAddedToDatabase)
+			NavigationManager.NavigateTo($"AddAddress/{Id}");
+		else
+			toastService.ShowError("Sorry!  A patient hasy to be saved  first.", "Oops!");
+	}
 
-    private void NavigateToPatients()
-    {
-        NavigationManager.NavigateTo($"Patients");
-    }
+	private void NavigateToPatients()
+	{
+		NavigationManager.NavigateTo($"Patients");
+	}
 
-    private void NavigateToEditAddress(string Id)
-    {
-        NavigationManager.NavigateTo($"AddAddress/{Id}");
-    }
+	private void NavigateToEditAddress(string Id)
+	{
+		NavigationManager.NavigateTo($"AddAddress/{Id}");
+	}
 }
