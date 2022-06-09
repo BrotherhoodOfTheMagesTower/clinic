@@ -1,5 +1,4 @@
-﻿version: "3.9"
-services:
+﻿services:
     clinicdb:
         image: "mcr.microsoft.com/mssql/server:2017-latest-ubuntu"
         environment:
@@ -7,4 +6,9 @@ services:
             ACCEPT_EULA: "Y"
         ports:
           - "1433:1433"
-    
+    web:
+        build: .
+        ports:
+          - "8000:80"
+        depends_on:
+          - clinicdb

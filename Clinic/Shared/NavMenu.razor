@@ -14,63 +14,62 @@
                 <span class="oi oi-home" aria-hidden="true"></span> Home
             </NavLink>
         </div>
-        <AuthorizeView>
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="CheckRole">
-                    <span class="oi oi-list-rich" aria-hidden="true"></span> Check role
-                </NavLink>
-            </div> 
-        </AuthorizeView>
-        <AuthorizeView Roles = "Administrator">
+        <AuthorizeView Roles="Administrator">
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="ManageUsers">
                     <span class="oi oi-list-rich" aria-hidden="true"></span> Manage users
                 </NavLink>
             </div>
         </AuthorizeView>
-        <AuthorizeView Roles = "Administrator">
+        <AuthorizeView Roles="Administrator">
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="CreateUser">
                     <span class="oi oi-list-rich" aria-hidden="true"></span> Create new user
                 </NavLink>
             </div>
         </AuthorizeView>
-        <AuthorizeView Roles = "Registrar">
+        <AuthorizeView Roles="Registrar">
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="Patients">
                     <span class="oi oi-list-rich" aria-hidden="true"></span> Patients
                 </NavLink>
             </div>
         </AuthorizeView>
-        <AuthorizeView Roles = "Registrar">
+        <AuthorizeView Roles="Registrar">
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="Appointments">
                     <span class="oi oi-list-rich" aria-hidden="true"></span> Appointments
                 </NavLink>
             </div>
         </AuthorizeView>
-        <AuthorizeView Roles = "Lab Technician, Lab Manager">
+        <AuthorizeView Roles="Lab Technician">
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="LabExaminations">
                     <span class="oi oi-list-rich" aria-hidden="true"></span> Examinations
                 </NavLink>
             </div>
         </AuthorizeView>
-        <AuthorizeView Roles = "Lab Manager">
+        <AuthorizeView Roles="Lab Manager">
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="ApproveExamination">
                     <span class="oi oi-list-rich" aria-hidden="true"></span> Approve Examinations
                 </NavLink>
             </div>
         </AuthorizeView>
-         <AuthorizeView Roles = "Doctor">
+        <AuthorizeView Roles="Doctor">
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="DoctorAppointments">
                     <span class="oi oi-list-rich" aria-hidden="true"></span> Appointments
                 </NavLink>
             </div>
         </AuthorizeView>
-  
+        <AuthorizeView Roles="Administrator">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="AboutAdministratorAccount">
+                    <span class="oi oi-info" aria-hidden="true"></span> About my account
+                </NavLink>
+            </div>
+        </AuthorizeView>
     </nav>
 </div>
 

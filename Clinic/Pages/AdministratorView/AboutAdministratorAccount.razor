@@ -1,0 +1,106 @@
+﻿@page "/AboutAdministratorAccount"
+<PageTitle>About my account</PageTitle>
+
+<AuthorizeView Context="adminInfo" Roles="Administrator">
+    <Authorized>
+        <section>
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="text-center" style="margin-top:8px">Welcome in our system!</h2>
+                </div>
+            </div>
+            <div class="card-body">
+                    <h3 class="text-center">Here you will find a quick description of the most important functionalities of your account.</h3>
+                <div class="container" style="margin-top:30px">
+                    <div class="col-md-12">
+                        <p>
+                            As an <b>Administrator</b> your main task is to manage users.
+                            This account allows you to add new users to the database, edit their accounts
+                            and also disabling their accounts.
+                        </p>
+                    </div>
+                    <div class="col-md-12">
+                        <h3><b>1. Creating a new user</b></h3>
+                        <p>
+                            In order to add a new user to the database, click the 
+                            <b>Create new user</b> option from navigation menu. The following
+                            view will be presented:
+                        </p>
+                        <img class="img-fluid" src="/Images/Administrator/CreateNewUser.jpg"/>
+                        <p>
+                            The mandatory fields are <b>Email and user name</b>, <b>Password</b>
+                            and one of the following roles: <b>Registrar</b>, <b>Lab Technician</b>,
+                            <b>Lab Manager</b>. If you want to add a user with <b>Doctor</b> role
+                            you need also to assign the <b>Permission number</b>. Specifying the
+                            first and last name is not obligatory. When you fill in the form correctly, 
+                            the <b>Add new user to the database</b> button will become clickable.
+                        </p>
+                    </div>
+                    <div class="col-md-12">
+                        <h3><b>2. Managing users</b></h3>
+                        <p>
+                            If you want to edit an account for specific users, simply press the <b>Manage users</b>
+                            button on the navigation menu. This will take you to a view with the following table:
+                        </p>
+                        <img class="img-fluid" src="/Images/Administrator/ManageUsers.jpg"/>
+                        <p>
+                            The following informations of all system users are displayed here: 
+                            <b>First Name</b>, <b>Last Name</b>, <b>Email</b>, <b>Phone number</b>,
+                            <b>Role</b> and <b>Is enabled</b>. The <b>Is enabled</b> column indicates 
+                            what is the current account status for each user - enabled or disabled.
+                        </p>
+                    </div>
+                    <div class="col-md-12">
+                        <h4><b>2.1 Enabling and disabling user accounts</b></h4>
+                        <p>
+                            If you want to disable the account for a particular user, simple press <b>Enable/Disable</b>
+                            on the corresponding row. This will open the following view:
+                        </p>
+                        <img class="img-fluid" src="/Images/Administrator/EnableOrDisableAcc.jpg"/>
+                        <p>
+                            If the account is currently enabled, the <b>Enable account</b> button
+                            will be disabled, but the <b>Disable account</b> not. After pressing
+                            <b>Disable account</b> simply refresh the page and as you will notice -
+                            the <b>Enable account</b> button will be clickable, but the <b>Disable account</b>
+                            button not.
+                        </p>
+                    </div>
+                    <div class="col-md-12">
+                        <h4><b>2.2 Editing user accounts</b></h4>
+                        <p>
+                            If you want to change account details, such as <b>Email</b>, <b>Password</b> or 
+                            <b>First & Last Name</b> for a particular user, press <b>Edit</b>
+                            on the corresponding row. This will open the following view:
+                        </p>
+                        <img class="img-fluid" src="/Images/Administrator/EditUser.jpg"/>
+                        <p>
+                            Here you can change each of those previously mentioned attributes, by
+                            inserting a new one into the form and then clicking the appropriate button.
+                        </p>
+                        <p>
+                            <b>NOTE:</b> The change buttons will only get enabled if you fill in a correct value.
+                            For example, the following conditions must be met for a <b>password</b>:
+                        </p>
+                        <p style="color:red">
+                            The Password must be at least 6 and at max 100 characters long.
+                        </p>
+                        <p style="color:red">
+                            Password must have at least one non alphanumeric character, at least one digit ('0'-'9') 
+                            and at least one uppercase ('A'-'Z').
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </Authorized>
+    <NotAuthorized>
+        <section>
+            <h1>Access denied!</h1>
+        </section>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+
+}

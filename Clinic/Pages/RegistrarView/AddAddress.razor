@@ -1,95 +1,118 @@
-﻿@page "/AddAddress/{EditPatientId}"
+﻿@page "/AddAddress/{PatientId}"
 @using Clinic.Data.Enums
 @using Clinic.Data.Models
 @using Clinic.Data
+@using Clinic.Services
+@using System.ComponentModel.DataAnnotations
 
 @inject NavigationManager NavigationManager;
+@inject PatientService patientService;
+@inject AddressService addressService;
+@inject IToastService toastService
 
 
-@if (!hasAddress)
-{
-    <PageTitle>Add Patient's Address</PageTitle>
-}else
-{
-    <PageTitle>Edit Patient's Address</PageTitle>
-}
 
-<AuthorizeView Roles = "Registrar" Context="addressAdding">
+<PageTitle>Add Patient's Address</PageTitle>
+
+
+<AuthorizeView Roles="Registrar" Context="addressAdding">
     <Authorized>
-            
-            @if (!hasAddress)
-            {
-                <h2 class="mb-3 fw-bold">Add patient's address</h2>  <br />
-            }else
-            {
-                <h2 class="mb-3 fw-bold">Edit patient's address</h2>  <br />
-            }
+        <section>
 
-            <EditForm EditContext="newAddress" OnValidSubmit="addAddress" class="w-50 bg-gray px-4 py-3 rounded">
+            <h2 class="mb-3 fw-bold">Add patient's address</h2>  <br />
 
-            <h3 class="mb-3 fw-bold">Enter the patient's:</h3>
 
-            <label class="d-block mb-1 ml-1">city</label> 
-            <InputText @bind-Value="@address.City" class="form-control w-75"/>
+            <EditForm EditContext="newAddress" OnValidSubmit="Address" class="w-50 bg-gray px-4 py-3 rounded">
 
-            <label class="d-block mb-1 ml-1">street </label> 
-            <InputText @bind-Value="@address.Street" class="form-control w-75"/>
+                <h3 class="mb-3 fw-bold">Enter the patient's:</h3>
 
-            <label class="d-block mb-1 ml-1">postal code</label> 
-            <InputText @bind-Value="@address.PostalCode" class="form-control w-75"/> 
+                <DataAnnotationsValidator />
+                <label class="d-block mb-1 ml-1">city</label>
+                <InputText @bind-Value="@address.City" class="form-control w-75" />
+                <ValidationMessage For="() => address.City" />
 
-            <label class="d-block mb-1 ml-1">house number</label> 
-            <InputText @bind-Value="@address.HouseNumber" class="form-control w-75"/>
+                <label class="d-block mb-1 ml-1">street </label>
+                <InputText @bind-Value="@address.Street" class="form-control w-75" />
+                <ValidationMessage For="() => address.Street" />
 
-            <label class="d-block mb-1 ml-1">local number </label> 
-            <InputText @bind-Value="@address.LocalNumber" class="form-control w-75"/>
+                <label class="d-block mb-1 ml-1">postal code</label>
+                <InputText @bind-Value="@address.PostalCode" class="form-control w-75" />
+                <ValidationMessage For="() => address.PostalCode" />
 
-            <br/>
-            <div>  
-            <button type="submit" class="btn btn-primary">Save</button>
-            </div>
+                <label class="d-block mb-1 ml-1">house number</label>
+                <InputText @bind-Value="@address.HouseNumber" class="form-control w-75" />
+                <ValidationMessage For="() => address.HouseNumber" />
+
+                <label class="d-block mb-1 ml-1">local number </label>
+                <InputText @bind-Value="@address.LocalNumber" class="form-control w-75" />
+
+                <br />
+                <div>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
             </EditForm>
-            <button type="submit" class="btn btn-primary" @onclick="() => NavigateToPatients()">Back</button>
-				
+        </section>
+
     </Authorized>
     <NotAuthorized>
-        <h1>Access denied!</h1>
+        <section>
+            <h1>Access denied!</h1>
+        </section>
     </NotAuthorized>
 </AuthorizeView>
 
-@code{
+@code {
     [Parameter]
-    public string EditPatientId { get; set; }
+    public string PatientId { get; set; } = String.Empty;
 
-    //czy dany pacjent ma adres
-    private bool hasAddress;
+    private bool hasAddress = false;
 
-    //TO DO
-    //Przypisanie wartości do pacjenta i do adresu (o ile pacjent miał adres) i ustawienie odpowednio zmiennej hasAddress
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
+        var tempPatient = patientService.GetById(Guid.Parse(PatientId));
+        if (tempPatient is not null)
+        {
+            patient = tempPatient;
+            if (patient.Address != null)
+            {
+                var tempAddress = addressService.GetById(patient.Address.Id);
+                if (tempAddress is not null)
+                {
+                    address = tempAddress;
+                    hasAddress = true;
+                }
+            }
+        }
         newAddress = new EditContext(address);
-        base.OnInitialized();
-        //Poniższy kod testowo (do usunięcia potem)
-        patient = new Patient() { Id = Guid.Parse(EditPatientId), FirstName = "Adam", LastName = "Nowak", Gender = Gender.MALE, Pesel = "12345678901", PhoneNumber = "123456789" };
-        address = new Address() { Id = new Guid(), City = "Racibórz", PostalCode = "47-400" };
-        hasAddress = true;
+
     }
     private Address address = new();
     private Patient patient = new();
-    EditContext newAddress;
+    EditContext? newAddress;
 
-    //TO DO
-    //Zapisanie danych do bazy
-    private void addAddress()
+    private void Address()
     {
-
+        if (hasAddress)
+        {
+            addressService.Update(address);
+            toastService.ShowSuccess($"Address was succesfully updated.", "Well done!");
+            NavigationManager.NavigateTo($"EditPatient/{PatientId}");
+        }
+        else
+        {
+            patient.Address = address;
+            addressService.Add(address);
+            toastService.ShowSuccess($"Address was succesfully added to the database.", "Well done!");
+            NavigationManager.NavigateTo($"EditPatient/{PatientId}");
+        }
+        //patient.Address = address;
+        //patientService.Update(patient);
+        //toastService.ShowSuccess($"Address was succesfully updated.", "Well done!");
+        //NavigationManager.NavigateTo($"EditPatient/{PatientId}");
     }
 
-     private void NavigateToPatients()
+    private void NavigateToPatients()
     {
-        NavigationManager.NavigateTo($"AddPatient/{EditPatientId}");
+        NavigationManager.NavigateTo($"EditPatient/{PatientId}");
     }
-
-
 }

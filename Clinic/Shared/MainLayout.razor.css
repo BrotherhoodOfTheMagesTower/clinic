@@ -8,6 +8,11 @@ main {
     flex: 1;
 }
 
+article {
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
 .sidebar {
     background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
 }
@@ -30,6 +35,8 @@ main {
         overflow: hidden;
         text-overflow: ellipsis;
     }
+
+
 
 @media (max-width: 640.98px) {
     .top-row:not(.auth) {
@@ -61,10 +68,5 @@ main {
         position: sticky;
         top: 0;
         z-index: 1;
-    }
-
-    .top-row, article {
-        padding-left: 2rem !important;
-        padding-right: 1.5rem !important;
     }
 }

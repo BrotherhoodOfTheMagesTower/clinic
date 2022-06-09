@@ -5,94 +5,107 @@
 @using System.Globalization
 @using System.ComponentModel.DataAnnotations
 @using System.Diagnostics
+@using Clinic.Services
 
 @inject NavigationManager NavigationManager;
+@inject IToastService toastService
+@inject GlossaryService glossaryService;
+@inject LaboratoryExaminationService laboratoryExaminationService;
+@inject AppointmentService appointmentService;
 
 <PageTitle>Order laboratory examination</PageTitle>
 
-
-
 <AuthorizeView Roles="Doctor" Context="examinationOrderByDoctor">
     <Authorized>
-         
-        <EditForm EditContext="examinationToOrder" OnValidSubmit="OrderExamination" class="w-50 bg-gray px-4 py-3 rounded">
 
-            <h1 class="mb-3 fw-bold">Order laboratory examination</h1><br />
-            <h3 class="mb-3 fw-bold">Examination:</h3>
+        @if (!validId)
+        {
+            <NotFound />
+        }
 
-            <label class="d-block mb-1 ml-1"> Name: </label>
-            <InputSelect class="mb-3 fw-bold"  @bind-Value="@glossaryCode">
-                @foreach (var c in allGlossaryDictionares)
-                {
-                    <option Value=@c.Code>@c.Name</option>
-                }
-            </InputSelect>
+        else
+        {
+            <section>
+                <EditForm EditContext="examinationToOrder" OnValidSubmit="OrderExamination" class="w-50 bg-gray px-4 py-3 rounded">
+                    <h1 class="mb-3 fw-bold">Order laboratory examination</h1><br />
+                    <h3 class="mb-3 fw-bold">Examination:</h3>
+                    <label class="d-block mb-1 ml-1"> Name: </label>
+                    @if (allGlossaryDictionares != null)
+                    {
+                        <InputSelect class="mb-3 fw-bold" @bind-Value="@glossaryCode">
+                            @foreach (var c in allGlossaryDictionares)
+                            {
+                        <option Value=@c.Code>@c.Name</option>
+                            }
+                </InputSelect>
+                    }
+                    <label class="d-block mb-1 ml-1">Doctor's notes:</label>
+                    <InputTextArea @bind-Value="@examination.DoctorsNotes" class="form-control w-75" /> <br />
+                    <div>
+                        <button type="submit" class="btn btn-primary">Order</button>
+                    </div>
+                </EditForm>
+            </section>
+        }
 
-            <label class="d-block mb-1 ml-1">Doctor's notes:</label>
-            <InputTextArea @bind-Value="@examination.DoctorsNotes" class="form-control w-75" />
-
-
-            <br />
-            <div>
-                <button type="submit" class="btn btn-primary">Order</button>
-            </div>
-        </EditForm>
     </Authorized>
     <NotAuthorized>
-        <h1>Access denied!</h1>
+        <section>
+            <h1>Access denied!</h1>
+        </section>
     </NotAuthorized>
 </AuthorizeView>
 
 @code {
-
-    //id wizyty, ktore zostalo przekazane z poprzedniego widoku, trzeba na jego podstawie zwrocic z bazy danych wizyte do edytowania
+    //appointment Id
     [Parameter]
-    public string Id { get; set; }
+    public string Id { get; set; } = String.Empty;
 
-    //Kod badania
-    private string glossaryCode;
-
-    //testowa lista glossarydictionares, docelowo ma byc zwrocona z bazy
-    private List<GlossaryDictionary> allGlossaryDictionares = new List<GlossaryDictionary>()
-    {
-    new GlossaryDictionary {Code = GlossaryCode.LAB_BLOOD, Name = "Blood examination", Type = GlossaryType.LABORATORY },
-    new GlossaryDictionary {Code = GlossaryCode.LAB_COVID, Name = "Covid examination", Type = GlossaryType.LABORATORY },
-    new GlossaryDictionary {Code = GlossaryCode.LAB_URINE, Name = "Urine examination", Type = GlossaryType.LABORATORY }
-    };
-
-    //protected override void OnInitialized()
-    //{
-    //    examinationToOrder = new EditContext(examination);
-    //    examination.Status = ExaminationStatus.APPROVED;
-    //    examination.OrderedAt = DateTime.Now;
-    //    base.OnInitialized();
-    //}
+    private string glossaryCode = String.Empty;
+    private List<GlossaryDictionary>? allGlossaryDictionares;
     private LaboratoryExamination examination = new();
-    EditContext examinationToOrder;
+    private EditContext? examinationToOrder;
+    private bool validId = true;
+    private Guid parsedId;
 
-
-    //TO DO
     protected override async Task OnInitializedAsync()
     {
         examinationToOrder = new EditContext(examination);
- 
-        base.OnInitialized();
+        allGlossaryDictionares = (await glossaryService.GetAllDictionariesAsync(GlossaryType.LABORATORY)).ToList();
+        glossaryCode = allGlossaryDictionares.First().Code.ToString() ?? "";
+        validId = Guid.TryParse(Id, out parsedId);
     }
 
-    //TO DO
-    //Zapisanie danych do bazy
     private void OrderExamination()
     {
-        examination.Status = ExaminationStatus.APPROVED;
-        examination.OrderedAt = DateTime.Now;
-        //przypisanie do examination obiektu GlossaryDictionary na podstawie kodu wybranego w select
-        foreach (var d in allGlossaryDictionares) 
+        if (validId == false)
         {
-            if (d.Code.ToString().Equals(glossaryCode))
-                examination.GlossaryDictionary = d;
+            return;
         }
 
-         Debug.WriteLine($"Code: {examination.GlossaryDictionary.Code}, notes: {examination.DoctorsNotes}");
+        var tempAppoitment = appointmentService.GetById(parsedId);
+        if (tempAppoitment is not null)
+        {
+            examination.Appointment = tempAppoitment;
+        }
 
+        examination.Status = ExaminationStatus.COMMISIONED;
+        examination.OrderedAt = DateTime.Now;
+
+        if (allGlossaryDictionares != null)
+        {
+            foreach (var dictionary in allGlossaryDictionares)
+            {
+                if (dictionary.Code.ToString().Equals(glossaryCode))
+                    examination.GlossaryDictionary = dictionary;
+            }
+
+            laboratoryExaminationService.Add(examination);
+            if (laboratoryExaminationService.GetById(examination.Id) != null)
+            {
+                toastService.ShowSuccess("Laboratory examination ordered successfully!");
+                NavigationManager.NavigateTo($"EditAppointment/{Id}");
+            }
+        }
     }
-}
+    }

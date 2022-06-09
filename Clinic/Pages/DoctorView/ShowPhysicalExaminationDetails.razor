@@ -1,0 +1,68 @@
+﻿@page "/ShowPhysicalExaminationDetails/{ExaminationId}"
+@using Clinic.Data.Enums
+@using Clinic.Data.Models
+@using Clinic.Data
+@using Clinic.Services
+
+@inject NavigationManager NavigationManager;
+@inject IToastService toastService;
+@inject PhysicalExaminationService physicalExaminationService;
+
+<PageTitle>Show physical examination details</PageTitle>
+
+<AuthorizeView Roles="Doctor" Context="examinationEditing">
+    <Authorized>
+        @if (!validId)
+        {
+            <NotFound />
+        }
+
+        else
+        {
+            <section>
+                @if (examination != null)
+                {
+
+                    <h1 class="mb-3 fw-bold">Show physical examination details</h1>
+
+                    <br />
+                    <h3 class="mb-3 fw-bold">Examination:</h3>
+
+                    <label class="d-block mb-1 ml-1">Name: </label>
+                    <label class="form-control w-75"> @examination.GlossaryDictionary.Name </label>
+
+                    <br />
+
+                    <label class="d-block mb-1 ml-1">Result: </label>
+                    <label class="form-control w-75"> @examination.Result </label>
+
+                    <br />
+
+                }
+            </section>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <h1>Access denied!</h1>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    [Parameter]
+    public string ExaminationId { get; set; } = String.Empty;
+
+    private PhysicalExamination? examination;
+    private bool validId = true;
+    private Guid parsedId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        validId = Guid.TryParse(ExaminationId, out parsedId);
+        if (validId == false)
+        {
+            return;
+        }
+        examination = await physicalExaminationService.GetByIdAsync(parsedId);
+    }
+
+ }

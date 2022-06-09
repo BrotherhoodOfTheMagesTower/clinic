@@ -1,0 +1,105 @@
+﻿@page "/ShowLaboratoryExaminationDetails/{EditExaminationId}"
+@using Clinic.Data.Enums
+@using Clinic.Data.Models
+@using Clinic.Data
+@using Clinic.Services
+
+@inject NavigationManager NavigationManager;
+@inject IToastService toastService;
+@inject LaboratoryExaminationService laboratoryExaminationService;
+
+<PageTitle>Laboratory examination details</PageTitle>
+
+<AuthorizeView Roles="Doctor" Context="examinationEditing">
+    <Authorized>
+        @if (!validId)
+        {
+            <NotFound />
+        }
+
+        else
+        {
+            <section>
+                @if (examination != null)
+                {
+
+                    <h1 class="mb-3 fw-bold">Laboratory examination details</h1>
+
+                    <br />
+                    <h3 class="mb-3 fw-bold">Examination:</h3>
+
+
+                    <label class="d-block mb-1 ml-1">Name: </label>
+                    <label class="form-control w-75"> @examination.GlossaryDictionary.Name </label>
+
+                    <br />
+
+                    <label class="d-block mb-1 ml-1"> Status:</label>
+                    <label class="form-control w-75"> @status </label> <br />
+
+
+                    <label class="d-block mb-1 ml-1">Doctor notes: </label>
+                    <label class="form-control w-75"> @examination.DoctorsNotes </label> <br />
+
+                    @if (examination.Status == ExaminationStatus.APPROVED)
+
+                    {
+                        <label class="d-block mb-1 ml-1">Result: </label>
+                        <label class="form-control w-75"> @examination.Result</label>
+
+                        <br />
+
+                        <label class="d-block mb-1 ml-1">Lab Technician: </label>
+                        <label class="form-control w-75">@examination.LabTechnician?.FirstName @examination.LabTechnician?.LastName </label>
+
+                        <br />
+
+                        <label class="d-block mb-1 ml-1">Execution date: </label>
+                        <label class="form-control w-75">@examination.ExecutedOrCancelledAt </label>
+
+                        <br />
+                    }
+                    else if (examination.Status == ExaminationStatus.CANCELLED_TECH || examination.Status == ExaminationStatus.CANCELLED_MANAGER)
+                    {
+                        <p>This examination has been canceled!</p>
+                    }
+                    else
+                    {
+                        <p>There are no results yet!</p>
+                    }
+
+                }
+            </section>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <section>
+            <h1>Access denied!</h1>
+        </section>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    [Parameter]
+    public string EditExaminationId { get; set; } = String.Empty;
+
+    public string? status;
+    private LaboratoryExamination? examination;
+    private bool validId = true;
+    private Guid parsedId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        validId = Guid.TryParse(EditExaminationId, out parsedId);
+        if (validId == false)
+        {
+            return;
+        }
+        examination = await laboratoryExaminationService.GetByIdAsync(parsedId);
+        if (examination != null)
+        {
+            status = examination.Status.ToString().ToLower();
+        }
+    }
+
+ }

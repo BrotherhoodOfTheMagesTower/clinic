@@ -9,36 +9,37 @@
 @inject UserManager<ApplicationUser> userManager
 @inject IToastService toastService;
 
-<div class="card">
-    <div class="card-header">
-        <h2 class="text-center" style="margin-top:8px">Enable or disable account for user <b>@User.UserName</b></h2>
-    </div>
-</div>
-<div class="card-body">
-    @if (IsAccountEnabled)
-    {
-        <h3 class="text-center">The account for user @User.UserName is currently <b>enabled</b>.</h3>
-    }
-    else
-    {
-        <h3 class="text-center">The account for user @User.UserName is currently <b>disabled</b>.</h3>
-    }
-    <div class="container">
-        <div class="col-md-12 text-center">
-            <button @onclick="async () => await EnableAcc()" disabled="@(IsAccountEnabled)" type="button" style="margin-top: 20px" class="btn btn-lg btn-success">Enable account</button>
-        </div>
-        <div class="col-md-12 text-center">
-            <button @onclick="async () => await DisableAcc()" disabled="@(!IsAccountEnabled)" type="button" style="margin-top: 20px" class="btn btn-lg btn-danger">Disable account</button>
+<section>
+    <div class="card">
+        <div class="card-header">
+            <h2 class="text-center" style="margin-top:8px">Enable or disable account for user <b>@User?.UserName</b></h2>
         </div>
     </div>
+    <div class="card-body">
+        @if (IsAccountEnabled)
+        {
+            <h3 class="text-center">The account for user @User?.UserName is currently <b>enabled</b>.</h3>
+        }
+        else
+        {
+            <h3 class="text-center">The account for user @User?.UserName is currently <b>disabled</b>.</h3>
+        }
+        <div class="container">
+            <div class="col-md-12 text-center">
+                <button @onclick="async () => await EnableAcc()" disabled="@(IsAccountEnabled)" type="button" style="margin-top: 20px" class="btn btn-lg btn-success">Enable account</button>
+            </div>
+            <div class="col-md-12 text-center">
+                <button @onclick="async () => await DisableAcc()" disabled="@(!IsAccountEnabled)" type="button" style="margin-top: 20px" class="btn btn-lg btn-danger">Disable account</button>
+            </div>
+        </div>
 
-</div>
-
+    </div>
+</section>
 
 @code {
     private ApplicationUser? User { get; set; }
     [Parameter]
-    public string Id { get; set; }
+    public string Id { get; set; } = String.Empty;
     private bool IsAccountEnabled { get; set; }
 
     protected override async Task OnInitializedAsync()

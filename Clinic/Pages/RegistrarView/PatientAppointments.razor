@@ -1,0 +1,104 @@
+﻿@page "/PatientAppointments/{PatientId}"
+@using Clinic.Data.Enums
+@using Clinic.Data.Models
+@using Clinic.Data
+@using Clinic.Services
+
+@inject NavigationManager NavigationManager;
+@inject AppointmentService appointmentService;
+@inject PatientService patientService;
+@inject IToastService toastService
+
+
+<PageTitle>Appointments</PageTitle>
+
+<AuthorizeView Roles="Registrar">
+    <Authorized>
+        <section>
+            <h3 class="mb-3 fw-bold"><b>Appointments @patient?.FirstName @patient?.LastName</b></h3> <br />
+
+            @if (appointmentsList != null)
+            {
+                <TableTemplate Items="appointmentsList">
+                    <TableHeader>
+                        <th> Appointment's date </th>
+                        <th> Status </th>
+                        <th> Doctor's first name </th>
+                        <th> Last name </th>
+                        <th> Action </th>
+                    </TableHeader>
+                    <RowTemplate Context="appointment">
+                        <td> @appointment.RegisteredTo</td>
+                        <td> @appointment.Status.ToString().ToLower() </td>
+                        <td> @appointment.Doctor.FirstName </td>
+                        <td> @appointment.Doctor.LastName </td>
+                        <th>
+                            <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToEditAppointment(appointment.Id.ToString()))">Edit </a>
+                            <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => NavigateToCancelAppointment(appointment.Id.ToString()))">| Cancel</a>
+                        </th>
+                    </RowTemplate>
+                </TableTemplate>
+            }
+            else
+            {
+                <h3 class="mb-3 fw-bold">There are no appointments in the base</h3> <br />
+            }
+            <br /><br />
+        </section>
+    </Authorized>
+    <NotAuthorized>
+        <section>
+            <h1>Access denied!</h1>
+        </section>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    [Parameter]
+    public string PatientId { get; set; } = String.Empty;
+    public string searchAppointment = String.Empty;
+    private List<Appointment>? appointmentsList;
+    Patient? patient;
+
+    protected override void OnInitialized()
+    {
+        Guid parsedId;
+        var validId = Guid.TryParse(PatientId, out parsedId);
+        if (validId)
+        {
+            var tempPatient = patientService.GetById(parsedId);
+            if (tempPatient is not null)
+            {
+                patient = tempPatient;
+            }
+        }
+        if (patient is not null)
+        {
+            appointmentsList = appointmentService.GetPatientAppointmetsWithStatus(patient, AppointmentStatus.BOOKED);
+        }
+        appointmentsList = appointmentsList?.OrderBy(x => x.RegisteredTo).ToList();
+    }
+
+    public void NavigateToEditAppointment(string Id)
+    {
+        NavigationManager.NavigateTo($"RegistrarEditAppointment/{Id}");
+    }
+
+    public void NavigateToCancelAppointment(string Id)
+    {
+        Appointment? calAppointment;
+        Guid parsedId;
+        var validId = Guid.TryParse(Id, out parsedId);
+        if (validId)
+        {
+            var tempCalAppointment = appointmentService.GetById(parsedId);
+            if (tempCalAppointment is not null)
+            {
+                calAppointment = tempCalAppointment;
+                calAppointment.Status = AppointmentStatus.CANCELLED;
+                appointmentService.Update(calAppointment);
+                toastService.ShowSuccess($"Appointment cancelled.", "Well done!");
+            }
+        }
+    }
+}

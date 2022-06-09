@@ -11,83 +11,94 @@
 
 <AuthorizeView Context="another" Roles="Administrator">
     <Authorized>
-        <form method="post">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="text-center" style="margin-top:8px"><b>Create new user</b></h2>
+        <section>
+            <form method="post">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="text-center" style="margin-top:8px"><b>Create new user</b></h2>
+                    </div>
                 </div>
-            </div>
-            <div class="card-body">
-                <EditForm EditContext="doctorContext">
-                    <DataAnnotationsValidator />
-                    <div class="form-group mx-sm-3 mb-2">
-                        <label class="col-form-label" for="first-name">First name</label>
-                        <InputText class="form-control" id="first-name" @bind-Value="Doctor.FirstName" />
-                        <ValidationMessage For="() => Doctor.FirstName" />
-                    </div>
-                    <div class="form-group mx-sm-3 mb-2">
-                        <label class="col-form-label" for="second-name">Last name</label>
-                        <InputText class="form-control" id="last-name" @bind-Value="Doctor.LastName" />
-                        <ValidationMessage For="() => Doctor.LastName" />
-                    </div>
-                </EditForm>
-                <EditForm EditContext="emailContext">
-                    <DataAnnotationsValidator />
-                    <div class="form-group mx-sm-3 mb-2">
-                        <label class="col-form-label" for="email">Email and user name</label>
-                        <InputText class="form-control" id="new-email" @bind-Value="User.Email" />
-                        <ValidationMessage For="() => User.Email" />
-                    </div>
-                </EditForm>
-                <EditForm EditContext="passContext">
-                    <DataAnnotationsValidator />
-                    <div class="form-group mx-sm-3 mb-2">
-                        <label class="col-form-label" for="psswd">Password</label>
-                        <InputText class="form-control" id="psswd" @bind-Value="pass.Password" />
-                        <ValidationMessage For="() => pass.Password" />
-                    </div>
-                    <div class="form-group mx-sm-3 mb-2">
-                        <label class="col-form-label" for="psswd">Permission number</label>
-                        <small class="text-muted">[only for Doctors]</small>
-                        <InputNumber class="form-control" style="margin-bottom: 15px" id="permnumb" @bind-Value="Doctor.PermissionNumber" />
-                        <ValidationMessage For="() => Doctor.PermissionNumber" />
-                    </div>
-                    <div>
-                        <h4 class="modal-header" style="margin-top: 10px">Select role for new user <b></b></h4>
-                    </div>
-                    <InputRadioGroup @bind-Value="selectedRole">
-                        @foreach (var role in RolesWithSelection)
-                        {
-                            <div class="form-check"><InputRadio Value="role.Role.Name" class="form-check-input" /><span style="padding-left: 5px">@role.Role.Name</span></div>
-                        }
-                    </InputRadioGroup>
-                </EditForm>
-                <button @onclick="async () => await CreateNewUser()" disabled="@(!doctorContext.Validate() || !emailContext.Validate() || !passContext.Validate() || !emailContext.IsModified() || selectedRole.Equals(""))" type="button" style="margin-top: 20px" class="btn btn-lg btn-danger">Add new user to database</button>
-            </div>
-        </form>
+                <div class="card-body">
+                    <EditForm EditContext="doctorContext">
+                        <DataAnnotationsValidator />
+                        <div class="form-group mx-sm-3 mb-2">
+                            <label class="col-form-label" for="first-name">First name</label>
+                            <InputText class="form-control" id="first-name" @bind-Value="Doctor.FirstName" />
+                            <ValidationMessage For="() => Doctor.FirstName" />
+                        </div>
+                        <div class="form-group mx-sm-3 mb-2">
+                            <label class="col-form-label" for="second-name">Last name</label>
+                            <InputText class="form-control" id="last-name" @bind-Value="Doctor.LastName" />
+                            <ValidationMessage For="() => Doctor.LastName" />
+                        </div>
+                    </EditForm>
+                    <EditForm EditContext="emailContext">
+                        <DataAnnotationsValidator />
+                        <div class="form-group mx-sm-3 mb-2">
+                            <label class="col-form-label" for="email">Email and user name</label>
+                            <InputText class="form-control" id="new-email" @bind-Value="User.Email" />
+                            <ValidationMessage For="() => User.Email" />
+                        </div>
+                    </EditForm>
+                    <EditForm EditContext="passContext">
+                        <DataAnnotationsValidator />
+                        <div class="form-group mx-sm-3 mb-2">
+                            <label class="col-form-label" for="psswd">Password</label>
+                            <InputText class="form-control" id="psswd" @bind-Value="pass.Password" />
+                            <ValidationMessage For="() => pass.Password" />
+                        </div>
+                        <div class="form-group mx-sm-3 mb-2">
+                            <label class="col-form-label" for="psswd">Permission number</label>
+                            <small class="text-muted">[only for Doctors]</small>
+                            <InputNumber class="form-control" style="margin-bottom: 15px" id="permnumb" @bind-Value="Doctor.PermissionNumber" />
+                            <ValidationMessage For="() => Doctor.PermissionNumber" />
+                        </div>
+                        <div>
+                            <h4 class="modal-header" style="margin-top: 10px">Select role for new user <b></b></h4>
+                        </div>
+                        <InputRadioGroup @bind-Value="selectedRole">
+                            @if (RolesWithSelection is not null)
+                            {
+                                @foreach (var role in RolesWithSelection)
+                                {
+                                    <div class="form-check"><InputRadio Value="role?.Role?.Name" class="form-check-input" /><span style="padding-left: 5px">@role?.Role?.Name</span></div>
+                                }
+                            }
+                        </InputRadioGroup>
+                    </EditForm>
+                    @if (doctorContext is not null && emailContext is not null && passContext is not null)
+                    {
+                        <button @onclick="async () => await CreateNewUser()" disabled="@(!doctorContext.Validate() || !emailContext.Validate() || !passContext.Validate() || !emailContext.IsModified() || selectedRole.Equals(""))" type="button" style="margin-top: 20px" class="btn btn-lg btn-danger">Add new user to database</button>
+                    }
+                </div>
+            </form>
+        </section>
     </Authorized>
     <NotAuthorized>
-        <h1>Access denied!</h1>
+        <section>
+            <h1>Access denied!</h1>
+        </section>
+
     </NotAuthorized>
 </AuthorizeView>
 
 @code
 {
     private ApplicationUser User { get; set; } = new();
-    private List<IdentityRole> AllRoles { get; set; }
-    private List<AllRolesView> RolesWithSelection { get; set; }
+    private List<IdentityRole>? AllRoles { get; set; }
+    private List<AllRolesView>? RolesWithSelection { get; set; }
     private string selectedRole { get; set; } = "";
     private bool WasUserAddedToDatabase { get; set; }
 
-    EditContext doctorContext;
-    EditContext emailContext;
-    EditContext passContext;
+    EditContext? doctorContext;
+    EditContext? emailContext;
+    EditContext? passContext;
     Doctor Doctor = new();
     Pass pass = new();
 
     private class AllRolesView
     {
-        public IdentityRole Role { get; set; }
+        public IdentityRole? Role { get; set; }
         public bool IsSelected { get; set; }
     }
 
@@ -98,10 +109,10 @@
         [DataType(DataType.Password)]
         [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$^+=!*()@%&]).{6,}$", ErrorMessage = "Password must have at least one non alphanumeric character, at least one digit ('0'-'9') and at least one uppercase ('A'-'Z').")]
         [Display(Name = "Password")]
-        public string Password { get; set; }
+        public string Password { get; set; } = String.Empty;
     }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         AllRoles = userService.GetAllRoles();
         RolesWithSelection = new List<AllRolesView>();

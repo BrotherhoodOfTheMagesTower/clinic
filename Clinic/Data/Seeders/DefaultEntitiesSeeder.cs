@@ -18,7 +18,7 @@ namespace Clinic.Data
             //Seed 3 Doctors
             if (!context!.Doctors.Any() || context!.Doctors.Count() < 3)
             {
-                if(context!.Users.FirstOrDefault(x => x.Email == "doctor@1.com") == null)
+                if (context!.Users.FirstOrDefault(x => x.Email == "doctor@1.com") == null)
                 {
                     var doctor = new Doctor
                     {
@@ -250,7 +250,7 @@ namespace Clinic.Data
                         BirthDate = new DateTime(1999, 12, 23),
                         PhoneNumber = "625976788",
                         Gender = Enums.Gender.FEMALE,
-                        Appointments = null,
+                        Appointments = new List<Appointment>(),
                         Address = null
                     };
 
@@ -282,7 +282,7 @@ namespace Clinic.Data
                         BirthDate = new DateTime(1996, 6, 10),
                         PhoneNumber = "538125238",
                         Gender = Enums.Gender.FEMALE,
-                        Appointments = null,
+                        Appointments = new List<Appointment>(),
                         Address = null
                     };
 
@@ -314,7 +314,7 @@ namespace Clinic.Data
                         BirthDate = new DateTime(2002, 3, 27),
                         PhoneNumber = "786578354",
                         Gender = Enums.Gender.MALE,
-                        Appointments = null,
+                        Appointments = new List<Appointment>(),
                         Address = null
                     };
 
@@ -323,8 +323,8 @@ namespace Clinic.Data
                 }
             }
 
-            //Seed 4 appointments (and 4 examinations for one specific appointment - 2 Lab (Blood & COVID), 2 Physical (Ear & Throat))
-            if (!context!.Appointments.Any() || context.Appointments.Count() < 4)
+            //Seed 31 appointments
+            if (!context!.Appointments.Any() || context.Appointments.Count() < 31)
             {
                 var doctorService = new DoctorService(context);
                 var registrarService = new RegistrarService(context);
@@ -334,7 +334,7 @@ namespace Clinic.Data
                 var labManagerService = new LabManagerService(context);
 
                 //for Patrycja Konicz, finished and without examinations
-                if (!context.Appointments.Any(x=>x.Id == Guid.Parse("a9d973ac-6683-4c61-bded-410f3841cc1b")))
+                if (!context.Appointments.Any(x => x.Id == Guid.Parse("a9d973ac-6683-4c61-bded-410f3841cc1b")))
                 {
                     var doc = doctorService.GetAllDoctors().ElementAt(0);
                     var pat = patientService.GetById(Guid.Parse("ba6c78a4-9cff-4bb1-acbd-f4c23a063616"))!;
@@ -355,20 +355,43 @@ namespace Clinic.Data
                     };
                     context.Appointments.Add(appointment);
                     context.SaveChanges();
+                }
 
-                    if(doc.Appointments is null)
-                    {
-                        doc.Appointments = new List<Appointment>() { appointment };
-                    } else doc.Appointments.Add(appointment);
+                //for Patrycja Konicz - 20 appointments for 2022-6-15 from 11:00 to 16:00 (each 15 minutes)
+                if (context.Patients.Where(x => x.Id == Guid.Parse("ba6c78a4-9cff-4bb1-acbd-f4c23a063616")).First().Appointments!.Count < 20)
+                {
+                    var doc = doctorService.GetAllDoctors().ElementAt(0);
+                    var pat = patientService.GetById(Guid.Parse("ba6c78a4-9cff-4bb1-acbd-f4c23a063616"))!;
+                    var reg = registrarService.GetAllRegistrars().ElementAt(0);
+                    var apps = new List<Appointment>();
 
-                    if (pat.Appointments is null)
-                    {
-                        pat.Appointments = new List<Appointment>() { appointment };
-                    }
-                    else pat.Appointments.Add(appointment);
+                    apps.Add(CreateAppointment(11, 00, 11, 15, doc, pat, reg));
+                    apps.Add(CreateAppointment(11, 15, 11, 30, doc, pat, reg));
+                    apps.Add(CreateAppointment(11, 30, 11, 45, doc, pat, reg));
+                    apps.Add(CreateAppointment(11, 45, 12, 00, doc, pat, reg));
 
-                    doctorService.Update(doc);
-                    patientService.Update(pat);
+                    apps.Add(CreateAppointment(12, 00, 12, 15, doc, pat, reg));
+                    apps.Add(CreateAppointment(12, 15, 12, 30, doc, pat, reg));
+                    apps.Add(CreateAppointment(12, 30, 12, 45, doc, pat, reg));
+                    apps.Add(CreateAppointment(12, 45, 13, 00, doc, pat, reg));
+                    
+                    apps.Add(CreateAppointment(13, 00, 13, 15, doc, pat, reg));
+                    apps.Add(CreateAppointment(13, 15, 13, 30, doc, pat, reg));
+                    apps.Add(CreateAppointment(13, 30, 13, 45, doc, pat, reg));
+                    apps.Add(CreateAppointment(13, 45, 14, 00, doc, pat, reg));
+                    
+                    apps.Add(CreateAppointment(14, 00, 14, 15, doc, pat, reg));
+                    apps.Add(CreateAppointment(14, 15, 14, 30, doc, pat, reg));
+                    apps.Add(CreateAppointment(14, 30, 14, 45, doc, pat, reg));
+                    apps.Add(CreateAppointment(14, 45, 15, 00, doc, pat, reg));
+                    
+                    apps.Add(CreateAppointment(15, 00, 15, 15, doc, pat, reg));
+                    apps.Add(CreateAppointment(15, 15, 15, 30, doc, pat, reg));
+                    apps.Add(CreateAppointment(15, 30, 15, 45, doc, pat, reg));
+                    apps.Add(CreateAppointment(15, 45, 16, 00, doc, pat, reg));
+
+                    context.Appointments.AddRange(apps);
+                    context.SaveChanges();
                 }
 
                 //for Patryk Niedopieralski - finished with 4 examinations
@@ -448,107 +471,28 @@ namespace Clinic.Data
 
                     context.Appointments.Add(appointment);
                     context.SaveChanges();
-
-                    if (doc.Appointments is null)
-                    {
-                        doc.Appointments = new List<Appointment>() { appointment };
-                    } else doc.Appointments.Add(appointment);
-
-                    if (pat.Appointments is null)
-                    {
-                        pat.Appointments = new List<Appointment>() { appointment };
-                    } else pat.Appointments.Add(appointment);
-
-                    if(tech1.LaboratoryExaminations is null)
-                    {
-                        tech1.LaboratoryExaminations = new List<LaboratoryExamination>() { labExam_1 };
-                    } else tech1.LaboratoryExaminations.Add(labExam_1);
-
-                    if (tech2.LaboratoryExaminations is null)
-                    {
-                        tech2.LaboratoryExaminations = new List<LaboratoryExamination>() { labExam_2 };
-                    } else tech2.LaboratoryExaminations.Add(labExam_2);
-
-                    if (man1.LaboratoryExaminations is null)
-                    {
-                        man1.LaboratoryExaminations = new List<LaboratoryExamination>() { labExam_1 };
-                    } else man1.LaboratoryExaminations.Add(labExam_1);
-
-                    if (man2.LaboratoryExaminations is null)
-                    {
-                        man2.LaboratoryExaminations = new List<LaboratoryExamination>() { labExam_2 };
-                    } else man2.LaboratoryExaminations.Add(labExam_2);
-
-                    if(labBlood!.LaboratoryExaminations is null)
-                    {
-                        labBlood.LaboratoryExaminations = new List<LaboratoryExamination>() { labExam_1 };
-                    } else labBlood.LaboratoryExaminations.Add(labExam_1);
-
-                    if (labCovid!.LaboratoryExaminations is null)
-                    {
-                        labCovid.LaboratoryExaminations = new List<LaboratoryExamination>() { labExam_2 };
-                    } else labCovid.LaboratoryExaminations.Add(labExam_2);
-
-                    if (phyEar!.PhysicalExaminations is null)
-                    {
-                        phyEar.PhysicalExaminations = new List<PhysicalExamination>() { phyExam_1 };
-                    }
-                    else phyEar.PhysicalExaminations.Add(phyExam_1);
-
-                    if (phyThroat!.PhysicalExaminations is null)
-                    {
-                        phyThroat.PhysicalExaminations = new List<PhysicalExamination>() { phyExam_2 };
-                    }
-                    else phyThroat.PhysicalExaminations.Add(phyExam_2);
-
-                    doctorService.Update(doc);
-                    patientService.Update(pat);
-                    labTechnicianService.Update(tech1);
-                    labTechnicianService.Update(tech2);
-                    labManagerService.Update(man1);
-                    labManagerService.Update(man2);
-                    glossaryService.Update(labBlood);
-                    glossaryService.Update(labCovid);
-                    glossaryService.Update(phyEar);
-                    glossaryService.Update(phyThroat);
-
                 }
 
-                //for Patryk Niedopieralski - booked without examinations
-                if (!context.Appointments.Any(x => x.Id == Guid.Parse("53d81e19-e81d-4461-9544-ae47d1579f12")))
+                //for Patryk Niedopieralski - 8 appointments for 2022-6-15 from 8:00 to 9:00 & from 10:00 to 11:00 (each 15 minutes)
+                if (context.Patients.Where(x => x.Id == Guid.Parse("54319b96-4f10-4a47-a880-d85ebe60ac70")).First().Appointments!.Count < 8)
                 {
                     var doc = doctorService.GetAllDoctors().ElementAt(2);
                     var pat = patientService.GetById(Guid.Parse("54319b96-4f10-4a47-a880-d85ebe60ac70"))!;
+                    var reg = registrarService.GetAllRegistrars().ElementAt(0);
+                    var apps = new List<Appointment>();
 
-                    var appointment = new Appointment
-                    {
-                        Id = Guid.Parse("53d81e19-e81d-4461-9544-ae47d1579f12"),
-                        Description = null,
-                        Diagnosis = null,
-                        Status = AppointmentStatus.BOOKED,
-                        RegisteredAt = new DateTime(2022, 3, 16, 7, 40, 12),
-                        RegisteredTo = new DateTime(2023, 11, 19, 12, 00, 00),
-                        Doctor = doc,
-                        Registrar = registrarService.GetAllRegistrars().ElementAt(0),
-                        Patient = pat,
-                        LaboratoryExaminations = null,
-                        PhysicalExaminations = null
-                    };
-                    context.Appointments.Add(appointment);
+                    apps.Add(CreateAppointment(8, 00, 8, 15, doc, pat, reg));
+                    apps.Add(CreateAppointment(8, 15, 8, 30, doc, pat, reg));
+                    apps.Add(CreateAppointment(8, 30, 8, 45, doc, pat, reg));
+                    apps.Add(CreateAppointment(8, 45, 9, 00, doc, pat, reg));
+
+                    apps.Add(CreateAppointment(10, 00, 10, 15, doc, pat, reg));
+                    apps.Add(CreateAppointment(10, 15, 10, 30, doc, pat, reg));
+                    apps.Add(CreateAppointment(10, 30, 10, 45, doc, pat, reg));
+                    apps.Add(CreateAppointment(10, 45, 11, 00, doc, pat, reg));
+                    
+                    context.Appointments.AddRange(apps);
                     context.SaveChanges();
-
-                    if (doc.Appointments is null)
-                    {
-                        doc.Appointments = new List<Appointment>() { appointment };
-                    } else doc.Appointments.Add(appointment);
-
-                    if (pat.Appointments is null)
-                    {
-                        pat.Appointments = new List<Appointment>() { appointment };
-                    } else pat.Appointments.Add(appointment);
-
-                    doctorService.Update(doc);
-                    patientService.Update(pat);
                 }
 
                 //for Patryk Niedopieralski - booked without examinations (but different Doctor)
@@ -573,23 +517,27 @@ namespace Clinic.Data
                     };
                     context.Appointments.Add(appointment);
                     context.SaveChanges();
-
-                    if (doc.Appointments is null)
-                    {
-                        doc.Appointments = new List<Appointment>() { appointment };
-                    }
-                    else doc.Appointments.Add(appointment);
-
-                    if (pat.Appointments is null)
-                    {
-                        pat.Appointments = new List<Appointment>() { appointment };
-                    }
-                    else pat.Appointments.Add(appointment);
-
-                    doctorService.Update(doc);
-                    patientService.Update(pat);
                 }
             }
         }
+        private static Appointment CreateAppointment(int fromHour, int fromMinute, int toHour, int toMinute, Doctor doc, Patient pat, Registrar reg)
+        {
+            return new Appointment
+            {
+                Id = Guid.NewGuid(),
+                Description = null,
+                Diagnosis = null,
+                Status = AppointmentStatus.BOOKED,
+                RegisteredAt = new DateTime(2022, 6, 15, fromHour, fromMinute, 0),
+                RegisteredTo = new DateTime(2023, 6, 15, toHour, toMinute, 0),
+                Doctor = doc,
+                Registrar = reg,
+                Patient = pat,
+                LaboratoryExaminations = null,
+                PhysicalExaminations = null
+            };
+        }
     }
 }
+
+
