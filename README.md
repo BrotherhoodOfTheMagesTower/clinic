@@ -9,6 +9,7 @@ System to manage medical clinic. It provides user with various functionality bas
  - [How to use](#how-to-use)
  - [Features for particular roles](#features-for-particular-roles)
  - [Technologies](#technologies)
+ - [Database diagram](#database-diagram)
  - [Status](#status)
  - [Links](#links)
 
@@ -89,9 +90,13 @@ To use the app perform following steps:
 - Azure
 - Visual Studio
 
+### Database diagram
+
+<img src="https://user-images.githubusercontent.com/56251920/172829122-80ee1acd-2039-4ef6-9e46-b839acec2c70.png" width="70%"/>
+
 ### Status
 
-Development in progress
+Finished
 
 ### Links
 
