@@ -87,13 +87,17 @@
     private void AddPatientToDatabase()
     {
         patient.Address = null;
-        wasPatientAddedToDatabase = patientService.Add(patient);
-        if (wasPatientAddedToDatabase)
-            toastService.ShowSuccess($"Patient {patient.FirstName} {patient.LastName} was added to the database.", "Well done!");
-        else
-            toastService.ShowError("Sorry!  A patient with this pesel number has already added..", "Oops!");
+        if (patient.BirthDate < DateTime.Now)
+        {
+            wasPatientAddedToDatabase = patientService.Add(patient);
+            if (wasPatientAddedToDatabase)
+                toastService.ShowSuccess($"Patient {patient.FirstName} {patient.LastName} was added to the database.", "Well done!");
+            else
+                toastService.ShowError("Sorry!  A patient with this pesel number has already added..", "Oops!");
 
-        NavigationManager.NavigateTo($"Patients");
+            NavigationManager.NavigateTo($"Patients");
+        }
+        else toastService.ShowError("Sorry!  The date of birth is incorrect ", "Oops!");
     }
 
     private void NavigateToAddAddress(string Id)
